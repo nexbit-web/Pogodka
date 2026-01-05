@@ -1070,20 +1070,25 @@ export default function Home() {
             </div>
           </div>
           <div className="">
-            <div className="flex bg-muted/50 rounded-xl overflow-x-auto scrollbar-none">
-            {data.forecast.forecastday[0].hour.slice(0, 24).map((hour) => (
-              <div key={hour.time} className="flex flex-col items-center p-1 w-19 hover:bg-muted/70 rounded-xl text-shadow">
-                <p>{new Date(hour.time).getHours()}</p>
-                <Image
-                  src={`https:${hour.condition.icon}`}
-                  alt="Weather icon"
-                  width={40}
-                  height={40}
-                />
-                <p>{Math.round(hour.temp_c)}°</p>
-              </div>
-            ))}
-             
+            <div className="flex justify-between bg-muted/50 rounded-xl overflow-x-auto no-scrollbar">
+              {data.forecast.forecastday[0].hour.slice(0, 24).map((hour) => (
+                <div
+                  key={hour.time}
+                  className="flex flex-col items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-3"
+                >
+                  <p className="text-sm font-medium">
+                    {new Date(hour.time).getHours()}:00
+                  </p>
+                  <img
+                    src={`https:${hour.condition.icon}`}
+                    alt="Weather icon"
+                    className="w-12 h-12"
+                  />
+                  <p className="text-lg font-semibold">
+                    {Math.round(hour.temp_c)}°
+                  </p>
+                </div>
+              ))}
             </div>
           </div>
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
