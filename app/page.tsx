@@ -1100,26 +1100,27 @@ export default function Home() {
     )
       .then((res) => res.json())
       .then((data) => {
-        setDays(data.forecast.forecastday); // 7-дневный прогноз
-        setCurrent(data.current); // текущая погода
+        setDays(data.forecast.forecastday); 
+        setCurrent(data.current); 
       })
       .catch(console.error);
   }, []);
 
-  // Прокрутка к текущему часу
-  useEffect(() => {
-    if (currentHourRef.current) {
-      currentHourRef.current.scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-      });
-    }
-  }, [days]);
+  // Прокрутка до поточного часу
+ useEffect(() => {
+  if (currentHourRef.current) {
+    currentHourRef.current.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",  
+      block: "nearest", 
+    });
+  }
+}, [days]);
 
   const now = new Date();
   const currentHour = now.getHours();
 
-  // Функция для дня недели
+  // Функція для дня неділі
   function getDayLabel(dateString: string) {
     const today = new Date();
     const date = new Date(dateString);
@@ -1168,33 +1169,34 @@ export default function Home() {
             </div>
           </div>
           <div className="">
-            <div className="flex justify-between bg-muted/50 rounded-4xl scroll-on-hover overflow-x-auto">
-              {days.length > 0 &&
-                days[0].hour.slice(0, 24).map((hour: any) => {
-                  const hourTime = new Date(hour.time).getHours();
-                  const isCurrent = hourTime === currentHour;
+         <div
+  className="flex justify-between bg-muted/50 rounded-4xl overflow-x-auto scroll-on-hover"
+  style={{ scrollBehavior: "smooth" }} // плавная прокрутка
+>
+  {days.length > 0 &&
+    days[0].hour.slice(0, 24).map((hour: any) => {
+      const hourTime = new Date(hour.time).getHours();
+      const isCurrent = hourTime === currentHour;
 
-                  return (
-                    <div
-                      key={hour.time}
-                      ref={isCurrent ? currentHourRef : null}
-                      className={`flex flex-col items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-3 ${
-                        isCurrent ? "bg-[color:var(--primary)] text-white" : ""
-                      }`}
-                    >
-                      <p className="text-sm font-medium">{hourTime}:00</p>
-                      <img
-                        src={`https:${hour.condition.icon}`}
-                        alt="Weather icon"
-                        className="w-12 h-12"
-                      />
-                      <p className="text-lg font-semibold">
-                        {Math.round(hour.temp_c)}°
-                      </p>
-                    </div>
-                  );
-                })}
-            </div>
+      return (
+        <div
+          key={hour.time}
+          ref={isCurrent ? currentHourRef : null}
+          className={`flex flex-col items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-3 ${
+            isCurrent ? "bg-[color:var(--primary)] text-white" : ""
+          }`}
+        >
+          <p className="text-sm font-medium">{hourTime}:00</p>
+          <img
+            src={`https:${hour.condition.icon}`}
+            alt="Weather icon"
+            className="w-12 h-12"
+          />
+          <p className="text-lg font-semibold">{Math.round(hour.temp_c)}°</p>
+        </div>
+      );
+    })}
+</div>
           </div>
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             <div className="bg-muted/50 aspect-video rounded-4xl">
