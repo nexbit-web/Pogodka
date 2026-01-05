@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <>
       <Container>
-        <div className="flex flex-1 flex-col gap-4 p-4 ">
+        <div className="flex flex-1 flex-col gap-4 p-0 sm:p-4 w-full">
           <div className="flex flex-col items-center">
             <h1 className="text-3xl font-bold text-shadow">Роздільна</h1>
             <h2 className="text-7xl">14°</h2>
