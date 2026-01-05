@@ -22,7 +22,7 @@ export const Header: React.FC<Props> = ({ className }) => {
 >
   <SidebarTrigger className="-ml-1 cursor-pointer" />
 
-  <div className="flex-1 flex justify-center px-4">
+  <div className="flex-1 flex justify-center px-1.5">
     <Input
       placeholder="Пошук..."
       className="
