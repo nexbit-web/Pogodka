@@ -1070,7 +1070,7 @@ export default function Home() {
             </div>
           </div>
           <div className="">
-            <div className="flex justify-between bg-muted/50 rounded-xl overflow-x-auto no-scrollbar">
+            <div className="flex justify-between bg-muted/50 rounded-xl scroll-on-hover">
               {data.forecast.forecastday[0].hour.slice(0, 24).map((hour) => (
                 <div
                   key={hour.time}
