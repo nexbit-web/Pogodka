@@ -1,0 +1,17 @@
+// datasource db {
+//   provider  = "postgresql"
+//   url  	    = env("DATABASE_URL")
+// }
+
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// model City {
+//   id        Int     @id @default(autoincrement())
+//   name      String
+//   region    String?
+//   country   String?
+//   latitude  Float?
+//   longitude Float?
+// }
