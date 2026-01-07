@@ -1,17 +1,24 @@
-// datasource db {
-//   provider  = "postgresql"
-//   url  	    = env("DATABASE_URL")
-// }
+generator client {
+  provider = "prisma-client"
+}
 
-// generator client {
-//   provider = "prisma-client-js"
-// }
+datasource db {
+  provider = "postgresql"
+}
 
-// model City {
-//   id        Int     @id @default(autoincrement())
-//   name      String
-//   region    String?
-//   country   String?
-//   latitude  Float?
-//   longitude Float?
-// }
+model City {
+  id        Int     @id @default(autoincrement())
+  nameUa    String
+  nameRu    String
+  nameEn    String
+  region    String
+  countryUa String
+  countryEn String
+  latitude  Float
+  longitude Float
+
+  @@unique([nameEn])
+  @@index([nameUa])
+  @@index([nameRu])
+  @@index([region])
+}

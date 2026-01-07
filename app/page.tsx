@@ -1093,6 +1093,7 @@ export default function Home() {
   const [days, setDays] = useState<Day[]>([]);
   const [current, setCurrent] = useState<CurrentWeather | null>(null);
   const currentHourRef = useRef<HTMLDivElement>(null);
+  const [location, setLocation] = useState<{ name: string } | null>(null);
 
   useEffect(() => {
     fetch(
@@ -1100,22 +1101,23 @@ export default function Home() {
     )
       .then((res) => res.json())
       .then((data) => {
-        setDays(data.forecast.forecastday); 
-        setCurrent(data.current); 
+        setDays(data.forecast.forecastday); // прогноз на 7 днів
+        setCurrent(data.current); // поточна погода
+        setLocation(data.location); // назва міста
       })
       .catch(console.error);
   }, []);
 
   // Прокрутка до поточного часу
- useEffect(() => {
-  if (currentHourRef.current) {
-    currentHourRef.current.scrollIntoView({
-      behavior: "smooth",
-      inline: "center",  
-      block: "nearest", 
-    });
-  }
-}, [days]);
+  useEffect(() => {
+    if (currentHourRef.current) {
+      currentHourRef.current.scrollIntoView({
+        behavior: "smooth",
+        inline: "center",
+        block: "nearest",
+      });
+    }
+  }, [days]);
 
   const now = new Date();
   const currentHour = now.getHours();
@@ -1139,7 +1141,9 @@ export default function Home() {
       <Container>
         <div className="flex flex-1 flex-col gap-6 p-0 sm:p-4 w-full">
           <div className="flex mt-9 mb-9 flex-col items-center">
-            <h1 className="text-3xl font-bold text-shadow">Роздільна</h1>
+            <h1 className="text-3xl font-bold text-shadow">
+              {location ? location.name : "--"}
+            </h1>
 
             {/* Поточна температура */}
             <h2 className="text-7xl">
@@ -1169,34 +1173,36 @@ export default function Home() {
             </div>
           </div>
           <div className="">
-         <div
-  className="flex justify-between bg-muted/50 rounded-4xl overflow-x-auto scroll-on-hover"
-  style={{ scrollBehavior: "smooth" }} // плавная прокрутка
->
-  {days.length > 0 &&
-    days[0].hour.slice(0, 24).map((hour: any) => {
-      const hourTime = new Date(hour.time).getHours();
-      const isCurrent = hourTime === currentHour;
+            <div
+              className="flex justify-between bg-muted/50 rounded-4xl overflow-x-auto scroll-on-hover"
+              style={{ scrollBehavior: "smooth" }} // плавная прокрутка
+            >
+              {days.length > 0 &&
+                days[0].hour.slice(0, 24).map((hour: any) => {
+                  const hourTime = new Date(hour.time).getHours();
+                  const isCurrent = hourTime === currentHour;
 
-      return (
-        <div
-          key={hour.time}
-          ref={isCurrent ? currentHourRef : null}
-          className={`flex flex-col items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-3 ${
-            isCurrent ? "bg-[color:var(--primary)] text-white" : ""
-          }`}
-        >
-          <p className="text-sm font-medium">{hourTime}:00</p>
-          <img
-            src={`https:${hour.condition.icon}`}
-            alt="Weather icon"
-            className="w-12 h-12"
-          />
-          <p className="text-lg font-semibold">{Math.round(hour.temp_c)}°</p>
-        </div>
-      );
-    })}
-</div>
+                  return (
+                    <div
+                      key={hour.time}
+                      ref={isCurrent ? currentHourRef : null}
+                      className={`flex flex-col items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-3 ${
+                        isCurrent ? "bg-[color:var(--primary)] text-white" : ""
+                      }`}
+                    >
+                      <p className="text-sm font-medium">{hourTime}:00</p>
+                      <img
+                        src={`https:${hour.condition.icon}`}
+                        alt="Weather icon"
+                        className="w-12 h-12"
+                      />
+                      <p className="text-lg font-semibold">
+                        {Math.round(Number(hour.temp_c))}°
+                      </p>
+                    </div>
+                  );
+                })}
+            </div>
           </div>
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             <div className="bg-muted/50 aspect-video rounded-4xl">
@@ -1229,4 +1235,3 @@ export default function Home() {
     </>
   );
 }
-

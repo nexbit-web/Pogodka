@@ -1,0 +1,4432 @@
+[
+  {
+    "nameUa": "Львів, Львівська обл.",
+    "nameRu": "Львов, Львовская обл.",
+    "nameEn": "Lviv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.841952,
+    "longitude": 24.031592
+  },
+  {
+    "nameUa": "Дрогобич, Дрогобицький р-н, Львівська обл.",
+    "nameRu": "Дрогобыч, Дрогобычский р-н, Львовская обл.",
+    "nameEn": "Drohobych",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.351853,
+    "longitude": 23.504969
+  },
+  {
+    "nameUa": "Червоноград, Червоноградський р-н, Львівська обл.",
+    "nameRu": "Червоноград, Червоноградский р-н, Львовская обл.",
+    "nameEn": "Chervonohrad",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.398567,
+    "longitude": 24.227611
+  },
+  {
+    "nameUa": "Стрий, Стрийський р-н, Львівська обл.",
+    "nameRu": "Стрый, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Stryi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.256944,
+    "longitude": 23.847222
+  },
+  {
+    "nameUa": "Самбір, Самбірський р-н, Львівська обл.",
+    "nameRu": "Самбор, Самборский р-н, Львовская обл.",
+    "nameEn": "Sambir",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.518611,
+    "longitude": 23.197222
+  },
+  {
+    "nameUa": "Борислав, Дрогобицький р-н, Львівська обл.",
+    "nameRu": "Борислав, Дрогобычский р-н, Львовская обл.",
+    "nameEn": "Boryslav",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.289722,
+    "longitude": 23.419444
+  },
+  {
+    "nameUa": "Трускавець, Дрогобицький р-н, Львівська обл.",
+    "nameRu": "Трускавец, Дрогобычский р-н, Львовская обл.",
+    "nameEn": "Truskavets",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.280556,
+    "longitude": 23.505
+  },
+  {
+    "nameUa": "Новий Розділ, Стрийський р-н, Львівська обл.",
+    "nameRu": "Новый Роздол, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Novyi Rozdil",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.466667,
+    "longitude": 24.016667
+  },
+  {
+    "nameUa": "Золочів, Золочівський р-н, Львівська обл.",
+    "nameRu": "Золочев, Золочевский р-н, Львовская обл.",
+    "nameEn": "Zolochiv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.806944,
+    "longitude": 24.897222
+  },
+  {
+    "nameUa": "Броди, Золочівський р-н, Львівська обл.",
+    "nameRu": "Броды, Золочевский р-н, Львовская обл.",
+    "nameEn": "Brody",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.083333,
+    "longitude": 25.15
+  },
+  {
+    "nameUa": "Миколаїв, Стрийський р-н, Львівська обл.",
+    "nameRu": "Николаев, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Mykolaiv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.525278,
+    "longitude": 23.985
+  },
+  {
+    "nameUa": "Радехів, Червоноградський р-н, Львівська обл.",
+    "nameRu": "Радехов, Червоноградский р-н, Львовская обл.",
+    "nameEn": "Radekhiv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.282222,
+    "longitude": 24.6375
+  },
+  {
+    "nameUa": "Жидачів, Стрийський р-н, Львівська обл.",
+    "nameRu": "Жидачов, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Zhydachiv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.383333,
+    "longitude": 24.133333
+  },
+  {
+    "nameUa": "Яворів, Яворівський р-н, Львівська обл.",
+    "nameRu": "Яворов, Яворовский р-н, Львовская обл.",
+    "nameEn": "Yavoriv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.946389,
+    "longitude": 23.393056
+  },
+  {
+    "nameUa": "Сокаль, Червоноградський р-н, Львівська обл.",
+    "nameRu": "Сокаль, Червоноградский р-н, Львовская обл.",
+    "nameEn": "Sokal",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.483333,
+    "longitude": 24.283333
+  },
+  {
+    "nameUa": "Перемишляни, Львівський р-н, Львівська обл.",
+    "nameRu": "Перемышляны, Львовский р-н, Львовская обл.",
+    "nameEn": "Peremyshliany",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.666667,
+    "longitude": 24.566667
+  },
+  {
+    "nameUa": "Городок, Львівський р-н, Львівська обл.",
+    "nameRu": "Городок, Львовский р-н, Львовская обл.",
+    "nameEn": "Horodok",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.783333,
+    "longitude": 23.65
+  },
+  {
+    "nameUa": "Кам'янка-Бузька, Львівський р-н, Львівська обл.",
+    "nameRu": "Каменка-Бугская, Львовский р-н, Львовская обл.",
+    "nameEn": "Kamianka-Buzka",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.1,
+    "longitude": 24.35
+  },
+  {
+    "nameUa": "Турка, Самбірський р-н, Львівська обл.",
+    "nameRu": "Турка, Самборский р-н, Львовская обл.",
+    "nameEn": "Turka",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.15,
+    "longitude": 23.033333
+  },
+  {
+    "nameUa": "Старий Самбір, Самбірський р-н, Львівська обл.",
+    "nameRu": "Старый Самбор, Самборский р-н, Львовская обл.",
+    "nameEn": "Staryi Sambir",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.433333,
+    "longitude": 23.0
+  },
+  {
+    "nameUa": "Рава-Руська, Львівський р-н, Львівська обл.",
+    "nameRu": "Рава-Русская, Львовский р-н, Львовская обл.",
+    "nameEn": "Rava-Ruska",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.233333,
+    "longitude": 23.633333
+  },
+  {
+    "nameUa": "Добромиль, Самбірський р-н, Львівська обл.",
+    "nameRu": "Добромиль, Самборский р-н, Львовская обл.",
+    "nameEn": "Dobromyl",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.566667,
+    "longitude": 22.783333
+  },
+  {
+    "nameUa": "Жовква, Львівський р-н, Львівська обл.",
+    "nameRu": "Жолква, Львовский р-н, Львовская обл.",
+    "nameEn": "Zhovkva",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.066667,
+    "longitude": 23.966667
+  },
+  {
+    "nameUa": "Мостиська, Яворівський р-н, Львівська обл.",
+    "nameRu": "Мостиска, Яворовский р-н, Львовская обл.",
+    "nameEn": "Mostyska",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8,
+    "longitude": 23.166667
+  },
+  {
+    "nameUa": "Великі Мости, Червоноградський р-н, Львівська обл.",
+    "nameRu": "Великие Мосты, Червоноградский р-н, Львовская обл.",
+    "nameEn": "Velyki Mosty",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.233333,
+    "longitude": 24.15
+  },
+  {
+    "nameUa": "Белз, Червоноградський р-н, Львівська обл.",
+    "nameRu": "Белз, Червоноградский р-н, Львовская обл.",
+    "nameEn": "Belz",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.383333,
+    "longitude": 24.016667
+  },
+  {
+    "nameUa": "Хирів, Самбірський р-н, Львівська обл.",
+    "nameRu": "Хыров, Самборский р-н, Львовская обл.",
+    "nameEn": "Khyriv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.533333,
+    "longitude": 22.85
+  },
+  {
+    "nameUa": "Комарно, Львівський р-н, Львівська обл.",
+    "nameRu": "Комарно, Львовский р-н, Львовская обл.",
+    "nameEn": "Komarno",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.633333,
+    "longitude": 23.7
+  },
+  {
+    "nameUa": "Рудки, Самбірський р-н, Львівська обл.",
+    "nameRu": "Рудки, Самборский р-н, Львовская обл.",
+    "nameEn": "Rudky",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.65,
+    "longitude": 23.483333
+  },
+  {
+    "nameUa": "Глиняни, Львівський р-н, Львівська обл.",
+    "nameRu": "Глиняны, Львовский р-н, Львовская обл.",
+    "nameEn": "Hlyniany",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.816667,
+    "longitude": 24.516667
+  },
+  {
+    "nameUa": "Дубляни, Львівський р-н, Львівська обл.",
+    "nameRu": "Дубляны, Львовский р-н, Львовская обл.",
+    "nameEn": "Dubliany",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.9,
+    "longitude": 24.083333
+  },
+  {
+    "nameUa": "Винники, Львівський р-н, Львівська обл.",
+    "nameRu": "Винники, Львовский р-н, Львовская обл.",
+    "nameEn": "Vynnyky",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.816667,
+    "longitude": 24.133333
+  },
+  {
+    "nameUa": "Моршин, Стрийський р-н, Львівська обл.",
+    "nameRu": "Моршин, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Morshyn",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.15,
+    "longitude": 23.866667
+  },
+  {
+    "nameUa": "Східниця, Дрогобицький р-н, Львівська обл.",
+    "nameRu": "Сходница, Дрогобычский р-н, Львовская обл.",
+    "nameEn": "Skhidnytsia",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.233333,
+    "longitude": 23.35
+  },
+  {
+    "nameUa": "Бібрка, Львівський р-н, Львівська обл.",
+    "nameRu": "Бобрка, Львовский р-н, Львовская обл.",
+    "nameEn": "Bibrka",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.633333,
+    "longitude": 24.3
+  },
+  {
+    "nameUa": "Новий Калинів, Самбірський р-н, Львівська обл.",
+    "nameRu": "Новый Калинов, Самборский р-н, Львовская обл.",
+    "nameEn": "Novyi Kalyniv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.55,
+    "longitude": 23.3
+  },
+  {
+    "nameUa": "Щирець, Львівський р-н, Львівська обл.",
+    "nameRu": "Щирец, Львовский р-н, Львовская обл.",
+    "nameEn": "Shchyrets",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.65,
+    "longitude": 23.85
+  },
+  {
+    "nameUa": "Підкамінь, Золочівський р-н, Львівська обл.",
+    "nameRu": "Подкамень, Золочевский р-н, Львовская обл.",
+    "nameEn": "Pidkamin",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.95,
+    "longitude": 25.3167
+  },
+  {
+    "nameUa": "Поморяни, Золочівський р-н, Львівська обл.",
+    "nameRu": "Поморяны, Золочевский р-н, Львовская обл.",
+    "nameEn": "Pomoriany",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.6333,
+    "longitude": 24.9333
+  },
+  {
+    "nameUa": "Олесько, Золочівський р-н, Львівська обл.",
+    "nameRu": "Олеско, Золочевский р-н, Львовская обл.",
+    "nameEn": "Olesko",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.9667,
+    "longitude": 24.9
+  },
+  {
+    "nameUa": "Куликів, Львівський р-н, Львівська обл.",
+    "nameRu": "Куликов, Львовский р-н, Львовская обл.",
+    "nameEn": "Kulykiv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.9833,
+    "longitude": 24.0833
+  },
+  {
+    "nameUa": "Краковець, Яворівський р-н, Львівська обл.",
+    "nameRu": "Краковец, Яворовский р-н, Львовская обл.",
+    "nameEn": "Krakovets",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.95,
+    "longitude": 23.1667
+  },
+  {
+    "nameUa": "Івано-Франкове, Яворівський р-н, Львівська обл.",
+    "nameRu": "Ивано-Франково, Яворовский р-н, Львовская обл.",
+    "nameEn": "Ivano-Frankove",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.9167,
+    "longitude": 23.7333
+  },
+  {
+    "nameUa": "Немирів, Яворівський р-н, Львівська обл.",
+    "nameRu": "Немиров, Яворовский р-н, Львовская обл.",
+    "nameEn": "Nemyrov",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8667,
+    "longitude": 23.45
+  },
+  {
+    "nameUa": "Судова Вишня, Яворівський р-н, Львівська обл.",
+    "nameRu": "Судовая Вишня, Яворовский р-н, Львовская обл.",
+    "nameEn": "Sudova Vyshnia",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8,
+    "longitude": 23.3833
+  },
+  {
+    "nameUa": "Магерів, Львівський р-н, Львівська обл.",
+    "nameRu": "Магеров, Львовский р-н, Львовская обл.",
+    "nameEn": "Maheriv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.0333,
+    "longitude": 23.7833
+  },
+  {
+    "nameUa": "Брюховичі, Львівський р-н, Львівська обл.",
+    "nameRu": "Брюховичи, Львовский р-н, Львовская обл.",
+    "nameEn": "Briukhovychi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.9,
+    "longitude": 23.95
+  },
+  {
+    "nameUa": "Рудне, Львівський р-н, Львівська обл.",
+    "nameRu": "Рудно, Львовский р-н, Львовская обл.",
+    "nameEn": "Rudne",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8333,
+    "longitude": 23.9
+  },
+  {
+    "nameUa": "Сокільники, Львівський р-н, Львівська обл.",
+    "nameRu": "Сокольники, Львовский р-н, Львовская обл.",
+    "nameEn": "Sokilnyky",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8,
+    "longitude": 23.9667
+  },
+  {
+    "nameUa": "Зимна Вода, Львівський р-н, Львівська обл.",
+    "nameRu": "Зимняя Вода, Львовский р-н, Львовская обл.",
+    "nameEn": "Zymna Voda",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8167,
+    "longitude": 23.9667
+  },
+  {
+    "nameUa": "Малехів, Львівський р-н, Львівська обл.",
+    "nameRu": "Малехов, Львовский р-н, Львовская обл.",
+    "nameEn": "Malekhiv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8833,
+    "longitude": 24.0667
+  },
+  {
+    "nameUa": "Славське, Стрийський р-н, Львівська обл.",
+    "nameRu": "Славское, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Slavske",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.85,
+    "longitude": 23.45
+  },
+  {
+    "nameUa": "Сколє, Стрийський р-н, Львівська обл.",
+    "nameRu": "Сколе, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Skole",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.0333,
+    "longitude": 23.5167
+  },
+  {
+    "nameUa": "Верхнє Синьовидне, Стрийський р-н, Львівська обл.",
+    "nameRu": "Верхнее Синеводное, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Verkhnie Synovydne",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.1,
+    "longitude": 23.6
+  },
+  {
+    "nameUa": "Тухля, Стрийський р-н, Львівська обл.",
+    "nameRu": "Тухля, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Tukhlia",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.9167,
+    "longitude": 23.4833
+  },
+  {
+    "nameUa": "Нижанковичі, Самбірський р-н, Львівська обл.",
+    "nameRu": "Нижанковичи, Самборский р-н, Львовская обл.",
+    "nameEn": "Nyzhankovychi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.6833,
+    "longitude": 22.8167
+  },
+  {
+    "nameUa": "Стрілки, Самбірський р-н, Львівська обл.",
+    "nameRu": "Стрелки, Самборский р-н, Львовская обл.",
+    "nameEn": "Strilky",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.3167,
+    "longitude": 23.0833
+  },
+  {
+    "nameUa": "Гніздичів, Стрийський р-н, Львівська обл.",
+    "nameRu": "Гнездичево, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Hnizdychiv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2833,
+    "longitude": 24.1
+  },
+  {
+    "nameUa": "Розвадів, Стрийський р-н, Львівська обл.",
+    "nameRu": "Розвадов, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Rozvadiv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.4667,
+    "longitude": 24.1167
+  },
+  {
+    "nameUa": "Меденичі, Дрогобицький р-н, Львівська обл.",
+    "nameRu": "Меденичи, Дрогобычский р-н, Львовская обл.",
+    "nameEn": "Medenychi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.4167,
+    "longitude": 23.75
+  },
+  {
+    "nameUa": "Підбуж, Дрогобицький р-н, Львівська обл.",
+    "nameRu": "Подбуж, Дрогобычский р-н, Львовская обл.",
+    "nameEn": "Pidbuzh",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.3167,
+    "longitude": 23.6667
+  },
+  {
+    "nameUa": "Стебник, Дрогобицький р-н, Львівська обл.",
+    "nameRu": "Стебник, Дрогобычский р-н, Львовская обл.",
+    "nameEn": "Stebnyk",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.3,
+    "longitude": 23.5667
+  },
+  {
+    "nameUa": "Стара Сіль, Самбірський р-н, Львівська обл.",
+    "nameRu": "Старая Соль, Самборский р-н, Львовская обл.",
+    "nameEn": "Stara Sil",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.45,
+    "longitude": 23.1667
+  },
+  {
+    "nameUa": "Ралівка, Самбірський р-н, Львівська обл.",
+    "nameRu": "Раловка, Самборский р-н, Львовская обл.",
+    "nameEn": "Ralivka",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.5833,
+    "longitude": 23.25
+  },
+  {
+    "nameUa": "Лука, Самбірський р-н, Львівська обл.",
+    "nameRu": "Лука, Самборский р-н, Львовская обл.",
+    "nameEn": "Luka",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.5,
+    "longitude": 23.1333
+  },
+  {
+    "nameUa": "Крукеничі, Яворівський р-н, Львівська обл.",
+    "nameRu": "Крукеничи, Яворовский р-н, Львовская обл.",
+    "nameEn": "Krukenychi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.9667,
+    "longitude": 23.3167
+  },
+  {
+    "nameUa": "Шкло, Яворівський р-н, Львівська обл.",
+    "nameRu": "Шкло, Яворовский р-н, Львовская обл.",
+    "nameEn": "Shklo",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.95,
+    "longitude": 23.5333
+  },
+  {
+    "nameUa": "Новий Яричів, Львівський р-н, Львівська обл.",
+    "nameRu": "Новый Ярычев, Львовский р-н, Львовская обл.",
+    "nameEn": "Novyi Yarychiv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.9167,
+    "longitude": 24.3
+  },
+  {
+    "nameUa": "Великий Любінь, Львівський р-н, Львівська обл.",
+    "nameRu": "Великий Любень, Львовский р-н, Львовская обл.",
+    "nameEn": "Velykyi Liubin",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.7333,
+    "longitude": 23.7333
+  },
+  {
+    "nameUa": "Ходорів, Стрийський р-н, Львівська обл.",
+    "nameRu": "Ходоров, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Khodoriv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.4,
+    "longitude": 24.3167
+  },
+  {
+    "nameUa": "Розділ, Стрийський р-н, Львівська обл.",
+    "nameRu": "Роздол, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Rozdil",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.4667,
+    "longitude": 24.0667
+  },
+  {
+    "nameUa": "Журавно, Стрийський р-н, Львівська обл.",
+    "nameRu": "Журавно, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Zhuravno",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2667,
+    "longitude": 24.2833
+  },
+  {
+    "nameUa": "Грабовець, Стрийський р-н, Львівська обл.",
+    "nameRu": "Грабовец, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Hrabovets",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2333,
+    "longitude": 23.8833
+  },
+  {
+    "nameUa": "Дуліби, Стрийський р-н, Львівська обл.",
+    "nameRu": "Дулибы, Стрыйский р-н, Львовская обл.",
+    "nameEn": "Duliby",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2333,
+    "longitude": 23.8167
+  },
+  {
+    "nameUa": "Добротвір, Червоноградський р-н, Львівська обл.",
+    "nameRu": "Добротвор, Червоноградский р-н, Львовская обл.",
+    "nameEn": "Dobrotvir",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.2167,
+    "longitude": 24.3833
+  },
+  {
+    "nameUa": "Гірник, Червоноградський р-н, Львівська обл.",
+    "nameRu": "Горняк, Червоноградский р-н, Львовская обл.",
+    "nameEn": "Hirnyk",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.4167,
+    "longitude": 24.2333
+  },
+  {
+    "nameUa": "Бориничі, Львівський р-н, Львівська обл.",
+    "nameRu": "Бориничи, Львовский р-н, Львовская обл.",
+    "nameEn": "Borynychi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.75,
+    "longitude": 24.2667
+  },
+  {
+    "nameUa": "Годовиця, Львівський р-н, Львівська обл.",
+    "nameRu": "Годовица, Львовский р-н, Львовская обл.",
+    "nameEn": "Hodovytsia",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.7833,
+    "longitude": 24.0833
+  },
+  {
+    "nameUa": "Пустомити, Львівський р-н, Львівська обл.",
+    "nameRu": "Пустомыты, Львовский р-н, Львовская обл.",
+    "nameEn": "Pustomyty",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.7167,
+    "longitude": 24.1333
+  },
+  {
+    "nameUa": "Оброшине, Львівський р-н, Львівська обл.",
+    "nameRu": "Оброшино, Львовский р-н, Львовская обл.",
+    "nameEn": "Obroshyne",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.7833,
+    "longitude": 23.95
+  },
+  {
+    "nameUa": "Зубра, Львівський р-н, Львівська обл.",
+    "nameRu": "Зубра, Львовский р-н, Львовская обл.",
+    "nameEn": "Zubra",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.7667,
+    "longitude": 24.0667
+  },
+  {
+    "nameUa": "Солонка, Львівський р-н, Львівська обл.",
+    "nameRu": "Солонка, Львовский р-н, Львовская обл.",
+    "nameEn": "Solonka",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.75,
+    "longitude": 24.0167
+  },
+  {
+    "nameUa": "Лисиничі, Львівський р-н, Львівська обл.",
+    "nameRu": "Лисиничи, Львовский р-н, Львовская обл.",
+    "nameEn": "Lysynychi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8,
+    "longitude": 24.1
+  },
+  {
+    "nameUa": "Підбірці, Львівський р-н, Львівська обл.",
+    "nameRu": "Подбирцы, Львовский р-н, Львовская обл.",
+    "nameEn": "Pidbirtsi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8167,
+    "longitude": 24.1167
+  },
+  {
+    "nameUa": "Муроване, Львівський р-н, Львівська обл.",
+    "nameRu": "Мурованное, Львовский р-н, Львовская обл.",
+    "nameEn": "Murovane",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.9,
+    "longitude": 24.1167
+  },
+  {
+    "nameUa": "Зашків, Львівський р-н, Львівська обл.",
+    "nameRu": "Зашков, Львовский р-н, Львовская обл.",
+    "nameEn": "Zashkiv",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.95,
+    "longitude": 23.9833
+  },
+  {
+    "nameUa": "Давидів, Львівський р-н, Львівська обл.",
+    "nameRu": "Давыдов, Львовский р-н, Львовская обл.",
+    "nameEn": "Davydov",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.7333,
+    "longitude": 24.1333
+  },
+  {
+    "nameUa": "Глинна, Львівський р-н, Львівська обл.",
+    "nameRu": "Глинна, Львовский р-н, Львовская обл.",
+    "nameEn": "Hlynna",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.7667,
+    "longitude": 24.1167
+  },
+  {
+    "nameUa": "Воютичі, Самбірський р-н, Львівська обл.",
+    "nameRu": "Воютичи, Самборский р-н, Львовская обл.",
+    "nameEn": "Voiutytsi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.5,
+    "longitude": 23.3167
+  },
+  {
+    "nameUa": "Бісковичі, Самбірський р-н, Львівська обл.",
+    "nameRu": "Бисковичи, Самборский р-н, Львовская обл.",
+    "nameEn": "Biskovychi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.5667,
+    "longitude": 23.1667
+  },
+  {
+    "nameUa": "Чайковичі, Самбірський р-н, Львівська обл.",
+    "nameRu": "Чайковичи, Самборский р-н, Львовская обл.",
+    "nameEn": "Chaikovychi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.55,
+    "longitude": 23.2
+  },
+  {
+    "nameUa": "Бабино, Самбірський р-н, Львівська обл.",
+    "nameRu": "Бабино, Самборский р-н, Львовская обл.",
+    "nameEn": "Babyno",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.4667,
+    "longitude": 23.25
+  },
+  {
+    "nameUa": "Кульчиці, Самбірський р-н, Львівська обл.",
+    "nameRu": "Кульчицы, Самборский р-н, Львовская обл.",
+    "nameEn": "Kulchytsi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.5167,
+    "longitude": 23.25
+  },
+  {
+    "nameUa": "Дубаневичі, Самбірський р-н, Львівська обл.",
+    "nameRu": "Дубаневичи, Самборский р-н, Львовская обл.",
+    "nameEn": "Dubanevychi",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.6,
+    "longitude": 23.2667
+  },
+  {
+    "nameUa": "Городківка, Самбірський р-н, Львівська обл.",
+    "nameRu": "Городковка, Самборский р-н, Львовская обл.",
+    "nameEn": "Horodkivka",
+    "region": "Львівська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.5667,
+    "longitude": 23.1833
+  },
+  {
+    "nameUa": "Вінниця, Вінницька обл.",
+    "nameRu": "Винница, Винницкая обл.",
+    "nameEn": "Vinnytsia",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2328,
+    "longitude": 28.4628
+  },
+  {
+    "nameUa": "Жмеринка, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Жмеринка, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Zhmerynka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.0369,
+    "longitude": 28.1092
+  },
+  {
+    "nameUa": "Козятин, Козятинський р-н, Вінницька обл.",
+    "nameRu": "Козятин, Козятинский р-н, Винницкая обл.",
+    "nameEn": "Koziatyn",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.9167,
+    "longitude": 28.8333
+  },
+  {
+    "nameUa": "Ладижин, Гайсинський р-н, Вінницька обл.",
+    "nameRu": "Ладыжин, Гайсинский р-н, Винницкая обл.",
+    "nameEn": "Ladyzhyn",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.6833,
+    "longitude": 29.25
+  },
+  {
+    "nameUa": "Могилів-Подільський, Могилів-Подільський р-н, Вінницька обл.",
+    "nameRu": "Могилёв-Подольский, Могилёв-Подольский р-н, Винницкая обл.",
+    "nameEn": "Mohyliv-Podilskyi",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.45,
+    "longitude": 27.8
+  },
+  {
+    "nameUa": "Хмільник, Хмільницький р-н, Вінницька обл.",
+    "nameRu": "Хмельник, Хмельницкий р-н, Винницкая обл.",
+    "nameEn": "Khmilnyk",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.55,
+    "longitude": 27.95
+  },
+  {
+    "nameUa": "Бар, Барський р-н, Вінницька обл.",
+    "nameRu": "Бар, Барский р-н, Винницкая обл.",
+    "nameEn": "Bar",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.0833,
+    "longitude": 27.6833
+  },
+  {
+    "nameUa": "Бершадь, Гайсинський р-н, Вінницька обл.",
+    "nameRu": "Бершадь, Гайсинский р-н, Винницкая обл.",
+    "nameEn": "Bershad",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3833,
+    "longitude": 29.5333
+  },
+  {
+    "nameUa": "Гайсин, Гайсинський р-н, Вінницька обл.",
+    "nameRu": "Гайсин, Гайсинский р-н, Винницкая обл.",
+    "nameEn": "Haisyn",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.8167,
+    "longitude": 29.3833
+  },
+  {
+    "nameUa": "Гнівань, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Гнивань, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Hnivan",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.0833,
+    "longitude": 28.35
+  },
+  {
+    "nameUa": "Іллінці, Іллінецький р-н, Вінницька обл.",
+    "nameRu": "Ильинцы, Ильинецкий р-н, Винницкая обл.",
+    "nameEn": "Illintsi",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.1,
+    "longitude": 29.2167
+  },
+  {
+    "nameUa": "Калинівка, Калинівський р-н, Вінницька обл.",
+    "nameRu": "Калиновка, Калиновский р-н, Винницкая обл.",
+    "nameEn": "Kalynivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.45,
+    "longitude": 28.45
+  },
+  {
+    "nameUa": "Липовець, Липовецький р-н, Вінницька обл.",
+    "nameRu": "Липовец, Липовецкий р-н, Винницкая обл.",
+    "nameEn": "Lypovets",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2167,
+    "longitude": 29.0167
+  },
+  {
+    "nameUa": "Немирів, Немирівський р-н, Вінницька обл.",
+    "nameRu": "Немиров, Немировский р-н, Винницкая обл.",
+    "nameEn": "Nemyriv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.9667,
+    "longitude": 28.85
+  },
+  {
+    "nameUa": "Погребище, Погребищенський р-н, Вінницька обл.",
+    "nameRu": "Погребище, Погребищенский р-н, Винницкая обл.",
+    "nameEn": "Pohrebyshche",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.4833,
+    "longitude": 29.2833
+  },
+  {
+    "nameUa": "Тульчин, Тульчинський р-н, Вінницька обл.",
+    "nameRu": "Тульчин, Тульчинский р-н, Винницкая обл.",
+    "nameEn": "Tulchyn",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.6833,
+    "longitude": 28.85
+  },
+  {
+    "nameUa": "Тиврів, Тиврівський р-н, Вінницька обл.",
+    "nameRu": "Тывров, Тывровский р-н, Винницкая обл.",
+    "nameEn": "Tyvriv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.0167,
+    "longitude": 28.5167
+  },
+  {
+    "nameUa": "Шаргород, Шаргородський р-н, Вінницька обл.",
+    "nameRu": "Шаргород, Шаргородский р-н, Винницкая обл.",
+    "nameEn": "Sharhorod",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.75,
+    "longitude": 28.0833
+  },
+  {
+    "nameUa": "Ямпіль, Ямпільський р-н, Вінницька обл.",
+    "nameRu": "Ямполь, Ямпольский р-н, Винницкая обл.",
+    "nameEn": "Yampil",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.25,
+    "longitude": 28.2833
+  },
+  {
+    "nameUa": "Вапнярка, Томашпільський р-н, Вінницька обл.",
+    "nameRu": "Вапнярка, Томашпольский р-н, Винницкая обл.",
+    "nameEn": "Vapniarka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.5333,
+    "longitude": 28.75
+  },
+  {
+    "nameUa": "Крижопіль, Крижопільський р-н, Вінницька обл.",
+    "nameRu": "Крыжополь, Крыжопольский р-н, Винницкая обл.",
+    "nameEn": "Kryzhopil",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3833,
+    "longitude": 28.8667
+  },
+  {
+    "nameUa": "Муровані Курилівці, Мурованокуриловецький р-н, Вінницька обл.",
+    "nameRu": "Мурованые Куриловцы, Мурованокуриловецкий р-н, Винницкая обл.",
+    "nameEn": "Murovani Kurylivtsi",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.7167,
+    "longitude": 27.6833
+  },
+  {
+    "nameUa": "Оратів, Оратівський р-н, Вінницька обл.",
+    "nameRu": "Оратов, Оратовский р-н, Винницкая обл.",
+    "nameEn": "Orativ",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.1833,
+    "longitude": 29.5333
+  },
+  {
+    "nameUa": "Піщанка, Піщанський р-н, Вінницька обл.",
+    "nameRu": "Песчанка, Песчанский р-н, Винницкая обл.",
+    "nameEn": "Pishchanka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 28.8833
+  },
+  {
+    "nameUa": "Теплик, Теплицький р-н, Вінницька обл.",
+    "nameRu": "Теплик, Теплицкий р-н, Винницкая обл.",
+    "nameEn": "Teplik",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.6667,
+    "longitude": 29.75
+  },
+  {
+    "nameUa": "Тростянець, Тростянецький р-н, Вінницька обл.",
+    "nameRu": "Тростянец, Тростянецкий р-н, Винницкая обл.",
+    "nameEn": "Trostianets",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.5167,
+    "longitude": 29.2333
+  },
+  {
+    "nameUa": "Чечельник, Чечельницький р-н, Вінницька обл.",
+    "nameRu": "Чечельник, Чечельницкий р-н, Винницкая обл.",
+    "nameEn": "Chechelnyk",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2167,
+    "longitude": 29.3667
+  },
+  {
+    "nameUa": "Браїлів, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Браилов, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Brailiv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.1167,
+    "longitude": 28.1667
+  },
+  {
+    "nameUa": "Вороновиця, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Вороновица, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Voronovytsia",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.1167,
+    "longitude": 28.6833
+  },
+  {
+    "nameUa": "Стрижавка, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Стрижавка, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Stryzhavka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.3,
+    "longitude": 28.4667
+  },
+  {
+    "nameUa": "Турбів, Липовецький р-н, Вінницька обл.",
+    "nameRu": "Турбов, Липовецкий р-н, Винницкая обл.",
+    "nameEn": "Turbiv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.35,
+    "longitude": 28.7333
+  },
+  {
+    "nameUa": "Десна, Калинівський р-н, Вінницька обл.",
+    "nameRu": "Десна, Калиновский р-н, Винницкая обл.",
+    "nameEn": "Desna",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2167,
+    "longitude": 28.5833
+  },
+  {
+    "nameUa": "Северинівка, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Севериновка, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Severynivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.0,
+    "longitude": 28.1
+  },
+  {
+    "nameUa": "Копайгород, Барський р-н, Вінницька обл.",
+    "nameRu": "Копайгород, Барский р-н, Винницкая обл.",
+    "nameEn": "Kopaigorod",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.8667,
+    "longitude": 27.8
+  },
+  {
+    "nameUa": "Станіславчик, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Станиславчик, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Stanislavchyk",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.9667,
+    "longitude": 28.1333
+  },
+  {
+    "nameUa": "Лука-Мелешківська, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Лука-Мелешковская, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Luka-Meleshkivska",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.1833,
+    "longitude": 28.4667
+  },
+  {
+    "nameUa": "Сутиски, Тиврівський р-н, Вінницька обл.",
+    "nameRu": "Сутиски, Тывровский р-н, Винницкая обл.",
+    "nameEn": "Sutysky",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.0667,
+    "longitude": 28.4667
+  },
+  {
+    "nameUa": "Якушинці, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Якушинцы, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Yakushyntsi",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2333,
+    "longitude": 28.3833
+  },
+  {
+    "nameUa": "Павлівка, Калинівський р-н, Вінницька обл.",
+    "nameRu": "Павловка, Калиновский р-н, Винницкая обл.",
+    "nameEn": "Pavlivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.4667,
+    "longitude": 28.5667
+  },
+  {
+    "nameUa": "Агрономічне, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Агрономичное, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Ahronomichne",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2333,
+    "longitude": 28.5667
+  },
+  {
+    "nameUa": "Широка Гребля, Хмільницький р-н, Вінницька обл.",
+    "nameRu": "Широкая Гребля, Хмельницкий р-н, Винницкая обл.",
+    "nameEn": "Shyroka Hreblya",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.1833,
+    "longitude": 28.5667
+  },
+  {
+    "nameUa": "Степанки, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Степанки, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Stepanky",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.15,
+    "longitude": 28.6167
+  },
+  {
+    "nameUa": "Михайлівка, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Михайловка, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Mykhailivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.1667,
+    "longitude": 28.6833
+  },
+  {
+    "nameUa": "Комсомольське, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Комсомольское, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Komsomolske",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.1833,
+    "longitude": 28.7
+  },
+  {
+    "nameUa": "Лукашівка, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Лукашевка, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Lukashivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2,
+    "longitude": 28.6833
+  },
+  {
+    "nameUa": "Голендри, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Голендры, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Holendry",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2167,
+    "longitude": 28.6667
+  },
+  {
+    "nameUa": "Степанівка, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Степановка, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Stepanivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2333,
+    "longitude": 28.7
+  },
+  {
+    "nameUa": "Ксаверівка, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Ксаверовка, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Ksaverivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.25,
+    "longitude": 28.6833
+  },
+  {
+    "nameUa": "Майдан, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Майдан, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Maidan",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2667,
+    "longitude": 28.7
+  },
+  {
+    "nameUa": "Переорки, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Переорки, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Pereorky",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2833,
+    "longitude": 28.6833
+  },
+  {
+    "nameUa": "Пирогів, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Пирогов, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Pyrogiv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.3167,
+    "longitude": 28.65
+  },
+  {
+    "nameUa": "Довгополівка, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Долгополовка, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Dovgopolivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.3333,
+    "longitude": 28.6333
+  },
+  {
+    "nameUa": "Сосонка, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Сосонка, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Sosonka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.35,
+    "longitude": 28.6167
+  },
+  {
+    "nameUa": "Хижинці, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Хижинцы, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Khyzhyntsi",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.3667,
+    "longitude": 28.6
+  },
+  {
+    "nameUa": "Сабарів, Вінницький р-н, Вінницька обл.",
+    "nameRu": "Сабаров, Винницкий р-н, Винницкая обл.",
+    "nameEn": "Sabariv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.4,
+    "longitude": 28.5667
+  },
+  {
+    "nameUa": "Людавка, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Людавка, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Liudavka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8,
+    "longitude": 28.1667
+  },
+  {
+    "nameUa": "Межирів, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Межиров, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Mezhyriv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8167,
+    "longitude": 28.15
+  },
+  {
+    "nameUa": "Носівка, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Носковка, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Nosivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8333,
+    "longitude": 28.1333
+  },
+  {
+    "nameUa": "Тартак, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Тартак, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Tartak",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.85,
+    "longitude": 28.1167
+  },
+  {
+    "nameUa": "Ружа, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Ружа, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Ruzha",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8667,
+    "longitude": 28.1
+  },
+  {
+    "nameUa": "Кацмазів, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Кацмазов, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Katsmaziv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.8833,
+    "longitude": 28.0833
+  },
+  {
+    "nameUa": "Петрівка, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Петровка, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Petrivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.9,
+    "longitude": 28.0667
+  },
+  {
+    "nameUa": "Слобода-Межирівська, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Слобода-Межировская, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Sloboda-Mezhyrivska",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.9167,
+    "longitude": 28.05
+  },
+  {
+    "nameUa": "Джурин, Шаргородський р-н, Вінницька обл.",
+    "nameRu": "Джурин, Шаргородский р-н, Винницкая обл.",
+    "nameEn": "Dzhuryn",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.8667,
+    "longitude": 28.2667
+  },
+  {
+    "nameUa": "Леляки, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Леляки, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Leliaky",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.9,
+    "longitude": 28.3
+  },
+  {
+    "nameUa": "Могилівка, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Могилёвка, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Mohylivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.95,
+    "longitude": 28.25
+  },
+  {
+    "nameUa": "Садове, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Садовое, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Sadove",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.9333,
+    "longitude": 28.2
+  },
+  {
+    "nameUa": "Рів, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Ров, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Riv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.8833,
+    "longitude": 28.15
+  },
+  {
+    "nameUa": "Слобода-Носівська, Жмеринський р-н, Вінницька обл.",
+    "nameRu": "Слобода-Носковская, Жмеринский р-н, Винницкая обл.",
+    "nameEn": "Sloboda-Nosivska",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.9167,
+    "longitude": 28.1
+  },
+  {
+    "nameUa": "Бабчинці, Могилів-Подільський р-н, Вінницька обл.",
+    "nameRu": "Бабчинцы, Могилёв-Подольский р-н, Винницкая обл.",
+    "nameEn": "Babchyntsi",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.55,
+    "longitude": 27.8667
+  },
+  {
+    "nameUa": "Вендичани, Могилів-Подільський р-н, Вінницька обл.",
+    "nameRu": "Вендичаны, Могилёв-Подольский р-н, Винницкая обл.",
+    "nameEn": "Vendychany",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.6167,
+    "longitude": 27.8
+  },
+  {
+    "nameUa": "Копай, Могилів-Подільський р-н, Вінницька обл.",
+    "nameRu": "Копай, Могилёв-Подольский р-н, Винницкая обл.",
+    "nameEn": "Kopai",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.5,
+    "longitude": 27.9333
+  },
+  {
+    "nameUa": "Серебрія, Могилів-Подільський р-н, Вінницька обл.",
+    "nameRu": "Серебрия, Могилёв-Подольский р-н, Винницкая обл.",
+    "nameEn": "Serebriya",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4333,
+    "longitude": 27.7333
+  },
+  {
+    "nameUa": "Юрківці, Могилів-Подільський р-н, Вінницька обл.",
+    "nameRu": "Юрковцы, Могилёв-Подольский р-н, Винницкая обл.",
+    "nameEn": "Yurkivtsi",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.6,
+    "longitude": 27.9167
+  },
+  {
+    "nameUa": "Озаринці, Могилів-Подільський р-н, Вінницька обл.",
+    "nameRu": "Озаринцы, Могилёв-Подольский р-н, Винницкая обл.",
+    "nameEn": "Ozaryntsi",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.6333,
+    "longitude": 27.75
+  },
+  {
+    "nameUa": "Слобода-Яришівська, Могилів-Подільський р-н, Вінницька обл.",
+    "nameRu": "Слобода-Ярышевская, Могилёв-Подольский р-н, Винницкая обл.",
+    "nameEn": "Sloboda-Yaryshivska",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.5333,
+    "longitude": 27.8
+  },
+  {
+    "nameUa": "Кукавка, Могилів-Подільський р-н, Вінницька обл.",
+    "nameRu": "Кукавка, Могилёв-Подольский р-н, Винницкая обл.",
+    "nameEn": "Kukavka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.5667,
+    "longitude": 27.7667
+  },
+  {
+    "nameUa": "Бронниця, Могилів-Подільський р-н, Вінницька обл.",
+    "nameRu": "Бронница, Могилёв-Подольский р-н, Винницкая обл.",
+    "nameEn": "Bronnytsia",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.45,
+    "longitude": 27.8833
+  },
+  {
+    "nameUa": "Яришів, Могилів-Подільський р-н, Вінницька обл.",
+    "nameRu": "Ярышев, Могилёв-Подольский р-н, Винницкая обл.",
+    "nameEn": "Yaryshiv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.5333,
+    "longitude": 27.8
+  },
+  {
+    "nameUa": "Борщів, Тульчинський р-н, Вінницька обл.",
+    "nameRu": "Борщёв, Тульчинский р-н, Винницкая обл.",
+    "nameEn": "Borshchiv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.6167,
+    "longitude": 28.6333
+  },
+  {
+    "nameUa": "Шпиків, Тульчинський р-н, Вінницька обл.",
+    "nameRu": "Шпиков, Тульчинский р-н, Винницкая обл.",
+    "nameEn": "Shpykiv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.7667,
+    "longitude": 28.5667
+  },
+  {
+    "nameUa": "Кирнасівка, Тульчинський р-н, Вінницька обл.",
+    "nameRu": "Кирнасовка, Тульчинский р-н, Винницкая обл.",
+    "nameEn": "Kyrnasivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.7,
+    "longitude": 28.7667
+  },
+  {
+    "nameUa": "Тиманівка, Тульчинський р-н, Вінницька обл.",
+    "nameRu": "Тимановка, Тульчинский р-н, Винницкая обл.",
+    "nameEn": "Tymanivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.75,
+    "longitude": 28.7
+  },
+  {
+    "nameUa": "Пестеля, Тульчинський р-н, Вінницька обл.",
+    "nameRu": "Пестеля, Тульчинский р-н, Винницкая обл.",
+    "nameEn": "Pestelia",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.7333,
+    "longitude": 28.8
+  },
+  {
+    "nameUa": "Суворовське, Тульчинський р-н, Вінницька обл.",
+    "nameRu": "Суворовское, Тульчинский р-н, Винницкая обл.",
+    "nameEn": "Suvorovske",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.6667,
+    "longitude": 28.7167
+  },
+  {
+    "nameUa": "Кинашів, Тульчинський р-н, Вінницька обл.",
+    "nameRu": "Кинашев, Тульчинский р-н, Винницкая обл.",
+    "nameEn": "Kynashiv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.8,
+    "longitude": 28.75
+  },
+  {
+    "nameUa": "Ладижинські Хутори, Гайсинський р-н, Вінницька обл.",
+    "nameRu": "Ладыжинские Хутора, Гайсинский р-н, Винницкая обл.",
+    "nameEn": "Ladyzhynski Khutory",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.6667,
+    "longitude": 29.2
+  },
+  {
+    "nameUa": "Кунка, Гайсинський р-н, Вінницька обл.",
+    "nameRu": "Кунка, Гайсинский р-н, Винницкая обл.",
+    "nameEn": "Kunka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.8,
+    "longitude": 29.3
+  },
+  {
+    "nameUa": "Губник, Гайсинський р-н, Вінницька обл.",
+    "nameRu": "Губник, Гайсинский р-н, Винницкая обл.",
+    "nameEn": "Hubnyk",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.8333,
+    "longitude": 29.25
+  },
+  {
+    "nameUa": "Краснопілка, Гайсинський р-н, Вінницька обл.",
+    "nameRu": "Краснополка, Гайсинский р-н, Винницкая обл.",
+    "nameEn": "Krasnopilka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.75,
+    "longitude": 29.3167
+  },
+  {
+    "nameUa": "Райгород, Гайсинський р-н, Вінницька обл.",
+    "nameRu": "Райгород, Гайсинский р-н, Винницкая обл.",
+    "nameEn": "Raigorod",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.7667,
+    "longitude": 29.4
+  },
+  {
+    "nameUa": "Кіблич, Гайсинський р-н, Вінницька обл.",
+    "nameRu": "Киблич, Гайсинский р-н, Винницкая обл.",
+    "nameEn": "Kiblich",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.8167,
+    "longitude": 29.45
+  },
+  {
+    "nameUa": "Чечельницька Слобода, Чечельницький р-н, Вінницька обл.",
+    "nameRu": "Чечельницкая Слобода, Чечельницкий р-н, Винницкая обл.",
+    "nameEn": "Chechelnitska Sloboda",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 29.35
+  },
+  {
+    "nameUa": "Ольгопіль, Чечельницький р-н, Вінницька обл.",
+    "nameRu": "Ольгополь, Чечельницкий р-н, Винницкая обл.",
+    "nameEn": "Olhopil",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2333,
+    "longitude": 29.45
+  },
+  {
+    "nameUa": "Дашів, Іллінецький р-н, Вінницька обл.",
+    "nameRu": "Дашев, Ильинецкий р-н, Винницкая обл.",
+    "nameEn": "Dashiv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3,
+    "longitude": 29.2
+  },
+  {
+    "nameUa": "Глухівці, Козятинський р-н, Вінницька обл.",
+    "nameRu": "Глуховцы, Козятинский р-н, Винницкая обл.",
+    "nameEn": "Hlukhivtsi",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.1,
+    "longitude": 28.3
+  },
+  {
+    "nameUa": "Літин, Літинський р-н, Вінницька обл.",
+    "nameRu": "Литин, Литинский р-н, Винницкая обл.",
+    "nameEn": "Lityn",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.15,
+    "longitude": 28.4
+  },
+  {
+    "nameUa": "Махнівка, Козятинський р-н, Вінницька обл.",
+    "nameRu": "Махновка, Козятинский р-н, Винницкая обл.",
+    "nameEn": "Makhnivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2,
+    "longitude": 28.5
+  },
+  {
+    "nameUa": "Самгородок, Козятинський р-н, Вінницька обл.",
+    "nameRu": "Самгородок, Козятинский р-н, Винницкая обл.",
+    "nameEn": "Samhorodok",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.25,
+    "longitude": 28.6
+  },
+  {
+    "nameUa": "Іванів, Калинівський р-н, Вінницька обл.",
+    "nameRu": "Иванов, Калиновский р-н, Винницкая обл.",
+    "nameEn": "Ivaniv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.3,
+    "longitude": 28.7
+  },
+  {
+    "nameUa": "Городківка, Крижопільський р-н, Вінницька обл.",
+    "nameRu": "Городковка, Крыжопольский р-н, Винницкая обл.",
+    "nameEn": "Horodkivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4,
+    "longitude": 28.9
+  },
+  {
+    "nameUa": "Студена, Піщанський р-н, Вінницька обл.",
+    "nameRu": "Студена, Песчанский р-н, Винницкая обл.",
+    "nameEn": "Studena",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4,
+    "longitude": 28.6
+  },
+  {
+    "nameUa": "Соболівка, Тростянецький р-н, Вінницька обл.",
+    "nameRu": "Соболовка, Тростянецкий р-н, Винницкая обл.",
+    "nameEn": "Sobolivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 29.2
+  },
+  {
+    "nameUa": "Ободівка, Тростянецький р-н, Вінницька обл.",
+    "nameRu": "Ободовка, Тростянецкий р-н, Винницкая обл.",
+    "nameEn": "Obodivka",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3,
+    "longitude": 29.3
+  },
+  {
+    "nameUa": "Жданів, Хмільницький р-н, Вінницька обл.",
+    "nameRu": "Жданов, Хмельницкий р-н, Винницкая обл.",
+    "nameEn": "Zhdaniv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.1,
+    "longitude": 28.2
+  },
+  {
+    "nameUa": "Уланів, Хмільницький р-н, Вінницька обл.",
+    "nameRu": "Уланов, Хмельницкий р-н, Винницкая обл.",
+    "nameEn": "Ulaniv",
+    "region": "Вінницька область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.2,
+    "longitude": 28.3
+  },
+  {
+    "nameUa": "Луцьк, Луцький р-н, Волинська обл.",
+    "nameRu": "Луцк, Луцкий р-н, Волынская обл.",
+    "nameEn": "Lutsk",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.747778,
+    "longitude": 25.324444
+  },
+  {
+    "nameUa": "Ковель, Ковельський р-н, Волинська обл.",
+    "nameRu": "Ковель, Ковельский р-н, Волынская обл.",
+    "nameEn": "Kovel",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.219167,
+    "longitude": 24.687778
+  },
+  {
+    "nameUa": "Нововолинськ, Володимирський р-н, Волинська обл.",
+    "nameRu": "Нововолынск, Владимирский р-н, Волынская обл.",
+    "nameEn": "Novovolynsk",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.726944,
+    "longitude": 24.165
+  },
+  {
+    "nameUa": "Володимир, Володимирський р-н, Волинська обл.",
+    "nameRu": "Владимир, Владимирский р-н, Волынская обл.",
+    "nameEn": "Volodymyr",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.848056,
+    "longitude": 24.322222
+  },
+  {
+    "nameUa": "Камінь-Каширський, Камінь-Каширський р-н, Волинська обл.",
+    "nameRu": "Камень-Каширский, Камень-Каширский р-н, Волынская обл.",
+    "nameEn": "Kamin-Kashyrskyi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.62,
+    "longitude": 24.965278
+  },
+  {
+    "nameUa": "Берестечко, Луцький р-н, Волинська обл.",
+    "nameRu": "Берестечко, Луцкий р-н, Волынская обл.",
+    "nameEn": "Berestechko",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.357222,
+    "longitude": 25.111944
+  },
+  {
+    "nameUa": "Горохів, Луцький р-н, Волинська обл.",
+    "nameRu": "Горохов, Луцкий р-н, Волынская обл.",
+    "nameEn": "Horokhiv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.499444,
+    "longitude": 24.765
+  },
+  {
+    "nameUa": "Ківерці, Луцький р-н, Волинська обл.",
+    "nameRu": "Киверцы, Луцкий р-н, Волынская обл.",
+    "nameEn": "Kivertsi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.833056,
+    "longitude": 25.461389
+  },
+  {
+    "nameUa": "Любомль, Ковельський р-н, Волинська обл.",
+    "nameRu": "Любомль, Ковельский р-н, Волынская обл.",
+    "nameEn": "Liuboml",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.223611,
+    "longitude": 24.032778
+  },
+  {
+    "nameUa": "Рожище, Луцький р-н, Волинська обл.",
+    "nameRu": "Рожище, Луцкий р-н, Волынская обл.",
+    "nameEn": "Rozhyshche",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.912778,
+    "longitude": 25.27
+  },
+  {
+    "nameUa": "Устилуг, Володимирський р-н, Волинська обл.",
+    "nameRu": "Устилуг, Владимирский р-н, Волынская обл.",
+    "nameEn": "Ustyluh",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.86,
+    "longitude": 24.156944
+  },
+  {
+    "nameUa": "Благодатне, Ковельський р-н, Волинська обл.",
+    "nameRu": "Благодатное, Ковельский р-н, Волынская обл.",
+    "nameEn": "Blahodatne",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.216667,
+    "longitude": 24.7
+  },
+  {
+    "nameUa": "Голоби, Ковельський р-н, Волинська обл.",
+    "nameRu": "Голобы, Ковельский р-н, Волынская обл.",
+    "nameEn": "Holoby",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.083333,
+    "longitude": 25.016667
+  },
+  {
+    "nameUa": "Головне, Ковельський р-н, Волинська обл.",
+    "nameRu": "Головное, Ковельский р-н, Волынская обл.",
+    "nameEn": "Holovne",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.333333,
+    "longitude": 24.083333
+  },
+  {
+    "nameUa": "Заболоття, Ковельський р-н, Волинська обл.",
+    "nameRu": "Заболотье, Ковельский р-н, Волынская обл.",
+    "nameEn": "Zabolottia",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.633333,
+    "longitude": 24.016667
+  },
+  {
+    "nameUa": "Іваничі, Володимирський р-н, Волинська обл.",
+    "nameRu": "Иваничи, Владимирский р-н, Волынская обл.",
+    "nameEn": "Ivanychi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.633333,
+    "longitude": 24.366667
+  },
+  {
+    "nameUa": "Локачі, Володимирський р-н, Волинська обл.",
+    "nameRu": "Локачи, Владимирский р-н, Волынская обл.",
+    "nameEn": "Lokachi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.733333,
+    "longitude": 24.65
+  },
+  {
+    "nameUa": "Люблинець, Ковельський р-н, Волинська обл.",
+    "nameRu": "Люблинец, Ковельский р-н, Волынская обл.",
+    "nameEn": "Liublynets",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.183333,
+    "longitude": 24.6
+  },
+  {
+    "nameUa": "Овадне, Володимирський р-н, Волинська обл.",
+    "nameRu": "Овадное, Владимирский р-н, Волынская обл.",
+    "nameEn": "Ovadne",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.75,
+    "longitude": 24.133333
+  },
+  {
+    "nameUa": "Олександрія, Луцький р-н, Волинська обл.",
+    "nameRu": "Александрия, Луцкий р-н, Волынская обл.",
+    "nameEn": "Oleksandriia",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.866667,
+    "longitude": 25.083333
+  },
+  {
+    "nameUa": "Ратне, Ковельський р-н, Волинська обл.",
+    "nameRu": "Ратно, Ковельский р-н, Волынская обл.",
+    "nameEn": "Ratne",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.666667,
+    "longitude": 24.533333
+  },
+  {
+    "nameUa": "Стара Вижівка, Ковельський р-н, Волинська обл.",
+    "nameRu": "Старая Выжовка, Ковельский р-н, Волынская обл.",
+    "nameEn": "Stara Vyzhivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.616667,
+    "longitude": 24.183333
+  },
+  {
+    "nameUa": "Турійськ, Ковельський р-н, Волинська обл.",
+    "nameRu": "Турийск, Ковельский р-н, Волынская обл.",
+    "nameEn": "Turiisk",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.983333,
+    "longitude": 24.316667
+  },
+  {
+    "nameUa": "Шацьк, Ковельський р-н, Волинська обл.",
+    "nameRu": "Шацк, Ковельский р-н, Волынская обл.",
+    "nameEn": "Shatsk",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.516667,
+    "longitude": 23.916667
+  },
+  {
+    "nameUa": "Цумань, Луцький р-н, Волинська обл.",
+    "nameRu": "Цумань, Луцкий р-н, Волынская обл.",
+    "nameEn": "Tsuman",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.883333,
+    "longitude": 25.266667
+  },
+  {
+    "nameUa": "Борів, Камінь-Каширський р-н, Волинська обл.",
+    "nameRu": "Боров, Камень-Каширский р-н, Волынская обл.",
+    "nameEn": "Boriv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.583333,
+    "longitude": 24.75
+  },
+  {
+    "nameUa": "Ветли, Ковельський р-н, Волинська обл.",
+    "nameRu": "Ветлы, Ковельский р-н, Волынская обл.",
+    "nameEn": "Vetly",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.45,
+    "longitude": 24.066667
+  },
+  {
+    "nameUa": "Вишнів, Луцький р-н, Волинська обл.",
+    "nameRu": "Вишнев, Луцкий р-н, Волынская обл.",
+    "nameEn": "Vyshyniv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.75,
+    "longitude": 25.3
+  },
+  {
+    "nameUa": "Гряди, Камінь-Каширський р-н, Волинська обл.",
+    "nameRu": "Гряды, Камень-Каширский р-н, Волынская обл.",
+    "nameEn": "Hryady",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.666667,
+    "longitude": 24.833333
+  },
+  {
+    "nameUa": "Дубище, Луцький р-н, Волинська обл.",
+    "nameRu": "Дубище, Луцкий р-н, Волынская обл.",
+    "nameEn": "Dubyshche",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.783333,
+    "longitude": 25.133333
+  },
+  {
+    "nameUa": "Жовтаньці, Луцький р-н, Волинська обл.",
+    "nameRu": "Жовтанцы, Луцкий р-н, Волынская обл.",
+    "nameEn": "Zhovtantsi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.766667,
+    "longitude": 25.45
+  },
+  {
+    "nameUa": "Заброди, Ковельський р-н, Волинська обл.",
+    "nameRu": "Заброды, Ковельский р-н, Волынская обл.",
+    "nameEn": "Zabrody",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.7,
+    "longitude": 24.1
+  },
+  {
+    "nameUa": "Клевань, Луцький р-н, Волинська обл.",
+    "nameRu": "Клевань, Луцкий р-н, Волынская обл.",
+    "nameEn": "Klevan",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.75,
+    "longitude": 25.716667
+  },
+  {
+    "nameUa": "Літань, Володимирський р-н, Волинська обл.",
+    "nameRu": "Литань, Владимирский р-н, Волынская обл.",
+    "nameEn": "Lytan",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.833333,
+    "longitude": 24.25
+  },
+  {
+    "nameUa": "Маневичі, Камінь-Каширський р-н, Волинська обл.",
+    "nameRu": "Маневичи, Камень-Каширский р-н, Волынская обл.",
+    "nameEn": "Manevychi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.3,
+    "longitude": 25.533333
+  },
+  {
+    "nameUa": "Олика, Луцький р-н, Волинська обл.",
+    "nameRu": "Олыка, Луцкий р-н, Волынская обл.",
+    "nameEn": "Olyka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.720556,
+    "longitude": 25.816667
+  },
+  {
+    "nameUa": "Піща, Камінь-Каширський р-н, Волинська обл.",
+    "nameRu": "Пища, Камень-Каширский р-н, Волынская обл.",
+    "nameEn": "Pishcha",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.8,
+    "longitude": 24.166667
+  },
+  {
+    "nameUa": "Смідин, Ковельський р-н, Волинська обл.",
+    "nameRu": "Смидин, Ковельский р-н, Волынская обл.",
+    "nameEn": "Smydiv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.316667,
+    "longitude": 24.316667
+  },
+  {
+    "nameUa": "Торчин, Луцький р-н, Волинська обл.",
+    "nameRu": "Торчин, Луцкий р-н, Волынская обл.",
+    "nameEn": "Torczyn",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.766667,
+    "longitude": 25.016667
+  },
+  {
+    "nameUa": "Підгайці, Луцький р-н, Волинська обл.",
+    "nameRu": "Подгайцы, Луцкий р-н, Волынская обл.",
+    "nameEn": "Pidhaiktsi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.716667,
+    "longitude": 25.366667
+  },
+  {
+    "nameUa": "Підлісне, Камінь-Каширський р-н, Волинська обл.",
+    "nameRu": "Подлесное, Камень-Каширский р-н, Волынская обл.",
+    "nameEn": "Pidlisne",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.583333,
+    "longitude": 24.583333
+  },
+  {
+    "nameUa": "Седлище, Камінь-Каширський р-н, Волинська обл.",
+    "nameRu": "Седлище, Камень-Каширский р-н, Волынская обл.",
+    "nameEn": "Sedlyshche",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.583333,
+    "longitude": 24.583333
+  },
+  {
+    "nameUa": "Вербка, Камінь-Каширський р-н, Волинська обл.",
+    "nameRu": "Вербка, Камень-Каширский р-н, Волынская обл.",
+    "nameEn": "Verbka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.583333,
+    "longitude": 24.583333
+  },
+  {
+    "nameUa": "Мильче, Камінь-Каширський р-н, Волинська обл.",
+    "nameRu": "Мильче, Камень-Каширский р-н, Волынская обл.",
+    "nameEn": "Mylche",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.666667,
+    "longitude": 24.666667
+  },
+  {
+    "nameUa": "Абрамівка, Волинська обл.",
+    "nameRu": "Абрамовка, Волынская обл.",
+    "nameEn": "Abramivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.316667,
+    "longitude": 24.316667
+  },
+  {
+    "nameUa": "Андріївка, Волинська обл.",
+    "nameRu": "Андреевка, Волынская обл.",
+    "nameEn": "Andriivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.75,
+    "longitude": 25.3
+  },
+  {
+    "nameUa": "Антонівка, Волинська обл.",
+    "nameRu": "Антоновка, Волынская обл.",
+    "nameEn": "Antonivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Аудринів, Волинська обл.",
+    "nameRu": "Аудринов, Волынская обл.",
+    "nameEn": "Audryniv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.583333,
+    "longitude": 24.583333
+  },
+  {
+    "nameUa": "Березовичі, Волинська обл.",
+    "nameRu": "Березовичи, Волынская обл.",
+    "nameEn": "Berezovychi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.45,
+    "longitude": 24.066667
+  },
+  {
+    "nameUa": "Берестяне, Волинська обл.",
+    "nameRu": "Берестяное, Волынская обл.",
+    "nameEn": "Berestiane",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.766667,
+    "longitude": 25.45
+  },
+  {
+    "nameUa": "Березолунь, Волинська обл.",
+    "nameRu": "Березолуны, Волынская обл.",
+    "nameEn": "Berezolun",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.7,
+    "longitude": 24.1
+  },
+  {
+    "nameUa": "Бірки, Волинська обл.",
+    "nameRu": "Бирки, Волынская обл.",
+    "nameEn": "Birky",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.666667,
+    "longitude": 24.833333
+  },
+  {
+    "nameUa": "Боголюби, Волинська обл.",
+    "nameRu": "Боголюбы, Волынская обл.",
+    "nameEn": "Boholiuby",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.783333,
+    "longitude": 25.133333
+  },
+  {
+    "nameUa": "Борохів, Волинська обл.",
+    "nameRu": "Борохів, Волынская обл.",
+    "nameEn": "Borokhiv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.75,
+    "longitude": 25.716667
+  },
+  {
+    "nameUa": "Брище, Волинська обл.",
+    "nameRu": "Брыще, Волынская обл.",
+    "nameEn": "Bryshche",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.633333,
+    "longitude": 24.366667
+  },
+  {
+    "nameUa": "Бужани, Волинська обл.",
+    "nameRu": "Бужаны, Волынская обл.",
+    "nameEn": "Buzhani",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Вербів, Волинська обл.",
+    "nameRu": "Вербиов, Волынская обл.",
+    "nameEn": "Verbiv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.583333,
+    "longitude": 24.583333
+  },
+  {
+    "nameUa": "Ветлина, Волинська обл.",
+    "nameRu": "Ветлина, Волынская обл.",
+    "nameEn": "Vetlyna",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.45,
+    "longitude": 24.066667
+  },
+  {
+    "nameUa": "Вирів, Волинська обл.",
+    "nameRu": "Выров, Волынская обл.",
+    "nameEn": "Vyriv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.75,
+    "longitude": 25.3
+  },
+  {
+    "nameUa": "Волиця, Волинська обл.",
+    "nameRu": "Волица, Волынская обл.",
+    "nameEn": "Volytsia",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.848056,
+    "longitude": 24.322222
+  },
+  {
+    "nameUa": "Ворсівка, Волинська обл.",
+    "nameRu": "Ворсовка, Волынская обл.",
+    "nameEn": "Vorsivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.62,
+    "longitude": 24.965278
+  },
+  {
+    "nameUa": "Гайчанка, Волинська обл.",
+    "nameRu": "Гайчанка, Волынская обл.",
+    "nameEn": "Haiichanka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.357222,
+    "longitude": 25.111944
+  },
+  {
+    "nameUa": "Глибока Долина, Волинська обл.",
+    "nameRu": "Глубокая Долина, Волынская обл.",
+    "nameEn": "Hlybokyi Doly",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.219167,
+    "longitude": 24.687778
+  },
+  {
+    "nameUa": "Глиниці, Волинська обл.",
+    "nameRu": "Глиницы, Волынская обл.",
+    "nameEn": "Hlynets",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.499444,
+    "longitude": 24.765
+  },
+  {
+    "nameUa": "Горохівка, Волинська обл.",
+    "nameRu": "Гороховка, Волынская обл.",
+    "nameEn": "Horokhivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.833056,
+    "longitude": 25.461389
+  },
+  {
+    "nameUa": "Грибівка, Волинська обл.",
+    "nameRu": "Грибовка, Волынская обл.",
+    "nameEn": "Hrybivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.3,
+    "longitude": 25.533333
+  },
+  {
+    "nameUa": "Гута, Волинська обл.",
+    "nameRu": "Гутa, Волынская обл.",
+    "nameEn": "Huta",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.912778,
+    "longitude": 25.27
+  },
+  {
+    "nameUa": "Дачне, Волинська обл.",
+    "nameRu": "Дaчное, Волынская обл.",
+    "nameEn": "Dachne",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.223611,
+    "longitude": 24.032778
+  },
+  {
+    "nameUa": "Дідівка, Волинська обл.",
+    "nameRu": "Дидовка, Волынская обл.",
+    "nameEn": "Didivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.833056,
+    "longitude": 25.461389
+  },
+  {
+    "nameUa": "Довбиш, Волинська обл.",
+    "nameRu": "Довбыш, Волынская обл.",
+    "nameEn": "Dovbysh",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.633333,
+    "longitude": 24.366667
+  },
+  {
+    "nameUa": "Довжик, Волинська обл.",
+    "nameRu": "Довжик, Волынская обл.",
+    "nameEn": "Dovzhik",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.583333,
+    "longitude": 24.583333
+  },
+  {
+    "nameUa": "Жабче, Волинська обл.",
+    "nameRu": "Жабче, Волынская обл.",
+    "nameEn": "Zhabche",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Жидичин, Волинська обл.",
+    "nameRu": "Жидичин, Волынская обл.",
+    "nameEn": "Zhydychyn",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.75,
+    "longitude": 25.3
+  },
+  {
+    "nameUa": "Журавичі, Волинська обл.",
+    "nameRu": "Журавичи, Волынская обл.",
+    "nameEn": "Zhuravychi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.733333,
+    "longitude": 24.65
+  },
+  {
+    "nameUa": "Заборці, Волинська обл.",
+    "nameRu": "Заборцы, Волынская обл.",
+    "nameEn": "Zaborsti",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.666667,
+    "longitude": 24.533333
+  },
+  {
+    "nameUa": "Зайці, Волинська обл.",
+    "nameRu": "Зайцы, Волынская обл.",
+    "nameEn": "Zaitsi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.666667,
+    "longitude": 24.183333
+  },
+  {
+    "nameUa": "Замочок, Волинська обл.",
+    "nameRu": "Замочек, Волынская обл.",
+    "nameEn": "Zamochok",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.983333,
+    "longitude": 24.316667
+  },
+  {
+    "nameUa": "Заріччя, Волинська обл.",
+    "nameRu": "Заречье, Волынская обл.",
+    "nameEn": "Zarichchia",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.726944,
+    "longitude": 24.165
+  },
+  {
+    "nameUa": "Засмикове, Волинська обл.",
+    "nameRu": "Засмыкове, Волынская обл.",
+    "nameEn": "Zasmikove",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.516667,
+    "longitude": 23.916667
+  },
+  {
+    "nameUa": "Затурці, Волинська обл.",
+    "nameRu": "Затурец, Волынская обл.",
+    "nameEn": "Zaturtsi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.883333,
+    "longitude": 25.266667
+  },
+  {
+    "nameUa": "Зелена, Волинська обл.",
+    "nameRu": "Зеленa, Волынская обл.",
+    "nameEn": "Zelena",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.216667,
+    "longitude": 24.7
+  },
+  {
+    "nameUa": "Зоря, Волинська обл.",
+    "nameRu": "Зоря, Волынская обл.",
+    "nameEn": "Zoria",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.75,
+    "longitude": 24.133333
+  },
+  {
+    "nameUa": "Іванівка, Волинська обл.",
+    "nameRu": "Ивановка, Волынская обл.",
+    "nameEn": "Ivanivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.866667,
+    "longitude": 25.083333
+  },
+  {
+    "nameUa": "Кальня, Волинська обл.",
+    "nameRu": "Кальня, Волынская обл.",
+    "nameEn": "Kalnia",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.62,
+    "longitude": 24.965278
+  },
+  {
+    "nameUa": "Клепачі, Волинська обл.",
+    "nameRu": "Клепачи, Волынская обл.",
+    "nameEn": "Klepachi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.083333,
+    "longitude": 25.016667
+  },
+  {
+    "nameUa": "Княжилів, Волинська обл.",
+    "nameRu": "Княжилов, Волынская обл.",
+    "nameEn": "Kniazhydiv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.499444,
+    "longitude": 24.765
+  },
+  {
+    "nameUa": "Коблин, Волинська обл.",
+    "nameRu": "Коблин, Волынская обл.",
+    "nameEn": "Koblyn",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.357222,
+    "longitude": 25.111944
+  },
+  {
+    "nameUa": "Колодяжне, Волинська обл.",
+    "nameRu": "Колодяжное, Волынская обл.",
+    "nameEn": "Kolodiazhne",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.3,
+    "longitude": 25.533333
+  },
+  {
+    "nameUa": "Комарово, Волинська обл.",
+    "nameRu": "Комарово, Волынская обл.",
+    "nameEn": "Komarovo",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.333333,
+    "longitude": 24.083333
+  },
+  {
+    "nameUa": "Конотоп, Волинська обл.",
+    "nameRu": "Конотоп, Волынская обл.",
+    "nameEn": "Konotop",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.833056,
+    "longitude": 25.461389
+  },
+  {
+    "nameUa": "Котельники, Волинська обл.",
+    "nameRu": "Котельники, Волынская обл.",
+    "nameEn": "Kotielnyky",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.633333,
+    "longitude": 24.366667
+  },
+  {
+    "nameUa": "Кругляк, Волинська обл.",
+    "nameRu": "Кругляк, Волынская обл.",
+    "nameEn": "Kruhliak",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.583333,
+    "longitude": 24.583333
+  },
+  {
+    "nameUa": "Кульчин, Волинська обл.",
+    "nameRu": "Кульчин, Волынская обл.",
+    "nameEn": "Kulchyn",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 51.183333,
+    "longitude": 24.6
+  },
+  {
+    "nameUa": "Лаврове, Волинська обл.",
+    "nameRu": "Лаврово, Волынская обл.",
+    "nameEn": "Lavrove",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.75,
+    "longitude": 25.716667
+  },
+  {
+    "nameUa": "Лежниця, Волинська обл.",
+    "nameRu": "Лежниця, Волынская обл.",
+    "nameEn": "Lezhnytsia",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.633333,
+    "longitude": 24.366667
+  },
+  {
+    "nameUa": "Лобачівка, Волинська обл.",
+    "nameRu": "Лобачевка, Волынская обл.",
+    "nameEn": "Lobachivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Липа, Волинська обл.",
+    "nameRu": "Липа, Волынская обл.",
+    "nameEn": "Lypa",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Марковичі, Волинська обл.",
+    "nameRu": "Марковичи, Волынская обл.",
+    "nameEn": "Markovychi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Мар'янівка, Волинська обл.",
+    "nameRu": "Мариановка, Волынская обл.",
+    "nameEn": "Maryanivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Мерва, Волинська обл.",
+    "nameRu": "Мерва, Волынская обл.",
+    "nameEn": "Merva",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Михлин, Волинська обл.",
+    "nameRu": "Михлин, Волынская обл.",
+    "nameEn": "Mykhlyn",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Мирків, Волинська обл.",
+    "nameRu": "Мирков, Волынская обл.",
+    "nameEn": "Myrkiv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Мирне, Волинська обл.",
+    "nameRu": "Мирное, Волынская обл.",
+    "nameEn": "Myrne",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Мислині, Волинська обл.",
+    "nameRu": "Мыслини, Волынская обл.",
+    "nameEn": "Myslyni",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Наталин, Волинська обл.",
+    "nameRu": "Наталин, Волынская обл.",
+    "nameEn": "Natalyn",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Новосілки, Волинська обл.",
+    "nameRu": "Новосёлки, Волынская обл.",
+    "nameEn": "Novosilky",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Новостав, Волинська обл.",
+    "nameRu": "Новостав, Волынская обл.",
+    "nameEn": "Novostav",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Новий Зборишів, Волинська обл.",
+    "nameRu": "Новый Зборишев, Волынская обл.",
+    "nameEn": "Novyi Zborishiv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Ниви-Губинські, Волинська обл.",
+    "nameRu": "Нивы-Губинские, Волынская обл.",
+    "nameEn": "Nyvy-Hubynskyi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Ощів, Волинська обл.",
+    "nameRu": "Ощів, Волынская обл.",
+    "nameEn": "Oshchiv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Охлопів, Волинська обл.",
+    "nameRu": "Охлопов, Волынская обл.",
+    "nameEn": "Ohlopiv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Озерці, Волинська обл.",
+    "nameRu": "Озерцы, Волынская обл.",
+    "nameEn": "Ozerci",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Печихвости, Волинська обл.",
+    "nameRu": "Печихвости, Волынская обл.",
+    "nameEn": "Pechy khv osty",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Перемиль, Волинська обл.",
+    "nameRu": "Перемиль, Волынская обл.",
+    "nameEn": "Peremyl",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Підбереззя, Волинська обл.",
+    "nameRu": "Подберезье, Волынская обл.",
+    "nameEn": "Pidberezzya",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Пірванче, Волинська обл.",
+    "nameRu": "Пирванче, Волынская обл.",
+    "nameEn": "Pirvanche",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Полюхне, Волинська обл.",
+    "nameRu": "Полухне, Волынская обл.",
+    "nameEn": "Polyukhne",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Пустомити, Волинська обл.",
+    "nameRu": "Пустомиты, Волынская обл.",
+    "nameEn": "Pustomyty",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Пильгани, Волинська обл.",
+    "nameRu": "Пильганы, Волынская обл.",
+    "nameEn": "Pylhany",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Рачин, Волинська обл.",
+    "nameRu": "Рахин, Волынская обл.",
+    "nameEn": "Rachyn",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Ржищі, Волинська обл.",
+    "nameRu": "Ржищи, Волынская обл.",
+    "nameEn": "Rzhyshchi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Сенкевичівка, Волинська обл.",
+    "nameRu": "Сенкевичовка, Волынская обл.",
+    "nameEn": "Senkevychivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Сергіївка, Волинська обл.",
+    "nameRu": "Сергиевка, Волынская обл.",
+    "nameEn": "Serhiivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Шклинь, Волинська обл.",
+    "nameRu": "Шклин, Волынская обл.",
+    "nameEn": "Shklyn",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Шклинь Другий, Волинська обл.",
+    "nameRu": "Шклин Второй, Волынская обл.",
+    "nameEn": "Shklyn Drugyi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Широке, Волинська обл.",
+    "nameRu": "Широкое, Волынская обл.",
+    "nameEn": "Shyroke",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Сільце, Волинська обл.",
+    "nameRu": "Сильце, Волынская обл.",
+    "nameEn": "Silce",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Скабарівщина, Волинська обл.",
+    "nameRu": "Скабаревщина, Волынская обл.",
+    "nameEn": "Skabarivshchyna",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Скірче, Волинська обл.",
+    "nameRu": "Скирче, Волынская обл.",
+    "nameEn": "Skirche",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Скобелка, Волинська обл.",
+    "nameRu": "Скобелка, Волынская обл.",
+    "nameEn": "Skobelka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Скригове, Волинська обл.",
+    "nameRu": "Скригово, Волынская обл.",
+    "nameEn": "Skryhove",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Смолява, Волинська обл.",
+    "nameRu": "Смолява, Волынская обл.",
+    "nameEn": "Smolyava",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Софіївка, Волинська обл.",
+    "nameRu": "Софиевка, Волынская обл.",
+    "nameEn": "Sofiivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Старостав, Волинська обл.",
+    "nameRu": "Старостав, Волынская обл.",
+    "nameEn": "Starostav",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Староки, Волинська обл.",
+    "nameRu": "Староки, Волынская обл.",
+    "nameEn": "Staryky",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Стрільче, Волинська обл.",
+    "nameRu": "Стрельче, Волынская обл.",
+    "nameEn": "Strilche",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Терешківці, Волинська обл.",
+    "nameRu": "Терешковцы, Волынская обл.",
+    "nameEn": "Tereshkivtsi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Угринів, Волинська обл.",
+    "nameRu": "Угринов, Волынская обл.",
+    "nameEn": "Uhryniv",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Уманці, Волинська обл.",
+    "nameRu": "Уманцы, Волынская обл.",
+    "nameEn": "Umantsi",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Ватин, Волинська обл.",
+    "nameRu": "Ватин, Волынская обл.",
+    "nameEn": "Vatyn",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Ватинець, Волинська обл.",
+    "nameRu": "Ватинец, Волынская обл.",
+    "nameEn": "Vatyneets",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Вільхівка, Волинська обл.",
+    "nameRu": "Вильховка, Волынская обл.",
+    "nameEn": "Vylhivka",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Волиця-Дружкопільська, Волинська обл.",
+    "nameRu": "Волица-Дружкопольская, Волынская обл.",
+    "nameEn": "Volytsia-Druzhkopilska",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Волиця-Лобачівська, Волинська обл.",
+    "nameRu": "Волица-Лобачевская, Волынская обл.",
+    "nameEn": "Volytsia-Lobachivska",
+    "region": "Волинська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 50.5,
+    "longitude": 24.8
+  },
+  {
+    "nameUa": "Дніпро, Дніпровський р-н, Дніпропетровська обл.",
+    "nameRu": "Днепр, Днепровский р-н, Днепропетровская обл.",
+    "nameEn": "Dnipro",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.45,
+    "longitude": 35.046667
+  },
+  {
+    "nameUa": "Кривий Ріг, Криворізький р-н, Дніпропетровська обл.",
+    "nameRu": "Кривой Рог, Криворожский р-н, Днепропетровская обл.",
+    "nameEn": "Kryvyi Rih",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.92,
+    "longitude": 33.39
+  },
+  {
+    "nameUa": "Кам’янське, Кам’янський р-н, Дніпропетровська обл.",
+    "nameRu": "Каменское, Каменский р-н, Днепропетровская обл.",
+    "nameEn": "Kamianske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.52,
+    "longitude": 34.61
+  },
+  {
+    "nameUa": "Нікополь, Нікопольський р-н, Дніпропетровська обл.",
+    "nameRu": "Никополь, Никопольский р-н, Днепропетровская обл.",
+    "nameEn": "Nikopol",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.57,
+    "longitude": 34.4
+  },
+  {
+    "nameUa": "Павлоград, Павлоградський р-н, Дніпропетровська обл.",
+    "nameRu": "Павлоград, Павлоградский р-н, Днепропетровская обл.",
+    "nameEn": "Pavlohrad",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.53,
+    "longitude": 35.87
+  },
+  {
+    "nameUa": "Новомосковськ, Новомосковський р-н, Дніпропетровська обл.",
+    "nameRu": "Новомосковск, Новомосковский р-н, Днепропетровская обл.",
+    "nameEn": "Novomoskovsk",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.33,
+    "longitude": 35.24
+  },
+  {
+    "nameUa": "Жовті Води, Дніпровський р-н, Дніпропетровська обл.",
+    "nameRu": "Жёлтые Воды, Днепровский р-н, Днепропетровская обл.",
+    "nameEn": "Zhovti Vody",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.35,
+    "longitude": 33.5
+  },
+  {
+    "nameUa": "Покров, Нікопольський р-н, Дніпропетровська обл.",
+    "nameRu": "Покров, Никопольский р-н, Днепропетровская обл.",
+    "nameEn": "Pokrov",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.65,
+    "longitude": 34.08
+  },
+  {
+    "nameUa": "Марганець, Нікопольський р-н, Дніпропетровська обл.",
+    "nameRu": "Марганец, Никопольский р-н, Днепропетровская обл.",
+    "nameEn": "Marhanets",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.65,
+    "longitude": 34.6
+  },
+  {
+    "nameUa": "Синельникове, Синельниківський р-н, Дніпропетровська обл.",
+    "nameRu": "Синельниково, Синельниковский р-н, Днепропетровская обл.",
+    "nameEn": "Synelnykove",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.32,
+    "longitude": 35.51
+  },
+  {
+    "nameUa": "Тернівка, Павлоградський р-н, Дніпропетровська обл.",
+    "nameRu": "Терновка, Павлоградский р-н, Днепропетровская обл.",
+    "nameEn": "Ternivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.52,
+    "longitude": 36.08
+  },
+  {
+    "nameUa": "Вільногірськ, Кам’янський р-н, Дніпропетровська обл.",
+    "nameRu": "Вольногорск, Каменский р-н, Днепропетровская обл.",
+    "nameEn": "Vilnohirsk",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.48,
+    "longitude": 34.03
+  },
+  {
+    "nameUa": "Першотравенськ, Павлоградський р-н, Дніпропетровська обл.",
+    "nameRu": "Першотравенск, Павлоградский р-н, Днепропетровская обл.",
+    "nameEn": "Pershotravensk",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.34,
+    "longitude": 35.76
+  },
+  {
+    "nameUa": "Апостолове, Криворізький р-н, Дніпропетровська обл.",
+    "nameRu": "Апостолово, Криворожский р-н, Днепропетровская обл.",
+    "nameEn": "Apostolove",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.66,
+    "longitude": 33.72
+  },
+  {
+    "nameUa": "Верхівцеве, Кам’янський р-н, Дніпропетровська обл.",
+    "nameRu": "Верхівцево, Каменский р-н, Днепропетровская обл.",
+    "nameEn": "Verkhivtseve",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.49,
+    "longitude": 34.25
+  },
+  {
+    "nameUa": "Верхньодніпровськ, Кам’янський р-н, Дніпропетровська обл.",
+    "nameRu": "Верхнеднепровск, Каменский р-н, Днепропетровская обл.",
+    "nameEn": "Verkhnodniprovsk",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.64,
+    "longitude": 34.34
+  },
+  {
+    "nameUa": "Зеленодольськ, Синельниківський р-н, Дніпропетровська обл.",
+    "nameRu": "Зеленодольск, Синельниковский р-н, Днепропетровская обл.",
+    "nameEn": "Zelenodolsk",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.57,
+    "longitude": 33.65
+  },
+  {
+    "nameUa": "Перещепине, Дніпровський р-н, Дніпропетровська обл.",
+    "nameRu": "Перещепино, Днепровский р-н, Днепропетровская обл.",
+    "nameEn": "Pereshchepyne",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 49.01,
+    "longitude": 35.37
+  },
+  {
+    "nameUa": "Підгородне, Дніпровський р-н, Дніпропетровська обл.",
+    "nameRu": "Подгородное, Днепровский р-н, Днепропетровская обл.",
+    "nameEn": "Pidhorodne",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.58,
+    "longitude": 35.1
+  },
+  {
+    "nameUa": "П'ятихатки, Кам’янський р-н, Дніпропетровська обл.",
+    "nameRu": "Пятихатки, Каменский р-н, Днепропетровская обл.",
+    "nameEn": "Pyatykhatky",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.41,
+    "longitude": 33.7
+  },
+  {
+    "nameUa": "Абрамівка, Дніпропетровська обл.",
+    "nameRu": "Абрамовка, Днепропетровская обл.",
+    "nameEn": "Abramivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 34.8
+  },
+  {
+    "nameUa": "Андріївка, Дніпропетровська обл.",
+    "nameRu": "Андреевка, Днепропетровская обл.",
+    "nameEn": "Andriivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.15,
+    "longitude": 35.2
+  },
+  {
+    "nameUa": "Антонівка, Дніпропетровська обл.",
+    "nameRu": "Антоновка, Днепропетровская обл.",
+    "nameEn": "Antonivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.9,
+    "longitude": 34.5
+  },
+  {
+    "nameUa": "Бабайківка, Дніпропетровська обл.",
+    "nameRu": "Бабайковка, Днепропетровская обл.",
+    "nameEn": "Babaikivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3,
+    "longitude": 35.6
+  },
+  {
+    "nameUa": "Багате, Дніпропетровська обл.",
+    "nameRu": "Богатое, Днепропетровская обл.",
+    "nameEn": "Bahate",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4,
+    "longitude": 36.0
+  },
+  {
+    "nameUa": "Башмачка, Дніпропетровська обл.",
+    "nameRu": "Башмачка, Днепропетровская обл.",
+    "nameEn": "Bashmachka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.8,
+    "longitude": 34.2
+  },
+  {
+    "nameUa": "Березівка, Дніпропетровська обл.",
+    "nameRu": "Березовка, Днепропетровская обл.",
+    "nameEn": "Berezivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.1,
+    "longitude": 35.4
+  },
+  {
+    "nameUa": "Благовіщенка, Дніпропетровська обл.",
+    "nameRu": "Благовещенка, Днепропетровская обл.",
+    "nameEn": "Blahovishchenka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.5,
+    "longitude": 34.9
+  },
+  {
+    "nameUa": "Богданівка, Дніпропетровська обл.",
+    "nameRu": "Богдановка, Днепропетровская обл.",
+    "nameEn": "Bohdanivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.7,
+    "longitude": 33.8
+  },
+  {
+    "nameUa": "Божедарівка, Дніпропетровська обл.",
+    "nameRu": "Божедаровка, Днепропетровская обл.",
+    "nameEn": "Bozhedarivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.6,
+    "longitude": 34.7
+  },
+  {
+    "nameUa": "Братське, Дніпропетровська обл.",
+    "nameRu": "Братское, Днепропетровская обл.",
+    "nameEn": "Bratske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.6,
+    "longitude": 34.1
+  },
+  {
+    "nameUa": "Василівка, Дніпропетровська обл.",
+    "nameRu": "Васильевка, Днепропетровская обл.",
+    "nameEn": "Vasylivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 35.8
+  },
+  {
+    "nameUa": "Вербки, Дніпропетровська обл.",
+    "nameRu": "Вербки, Днепропетровская обл.",
+    "nameEn": "Verbky",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4,
+    "longitude": 35.3
+  },
+  {
+    "nameUa": "Веселе, Дніпропетровська обл.",
+    "nameRu": "Веселое, Днепропетровская обл.",
+    "nameEn": "Vesеле",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.0,
+    "longitude": 34.6
+  },
+  {
+    "nameUa": "Вільне, Дніпропетровська обл.",
+    "nameRu": "Вольное, Днепропетровская обл.",
+    "nameEn": "Vilne",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.9,
+    "longitude": 33.5
+  },
+  {
+    "nameUa": "Водяне, Дніпропетровська обл.",
+    "nameRu": "Водяное, Днепропетровская обл.",
+    "nameEn": "Vodiane",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3,
+    "longitude": 36.1
+  },
+  {
+    "nameUa": "Воскресенське, Дніпропетровська обл.",
+    "nameRu": "Воскресенское, Днепропетровская обл.",
+    "nameEn": "Voskresenske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.1,
+    "longitude": 35.0
+  },
+  {
+    "nameUa": "Гаврилівка, Дніпропетровська обл.",
+    "nameRu": "Гавриловка, Днепропетровская обл.",
+    "nameEn": "Havrylivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.8,
+    "longitude": 34.3
+  },
+  {
+    "nameUa": "Гейківка, Дніпропетровська обл.",
+    "nameRu": "Гейковка, Днепропетровская обл.",
+    "nameEn": "Heikivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.5,
+    "longitude": 34.8
+  },
+  {
+    "nameUa": "Горького, Дніпропетровська обл.",
+    "nameRu": "Горького, Днепропетровская обл.",
+    "nameEn": "Horkoho",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.7,
+    "longitude": 33.9
+  },
+  {
+    "nameUa": "Грушівка, Дніпропетровська обл.",
+    "nameRu": "Грушевка, Днепропетровская обл.",
+    "nameEn": "Hrushivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 35.5
+  },
+  {
+    "nameUa": "Демурине, Дніпропетровська обл.",
+    "nameRu": "Демурино, Днепропетровская обл.",
+    "nameEn": "Demuryne",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4,
+    "longitude": 36.2
+  },
+  {
+    "nameUa": "Дмитрівка, Дніпропетровська обл.",
+    "nameRu": "Дмитровка, Днепропетровская обл.",
+    "nameEn": "Dmytrivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.9,
+    "longitude": 34.0
+  },
+  {
+    "nameUa": "Добропілля, Дніпропетровська обл.",
+    "nameRu": "Доброполье, Днепропетровская обл.",
+    "nameEn": "Dobropillia",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.1,
+    "longitude": 35.7
+  },
+  {
+    "nameUa": "Долинське, Дніпропетровська обл.",
+    "nameRu": "Долинское, Днепропетровская обл.",
+    "nameEn": "Dolynske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.6,
+    "longitude": 33.7
+  },
+  {
+    "nameUa": "Єлизаветівка, Дніпропетровська обл.",
+    "nameRu": "Елизаветовка, Днепропетровская обл.",
+    "nameEn": "Yelyzavetivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3,
+    "longitude": 35.1
+  },
+  {
+    "nameUa": "Жовте, Дніпропетровська обл.",
+    "nameRu": "Желтое, Днепропетровская обл.",
+    "nameEn": "Zhovte",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.0,
+    "longitude": 34.8
+  },
+  {
+    "nameUa": "Залізничне, Дніпропетровська обл.",
+    "nameRu": "Железничное, Днепропетровская обл.",
+    "nameEn": "Zaliznychne",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.8,
+    "longitude": 34.5
+  },
+  {
+    "nameUa": "Запоріжжя, Дніпропетровська обл.",
+    "nameRu": "Запорожье, Днепропетровская обл.",
+    "nameEn": "Zaporizhzhia",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 36.0
+  },
+  {
+    "nameUa": "Зелений Гай, Дніпропетровська обл.",
+    "nameRu": "Зеленый Гай, Днепропетровская обл.",
+    "nameEn": "Zelenyi Hai",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.9,
+    "longitude": 33.6
+  },
+  {
+    "nameUa": "Зоря, Дніпропетровська обл.",
+    "nameRu": "Заря, Днепропетровская обл.",
+    "nameEn": "Zoria",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4,
+    "longitude": 35.4
+  },
+  {
+    "nameUa": "Іларіонове, Дніпропетровська обл.",
+    "nameRu": "Илларионово, Днепропетровская обл.",
+    "nameEn": "Ilarionove",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3,
+    "longitude": 35.2
+  },
+  {
+    "nameUa": "Калинівка, Дніпропетровська обл.",
+    "nameRu": "Калиновка, Днепропетровская обл.",
+    "nameEn": "Kalynivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.7,
+    "longitude": 34.4
+  },
+  {
+    "nameUa": "Кам’янське, Дніпропетровська обл.",
+    "nameRu": "Каменское, Днепропетровская обл.",
+    "nameEn": "Kamianske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.5,
+    "longitude": 34.6
+  },
+  {
+    "nameUa": "Карнаухівка, Дніпропетровська обл.",
+    "nameRu": "Карнауховка, Днепропетровская обл.",
+    "nameEn": "Karnaukhivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4,
+    "longitude": 34.7
+  },
+  {
+    "nameUa": "Катеринівка, Дніпропетровська обл.",
+    "nameRu": "Екатериновка, Днепропетровская обл.",
+    "nameEn": "Katerynivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.1,
+    "longitude": 35.3
+  },
+  {
+    "nameUa": "Квіткове, Дніпропетровська обл.",
+    "nameRu": "Цветочное, Днепропетровская обл.",
+    "nameEn": "Kvitkove",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.8,
+    "longitude": 33.7
+  },
+  {
+    "nameUa": "Кіровка, Дніпропетровська обл.",
+    "nameRu": "Кировка, Днепропетровская обл.",
+    "nameEn": "Kirovka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 35.9
+  },
+  {
+    "nameUa": "Красне, Дніпропетровська обл.",
+    "nameRu": "Красное, Днепропетровская обл.",
+    "nameEn": "Krasne",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.9,
+    "longitude": 34.1
+  },
+  {
+    "nameUa": "Кринички, Дніпропетровська обл.",
+    "nameRu": "Кринички, Днепропетровская обл.",
+    "nameEn": "Krynychky",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3,
+    "longitude": 34.5
+  },
+  {
+    "nameUa": "Лозуватка, Дніпропетровська обл.",
+    "nameRu": "Лозоватка, Днепропетровская обл.",
+    "nameEn": "Lozuvatka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.0,
+    "longitude": 33.9
+  },
+  {
+    "nameUa": "Любимівка, Дніпропетровська обл.",
+    "nameRu": "Любимовка, Днепропетровская обл.",
+    "nameEn": "Liubymivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.6,
+    "longitude": 34.0
+  },
+  {
+    "nameUa": "Майське, Дніпропетровська обл.",
+    "nameRu": "Майское, Днепропетровская обл.",
+    "nameEn": "Maiske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4,
+    "longitude": 35.5
+  },
+  {
+    "nameUa": "Межова, Дніпропетровська обл.",
+    "nameRu": "Межовая, Днепропетровская обл.",
+    "nameEn": "Mezhova",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 36.1
+  },
+  {
+    "nameUa": "Миколаївка, Дніпропетровська обл.",
+    "nameRu": "Николаевка, Днепропетровская обл.",
+    "nameEn": "Mykolaivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.8,
+    "longitude": 33.8
+  },
+  {
+    "nameUa": "Мирне, Дніпропетровська обл.",
+    "nameRu": "Мирное, Днепропетровская обл.",
+    "nameEn": "Myrne",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.1,
+    "longitude": 35.1
+  },
+  {
+    "nameUa": "Нива Трудова, Дніпропетровська обл.",
+    "nameRu": "Нива Трудовая, Днепропетровская обл.",
+    "nameEn": "Nyva Trudova",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.7,
+    "longitude": 34.2
+  },
+  {
+    "nameUa": "Новопідкряж, Дніпропетровська обл.",
+    "nameRu": "Новоподкряж, Днепропетровская обл.",
+    "nameEn": "Novopidkriazh",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3,
+    "longitude": 35.8
+  },
+  {
+    "nameUa": "Олександрівка, Дніпропетровська обл.",
+    "nameRu": "Александровка, Днепропетровская обл.",
+    "nameEn": "Oleksandrivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.0,
+    "longitude": 34.7
+  },
+  {
+    "nameUa": "Орджонікідзе, Дніпропетровська обл.",
+    "nameRu": "Орджоникидзе, Днепропетровская обл.",
+    "nameEn": "Ordzhonikidze",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.6,
+    "longitude": 33.9
+  },
+  {
+    "nameUa": "Павлівка, Дніпропетровська обл.",
+    "nameRu": "Павловка, Днепропетровская обл.",
+    "nameEn": "Pavlivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 35.6
+  },
+  {
+    "nameUa": "Партизанське, Дніпропетровська обл.",
+    "nameRu": "Партизанское, Днепропетровская обл.",
+    "nameEn": "Partyanske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.9,
+    "longitude": 34.3
+  },
+  {
+    "nameUa": "Петриківка, Дніпропетровська обл.",
+    "nameRu": "Петриковка, Днепропетровская обл.",
+    "nameEn": "Petrykivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4,
+    "longitude": 34.6
+  },
+  {
+    "nameUa": "Покровське, Дніпропетровська обл.",
+    "nameRu": "Покровское, Днепропетровская обл.",
+    "nameEn": "Pokrovske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.1,
+    "longitude": 36.0
+  },
+  {
+    "nameUa": "Привільне, Дніпропетровська обл.",
+    "nameRu": "Привольное, Днепропетровская обл.",
+    "nameEn": "Pryvilne",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.8,
+    "longitude": 33.6
+  },
+  {
+    "nameUa": "Просяна, Дніпропетровська обл.",
+    "nameRu": "Просяная, Днепропетровская обл.",
+    "nameEn": "Prosyana",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3,
+    "longitude": 35.4
+  },
+  {
+    "nameUa": "Радушне, Дніпропетровська обл.",
+    "nameRu": "Радушное, Днепропетровская обл.",
+    "nameEn": "Radushne",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.0,
+    "longitude": 34.5
+  },
+  {
+    "nameUa": "Сад, Дніпропетровська обл.",
+    "nameRu": "Сад, Днепропетровская обл.",
+    "nameEn": "Sad",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.7,
+    "longitude": 34.1
+  },
+  {
+    "nameUa": "Славгород, Дніпропетровська обл.",
+    "nameRu": "Славгород, Днепропетровская обл.",
+    "nameEn": "Slavhorod",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 35.7
+  },
+  {
+    "nameUa": "Солоне, Дніпропетровська обл.",
+    "nameRu": "Соленое, Днепропетровская обл.",
+    "nameEn": "Solone",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.1,
+    "longitude": 34.8
+  },
+  {
+    "nameUa": "Софіївка, Дніпропетровська обл.",
+    "nameRu": "Софиевка, Днепропетровская обл.",
+    "nameEn": "Sofiivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.0,
+    "longitude": 33.8
+  },
+  {
+    "nameUa": "Старозаводське, Дніпропетровська обл.",
+    "nameRu": "Старозаводское, Днепропетровская обл.",
+    "nameEn": "Starozavodske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.9,
+    "longitude": 34.2
+  },
+  {
+    "nameUa": "Сурсько-Литовське, Дніпропетровська обл.",
+    "nameRu": "Сурско-Литовское, Днепропетровская обл.",
+    "nameEn": "Surske-Lytovske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3,
+    "longitude": 35.0
+  },
+  {
+    "nameUa": "Томаківка, Дніпропетровська обл.",
+    "nameRu": "Томаковка, Днепропетровская обл.",
+    "nameEn": "Tomakivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.8,
+    "longitude": 34.7
+  },
+  {
+    "nameUa": "Троїцьке, Дніпропетровська обл.",
+    "nameRu": "Троицкое, Днепропетровская обл.",
+    "nameEn": "Troitske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.1,
+    "longitude": 35.5
+  },
+  {
+    "nameUa": "Українка, Дніпропетровська обл.",
+    "nameRu": "Украинка, Днепропетровская обл.",
+    "nameEn": "Ukrainka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.7,
+    "longitude": 33.7
+  },
+  {
+    "nameUa": "Хорошеве, Дніпропетровська обл.",
+    "nameRu": "Хорошее, Днепропетровская обл.",
+    "nameEn": "Khorosheve",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 36.2
+  },
+  {
+    "nameUa": "Царичанка, Дніпропетровська обл.",
+    "nameRu": "Царичанка, Днепропетровская обл.",
+    "nameEn": "Tsarychanka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4,
+    "longitude": 34.5
+  },
+  {
+    "nameUa": "Чаплі, Дніпропетровська обл.",
+    "nameRu": "Чапли, Днепропетровская обл.",
+    "nameEn": "Chapli",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.0,
+    "longitude": 34.9
+  },
+  {
+    "nameUa": "Червоний Яр, Дніпропетровська обл.",
+    "nameRu": "Красный Яр, Днепропетровская обл.",
+    "nameEn": "Chervonyi Yar",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.9,
+    "longitude": 33.9
+  },
+  {
+    "nameUa": "Червоногригорівка, Дніпропетровська обл.",
+    "nameRu": "Червоногригоровка, Днепропетровская обл.",
+    "nameEn": "Chervonohryhorivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.6,
+    "longitude": 34.3
+  },
+  {
+    "nameUa": "Червоне, Дніпропетровська обл.",
+    "nameRu": "Червонное, Днепропетровская обл.",
+    "nameEn": "Chervone",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.1,
+    "longitude": 35.8
+  },
+  {
+    "nameUa": "Чкалове, Дніпропетровська обл.",
+    "nameRu": "Чкалово, Днепропетровская обл.",
+    "nameEn": "Chkalove",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.8,
+    "longitude": 34.0
+  },
+  {
+    "nameUa": "Шевченко, Дніпропетровська обл.",
+    "nameRu": "Шевченко, Днепропетровская обл.",
+    "nameEn": "Shevchenko",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.2,
+    "longitude": 35.3
+  },
+  {
+    "nameUa": "Широке, Дніпропетровська обл.",
+    "nameRu": "Широкое, Днепропетровская обл.",
+    "nameEn": "Shyroke",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 47.7,
+    "longitude": 33.8
+  },
+  {
+    "nameUa": "Щорськ, Дніпропетровська обл.",
+    "nameRu": "Щорск, Днепропетровская обл.",
+    "nameEn": "Shchorsk",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.3,
+    "longitude": 34.8
+  },
+  {
+    "nameUa": "Юр’ївка, Дніпропетровська обл.",
+    "nameRu": "Юрьевка, Днепропетровская обл.",
+    "nameEn": "Yurivka",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.1,
+    "longitude": 36.1
+  },
+  {
+    "nameUa": "Яснополянське, Дніпропетровська обл.",
+    "nameRu": "Яснополянское, Днепропетровская обл.",
+    "nameEn": "Yasnopolyanske",
+    "region": "Дніпропетровська область",
+    "countryUa": "Україна",
+    "countryEn": "Ukraine",
+    "latitude": 48.4,
+    "longitude": 35.9
+  }
+]
