@@ -123,8 +123,8 @@ export const Header: React.FC<Props> = ({ className }) => {
           </Link> */}
 
           {query.length < 2 ? (
-            <p className="px-3 py-1 rounded-2xl text-gray-500">
-              Введіть мінімум 2 символи для пошуку
+            <p className="px-3 py-1 rounded-2xl text-gray-500 ">
+              Введіть мінімум 2 символи
             </p>
           ) : cities.length === 0 && !loading ? (
             <p className="flex gap-1 items-center px-3 py-1 rounded-2xl text-red-500">
@@ -132,7 +132,7 @@ export const Header: React.FC<Props> = ({ className }) => {
             </p>
           ) : null}
         </div>
-        
+
       </div>
 
       <ModeToggle />
