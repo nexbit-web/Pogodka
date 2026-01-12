@@ -19,11 +19,18 @@ export default async function WeatherPage({ params }: PageProps) {
   const { city: encodedCityName } = await params;
   const cityName = decodeURIComponent(encodedCityName);
 
+  // const baseUrl =
+  //   process.env.NODE_ENV === "development"
+  //     ? "http://localhost:3000"
+  //     : process.env.VERCEL_URL
+  //     ? `https://${process.env.VERCEL_URL}`
+  //     : "https://pogodka.vercel.app";
+
   const baseUrl =
     process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
+      ? "https://pogodka-kc9z0lg8s-mihalcann-2454s-projects.vercel.app"
       : process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
+      ? `https://pogodka-git-main-mihalcann-2454s-projects.vercel.app`
       : "https://pogodka.vercel.app";
 
   let data: ApiResponse;
