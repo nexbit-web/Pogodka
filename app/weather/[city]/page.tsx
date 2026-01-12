@@ -1,7 +1,7 @@
 import { Container } from "@/components/shared/Container";
 import { HourlyWeather } from "@/components/shared/Hourly-weather";
 import { WeatherHeadline } from "@/components/shared/Weather-headline";
-// import { DateTime } from "luxon";
+
 interface PageProps {
   params: Promise<{ city: string }>;
 }
@@ -12,62 +12,70 @@ interface ApiResponse {
   kraina: string;
   latitude: number;
   longitude: number;
-  weather: any; // тут весь объект Open-Meteo
+  weather: any; // Об'єкт Open-Meteo
 }
 
 export default async function WeatherPage({ params }: PageProps) {
-  const now = new Date();
-  const today = now.toISOString().split("T")[0];
-  const currentHour = now.getHours();
-
+  // Отримуємо назву міста з params
   const { city: encodedCityName } = await params;
   const cityName = decodeURIComponent(encodedCityName);
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL || "https://pogodka.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://pogodka.vercel.app";
 
-  const apiRes = await fetch(
-    `${baseUrl}/api/pogoda?city=${encodeURIComponent(cityName)}`,
-    { cache: "no-store" }
-  );
+  let data: ApiResponse;
 
-  if (!apiRes.ok) return <h1>Не удалось получить данные погоды</h1>;
+  // Виконуємо запит до API
+  try {
+    const apiRes = await fetch(
+      `${baseUrl}/api/pogoda?city=${encodeURIComponent(cityName)}`,
+      { cache: "no-store" }
+    );
 
-  const data: ApiResponse = await apiRes.json();
-  if ((data as any).error) return <h1>{(data as any).error}</h1>;
+    if (!apiRes.ok) {
+      const json = await apiRes.json();
+      return <h1 className="text-center mt-10 text-xl">{json.error || "Не вдалося отримати дані погоди"}</h1>;
+    }
+
+    data = await apiRes.json();
+
+    if (!data.weather?.hourly?.time?.length || !data.weather?.daily?.time?.length) {
+      return <h1 className="text-center mt-10 text-xl">Дані погоди відсутні</h1>;
+    }
+  } catch (error) {
+    console.error("Помилка при завантаженні даних:", error);
+    return <h1 className="text-center mt-10 text-xl">Помилка завантаження даних</h1>;
+  }
 
   const { weather } = data;
 
+  // Поточна дата та час
+  const now = new Date();
+  const today = now.toISOString().split("T")[0];
+  const currentHour = now.getUTCHours();
+
+  // Знаходимо індекс поточного часу
+  const hourIndex = weather.hourly.time.findIndex(
+    (time: string) =>
+      time.startsWith(today) && new Date(time).getUTCHours() === currentHour
+  );
+
+  // Поточна температура та код погоди
+  const currentTemp = weather.hourly.temperature_2m[hourIndex >= 0 ? hourIndex : 0] ?? 0;
+  const currentFeels = weather.hourly.apparent_temperature[hourIndex >= 0 ? hourIndex : 0] ?? 0;
+  const currentCode = weather.hourly.weathercode[hourIndex >= 0 ? hourIndex : 0] ?? 0;
+
+  // Переклад коду погоди в текст
   const getWeatherText = (code: number) => {
     const map: Record<number, string> = {
       0: "Ясно 🌞",
-      1: "Солнечно с облаками 🌤",
-      2: "Облачно",
-      3: "Пасмурно",
-      71: "Снег ❄️",
-      85: "Сильный снег ❄️☃️",
+      1: "Сонячно з хмарами 🌤",
+      2: "Хмарно",
+      3: "Похмуро",
+      71: "Сніг ❄️",
+      85: "Сильний сніг ❄️☃️",
     };
-    return map[code] || "Неизвестно";
+    return map[code] || "Не відомо";
   };
-
-  // знайти індекс поточного часу
-  const hourIndex = weather.hourly.time.findIndex(
-    (time: string) =>
-      time.startsWith(today) && new Date(time).getHours() === currentHour
-  );
-  // Берем поточну погоду з першого елемента погодинного масиву, якщо індекс не знайдено
-  const currentTemp =
-    hourIndex >= 0
-      ? weather.hourly.temperature_2m[hourIndex]
-      : weather.hourly.temperature_2m[0];
-  const currentFeels =
-    hourIndex >= 0
-      ? weather.hourly.apparent_temperature[hourIndex]
-      : weather.hourly.apparent_temperature[0];
-  const currentCode =
-    hourIndex >= 0
-      ? weather.hourly.weathercode[hourIndex]
-      : weather.hourly.weathercode[0];
 
   return (
     <Container>
@@ -76,15 +84,15 @@ export default async function WeatherPage({ params }: PageProps) {
         temperature={currentTemp}
         weather={currentCode}
         isFelt={currentFeels}
-        MinTemperature={weather.daily.temperature_2m_min[0]}
-        MaxTemperature={weather.daily.temperature_2m_max[0]}
+        MinTemperature={weather.daily.temperature_2m_min[0] ?? 0}
+        MaxTemperature={weather.daily.temperature_2m_max[0] ?? 0}
       />
 
       <HourlyWeather days={weather} />
 
       <section className="mt-4">
         <h2 className="text-2xl font-semibold">Щоденні дані</h2>
-        <table className="mt-2 border border-gray-300">
+        <table className="mt-2 border border-gray-300 w-full text-center">
           <thead>
             <tr>
               <th className="px-2 border">Дата</th>
@@ -98,18 +106,10 @@ export default async function WeatherPage({ params }: PageProps) {
             {weather.daily.time.map((date: string, idx: number) => (
               <tr key={date}>
                 <td className="px-2 border">{date}</td>
-                <td className="px-2 border">
-                  {Math.round(weather.daily.temperature_2m_max[idx])}
-                </td>
-                <td className="px-2 border">
-                  {Math.round(weather.daily.temperature_2m_min[idx])}
-                </td>
-                <td className="px-2 border">
-                  {weather.daily.precipitation_sum[idx]}
-                </td>
-                <td className="px-2 border">
-                  {getWeatherText(weather.daily.weathercode[idx])}
-                </td>
+                <td className="px-2 border">{Math.round(weather.daily.temperature_2m_max[idx] ?? 0)}</td>
+                <td className="px-2 border">{Math.round(weather.daily.temperature_2m_min[idx] ?? 0)}</td>
+                <td className="px-2 border">{weather.daily.precipitation_sum[idx] ?? 0}</td>
+                <td className="px-2 border">{getWeatherText(weather.daily.weathercode[idx] ?? 0)}</td>
               </tr>
             ))}
           </tbody>
