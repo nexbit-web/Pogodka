@@ -16,19 +16,22 @@ interface ApiResponse {
 }
 
 export default async function WeatherPage({ params }: PageProps) {
-  const now = new Date();
-  const today = now.toISOString().split("T")[0];
-  const currentHour = now.getHours();
-  
+  const kievNow = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "Europe/Kiev" })
+  );
+  const today = kievNow.toISOString().split("T")[0];
+  const currentHour = kievNow.getHours();
+
   const { city: encodedCityName } = await params;
   const cityName = decodeURIComponent(encodedCityName);
 
-const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://pogodka.vercel.app";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL || "https://pogodka.vercel.app";
 
-const apiRes = await fetch(
-  `${baseUrl}/api/pogoda?city=${encodeURIComponent(cityName)}`,
-  { cache: "no-store" }
-);
+  const apiRes = await fetch(
+    `${baseUrl}/api/pogoda?city=${encodeURIComponent(cityName)}`,
+    { cache: "no-store" }
+  );
 
   if (!apiRes.ok) return <h1>Не удалось получить данные погоды</h1>;
 
