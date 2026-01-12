@@ -1,7 +1,7 @@
 import { Container } from "@/components/shared/Container";
 import { HourlyWeather } from "@/components/shared/Hourly-weather";
 import { WeatherHeadline } from "@/components/shared/Weather-headline";
-
+import { DateTime } from "luxon";
 interface PageProps {
   params: Promise<{ city: string }>;
 }
@@ -16,11 +16,11 @@ interface ApiResponse {
 }
 
 export default async function WeatherPage({ params }: PageProps) {
-  const kievNow = new Date(
-    new Date().toLocaleString("en-US", { timeZone: "Europe/Kiev" })
-  );
-  const today = kievNow.toISOString().split("T")[0];
-  const currentHour = kievNow.getHours();
+
+const kievNow = DateTime.now().setZone("Europe/Kiev");
+
+const today = kievNow.toISODate(); // yyyy-mm-dd
+const currentHour = kievNow.hour;
 
   const { city: encodedCityName } = await params;
   const cityName = decodeURIComponent(encodedCityName);
