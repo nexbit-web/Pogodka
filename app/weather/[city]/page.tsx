@@ -19,11 +19,11 @@ export default async function WeatherPage({ params }: PageProps) {
   const { city: encodedCityName } = await params;
   const cityName = decodeURIComponent(encodedCityName);
 
-  // Тут ми обираємо повний URL для fetch
-  const baseUrl =
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : process.env.NEXT_PUBLIC_BASE_URL || "https://pogodka.vercel.app";
+  const baseUrl = (() => {
+    if (process.env.NODE_ENV === "development") return "http://localhost:3000";
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+    return "https://pogodka.vercel.app"; 
+  })();
 
   let data: ApiResponse;
 
@@ -44,7 +44,10 @@ export default async function WeatherPage({ params }: PageProps) {
 
     data = await apiRes.json();
 
-    if (!data.weather?.hourly?.time?.length || !data.weather?.daily?.time?.length) {
+    if (
+      !data.weather?.hourly?.time?.length ||
+      !data.weather?.daily?.time?.length
+    ) {
       return (
         <h1 className="text-center mt-10 text-xl">Дані погоди відсутні</h1>
       );
@@ -67,9 +70,12 @@ export default async function WeatherPage({ params }: PageProps) {
       time.startsWith(today) && new Date(time).getUTCHours() === currentHour
   );
 
-  const currentTemp = weather.hourly.temperature_2m[hourIndex >= 0 ? hourIndex : 0] ?? 0;
-  const currentFeels = weather.hourly.apparent_temperature[hourIndex >= 0 ? hourIndex : 0] ?? 0;
-  const currentCode = weather.hourly.weathercode[hourIndex >= 0 ? hourIndex : 0] ?? 0;
+  const currentTemp =
+    weather.hourly.temperature_2m[hourIndex >= 0 ? hourIndex : 0] ?? 0;
+  const currentFeels =
+    weather.hourly.apparent_temperature[hourIndex >= 0 ? hourIndex : 0] ?? 0;
+  const currentCode =
+    weather.hourly.weathercode[hourIndex >= 0 ? hourIndex : 0] ?? 0;
 
   const getWeatherText = (code: number) => {
     const map: Record<number, string> = {
@@ -112,10 +118,18 @@ export default async function WeatherPage({ params }: PageProps) {
             {weather.daily.time.map((date: string, idx: number) => (
               <tr key={date}>
                 <td className="px-2 border">{date}</td>
-                <td className="px-2 border">{Math.round(weather.daily.temperature_2m_max[idx] ?? 0)}</td>
-                <td className="px-2 border">{Math.round(weather.daily.temperature_2m_min[idx] ?? 0)}</td>
-                <td className="px-2 border">{weather.daily.precipitation_sum[idx] ?? 0}</td>
-                <td className="px-2 border">{getWeatherText(weather.daily.weathercode[idx] ?? 0)}</td>
+                <td className="px-2 border">
+                  {Math.round(weather.daily.temperature_2m_max[idx] ?? 0)}
+                </td>
+                <td className="px-2 border">
+                  {Math.round(weather.daily.temperature_2m_min[idx] ?? 0)}
+                </td>
+                <td className="px-2 border">
+                  {weather.daily.precipitation_sum[idx] ?? 0}
+                </td>
+                <td className="px-2 border">
+                  {getWeatherText(weather.daily.weathercode[idx] ?? 0)}
+                </td>
               </tr>
             ))}
           </tbody>
