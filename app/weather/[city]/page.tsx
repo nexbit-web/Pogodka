@@ -1,7 +1,7 @@
 import { Container } from "@/components/shared/Container";
 import { HourlyWeather } from "@/components/shared/Hourly-weather";
 import { WeatherHeadline } from "@/components/shared/Weather-headline";
-
+import { DateTime } from "luxon";
 interface PageProps {
   params: Promise<{ city: string }>;
 }
@@ -16,11 +16,10 @@ interface ApiResponse {
 }
 
 export default async function WeatherPage({ params }: PageProps) {
-  const kievNow = new Date(
-    new Date().toLocaleString("en-US", { timeZone: "Europe/Kiev" })
-  );
-  const today = kievNow.toISOString().split("T")[0];
-  const currentHour = kievNow.getHours();
+
+const kievNow = DateTime.now().setZone("Europe/Kiev");
+const today = kievNow.toFormat("yyyy-MM-dd"); // string
+const currentHour = kievNow.hour;
 
   const { city: encodedCityName } = await params;
   const cityName = decodeURIComponent(encodedCityName);
@@ -53,10 +52,12 @@ export default async function WeatherPage({ params }: PageProps) {
   };
 
   // знайти індекс поточного часу
-  const hourIndex = weather.hourly.time.findIndex(
-    (time: string) =>
-      time.startsWith(today) && new Date(time).getHours() === currentHour
-  );
+const hourIndex = weather.hourly.time.findIndex(
+  (time: string | null) =>
+    time !== null &&
+    time.startsWith(today) &&
+    DateTime.fromISO(time).hour === currentHour
+);
   // Берем поточну погоду з першого елемента погодинного масиву, якщо індекс не знайдено
   const currentTemp =
     hourIndex >= 0
