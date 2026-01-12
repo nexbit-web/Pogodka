@@ -18,8 +18,7 @@ interface ApiResponse {
 export default async function WeatherPage({ params }: PageProps) {
 
 const kievNow = DateTime.now().setZone("Europe/Kiev");
-
-const today = kievNow.toISODate(); // yyyy-mm-dd
+const today = kievNow.toFormat("yyyy-MM-dd"); // string
 const currentHour = kievNow.hour;
 
   const { city: encodedCityName } = await params;
@@ -53,10 +52,12 @@ const currentHour = kievNow.hour;
   };
 
   // знайти індекс поточного часу
-  const hourIndex = weather.hourly.time.findIndex(
-    (time: string) =>
-      time.startsWith(today) && new Date(time).getHours() === currentHour
-  );
+const hourIndex = weather.hourly.time.findIndex(
+  (time: string | null) =>
+    time !== null &&
+    time.startsWith(today) &&
+    DateTime.fromISO(time).hour === currentHour
+);
   // Берем поточну погоду з першого елемента погодинного масиву, якщо індекс не знайдено
   const currentTemp =
     hourIndex >= 0
