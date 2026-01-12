@@ -16,15 +16,17 @@ interface ApiResponse {
 }
 
 export default async function WeatherPage({ params }: PageProps) {
-  // Отримуємо назву міста з params
   const { city: encodedCityName } = await params;
   const cityName = decodeURIComponent(encodedCityName);
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://pogodka.vercel.app";
+  // Тут ми обираємо повний URL для fetch
+  const baseUrl =
+    process.env.NODE_ENV === "development"
+      ? "http://localhost:3000"
+      : process.env.NEXT_PUBLIC_BASE_URL || "https://pogodka.vercel.app";
 
   let data: ApiResponse;
 
-  // Виконуємо запит до API
   try {
     const apiRes = await fetch(
       `${baseUrl}/api/pogoda?city=${encodeURIComponent(cityName)}`,
@@ -33,38 +35,42 @@ export default async function WeatherPage({ params }: PageProps) {
 
     if (!apiRes.ok) {
       const json = await apiRes.json();
-      return <h1 className="text-center mt-10 text-xl">{json.error || "Не вдалося отримати дані погоди"}</h1>;
+      return (
+        <h1 className="text-center mt-10 text-xl">
+          {json.error || "Не вдалося отримати дані погоди"}
+        </h1>
+      );
     }
 
     data = await apiRes.json();
 
     if (!data.weather?.hourly?.time?.length || !data.weather?.daily?.time?.length) {
-      return <h1 className="text-center mt-10 text-xl">Дані погоди відсутні</h1>;
+      return (
+        <h1 className="text-center mt-10 text-xl">Дані погоди відсутні</h1>
+      );
     }
   } catch (error) {
     console.error("Помилка при завантаженні даних:", error);
-    return <h1 className="text-center mt-10 text-xl">Помилка завантаження даних</h1>;
+    return (
+      <h1 className="text-center mt-10 text-xl">Помилка завантаження даних</h1>
+    );
   }
 
   const { weather } = data;
 
-  // Поточна дата та час
   const now = new Date();
   const today = now.toISOString().split("T")[0];
   const currentHour = now.getUTCHours();
 
-  // Знаходимо індекс поточного часу
   const hourIndex = weather.hourly.time.findIndex(
     (time: string) =>
       time.startsWith(today) && new Date(time).getUTCHours() === currentHour
   );
 
-  // Поточна температура та код погоди
   const currentTemp = weather.hourly.temperature_2m[hourIndex >= 0 ? hourIndex : 0] ?? 0;
   const currentFeels = weather.hourly.apparent_temperature[hourIndex >= 0 ? hourIndex : 0] ?? 0;
   const currentCode = weather.hourly.weathercode[hourIndex >= 0 ? hourIndex : 0] ?? 0;
 
-  // Переклад коду погоди в текст
   const getWeatherText = (code: number) => {
     const map: Record<number, string> = {
       0: "Ясно 🌞",
