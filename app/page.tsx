@@ -1204,6 +1204,8 @@ export default function Home() {
                 })}
             </div>
           </div>
+
+          
           <div className="grid auto-rows-min gap-4 md:grid-cols-3">
             <div className="bg-muted/50 aspect-video rounded-4xl">
               <span className="flex gap-1 items-center pl-5 pt-2 font-medium   text-muted-foreground">

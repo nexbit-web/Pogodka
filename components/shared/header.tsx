@@ -98,29 +98,22 @@ export const Header: React.FC<Props> = ({ className }) => {
           )}
 
           {cities.map((city) => (
-            <Link key={city.id} href={""}>
+            <Link
+              key={city.id}
+              href={`/weather/${encodeURIComponent(city.nameUa)}`}
+              onClick={() => {
+                setQuery("");
+                setFocused(false);
+              }}
+            >
               <div
                 className="px-3 py-1 hover:bg-primary/10 rounded-2xl 
                   whitespace-nowrap overflow-hidden text-ellipsis"
               >
-                {city.nameUa} • 📍 {city.latitude.toFixed(4)},{" "}
-                {city.longitude.toFixed(4)}
+                {city.nameUa} • 📍 {city.region}
               </div>
             </Link>
           ))}
-
-          {/* <div className="text-sm text-gray-500 mt-1">
-                {city.region} • 📍 {city.latitude.toFixed(4)},{" "}
-                {city.longitude.toFixed(4)}
-              </div>
-              <div className="text-gray-600">
-                {city.nameEn} / {city.nameRu}
-              </div> */}
-          {/* <Link href={""}>
-            <div className="px-3 py-1 hover:bg-primary/10 rounded-2xl">
-              Київ
-            </div>
-          </Link> */}
 
           {query.length < 2 ? (
             <p className="px-3 py-1 rounded-2xl text-gray-500 ">
@@ -132,7 +125,6 @@ export const Header: React.FC<Props> = ({ className }) => {
             </p>
           ) : null}
         </div>
-
       </div>
 
       <ModeToggle />

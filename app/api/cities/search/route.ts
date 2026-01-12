@@ -27,7 +27,7 @@ export async function GET(request: Request) {
       latitude: true,
       longitude: true,
     },
-    take: 5, // лимит, чтобы не перегружать
+    take: 7, // лимит, чтобы не перегружать
     orderBy: { nameEn: "asc" },
   });
 
