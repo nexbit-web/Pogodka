@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import React, { useRef, useEffect } from "react";
-
+import { DateTime } from "luxon";
 interface Hour {
   time: string; // ISO строка
   temp: number;
@@ -26,10 +26,11 @@ interface HourlyWeatherProps {
 export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
   if (!days || !days.hourly) return null;
 
-  const today = new Date().toISOString().split("T")[0];
-  const currentHour = new Date().getHours();
+ const kievNow = DateTime.now().setZone("Europe/Kyiv");
 
-  const currentHourRef = useRef<HTMLDivElement | null>(null);
+const today = kievNow.toISODate()!; // YYYY-MM-DD, тип string
+const currentHour = kievNow.hour;  
+const currentHourRef = useRef<HTMLDivElement | null>(null);
 
   // Формируем массив часов с типом Hour
   const hours: Hour[] = days.hourly.time
