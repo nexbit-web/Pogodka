@@ -37,6 +37,7 @@ export default async function WeatherPage({ params }: PageProps) {
       throw new Error("API error");
     }
 
+    
     data = await apiRes.json();
   } catch (error) {
     console.error("Помилка при завантаженні даних:", error);
