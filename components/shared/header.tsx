@@ -58,7 +58,7 @@ export const Header: React.FC<Props> = ({ className }) => {
         className
       )}
     >
-      <SidebarTrigger className="-ml-1 cursor-pointer" />
+      <SidebarTrigger className="-ml-1 cursor-pointer z-10" />
 
       {focused && (
         <div
@@ -110,7 +110,7 @@ export const Header: React.FC<Props> = ({ className }) => {
                 className="px-3 py-1 hover:bg-primary/10 rounded-2xl 
                   whitespace-nowrap overflow-hidden text-ellipsis"
               >
-                {city.nameUa} • 📍 {city.region}
+                🇺🇦 {city.nameUa}, {city.region}
               </div>
             </Link>
           ))}
@@ -126,8 +126,9 @@ export const Header: React.FC<Props> = ({ className }) => {
           ) : null}
         </div>
       </div>
-
-      <ModeToggle />
+      <div className="z-10">
+        <ModeToggle />
+      </div>
     </header>
   );
 };

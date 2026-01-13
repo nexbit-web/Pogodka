@@ -26,11 +26,11 @@ interface HourlyWeatherProps {
 export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
   if (!days || !days.hourly) return null;
 
- const kievNow = DateTime.now().setZone("Europe/Kyiv");
+  const kievNow = DateTime.now().setZone("Europe/Kyiv");
 
-const today = kievNow.toISODate()!; // YYYY-MM-DD, тип string
-const currentHour = kievNow.hour;  
-const currentHourRef = useRef<HTMLDivElement | null>(null);
+  const today = kievNow.toISODate()!; // YYYY-MM-DD, тип string
+  const currentHour = kievNow.hour;
+  const currentHourRef = useRef<HTMLDivElement | null>(null);
 
   // Формируем массив часов с типом Hour
   const hours: Hour[] = days.hourly.time
@@ -90,7 +90,8 @@ const currentHourRef = useRef<HTMLDivElement | null>(null);
   return (
     <div>
       <div
-        className="flex gap-2 justify-evenly bg-muted/50 rounded-2xl overflow-x-auto scroll-on-hover"
+        className="flex gap-1 justify-evenly rounded-2xl overflow-x-auto scroll-on-hover
+                bg-black/5 backdrop-blur-md border border-white/10 shadow-md py-1"
         style={{ scrollBehavior: "smooth" }}
       >
         {hours.length > 0 &&
@@ -106,15 +107,23 @@ const currentHourRef = useRef<HTMLDivElement | null>(null);
                   isCurrent ? "bg-[color:var(--primary)] text-white" : ""
                 }`}
               >
-                <p className="text-lg font-medium">{hourTime}</p>
+                <p
+                  className="text-lg font-medium"
+                  style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
+                >
+                  {hourTime}
+                </p>
                 <Image
-                className="mx-1"
+                  className="mx-1"
                   src={getWeatherIcon(hour.code)}
                   alt="Weather icon"
                   width={35}
                   height={38}
                 />
-                <p className="text-lg font-semibold">
+                <p
+                  className="text-lg font-semibold"
+                  style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
+                >
                   {Math.round(hour.temp)}°
                 </p>
               </div>

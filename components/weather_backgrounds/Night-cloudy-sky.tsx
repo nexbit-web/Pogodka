@@ -13,6 +13,8 @@ interface Star {
   radius: number;
   alpha: number;
   twinkleSpeed: number;
+  falling?: boolean;
+  speedY?: number;
 }
 
 interface Cloud {
@@ -48,95 +50,105 @@ export const NightCloudySky: React.FC<NightSkyProps> = ({ width, height }) => {
     };
     window.addEventListener("resize", resize);
 
-    // ===== Проверка слабого устройства =====
+    // Проверка слабого устройства
     const lowEnd =
       navigator.hardwareConcurrency <= 4 ||
       (navigator as any).deviceMemory <= 2;
 
-    // ===== FPS =====
-    const FPS = lowEnd ? 15 : 24;
-    let last = 0;
-
-    // ===== Звезды =====
-    const starCount = lowEnd ? 50 : 90;
+    // Звезды
+    const starCount = lowEnd ? 50 : 120;
     const stars: Star[] = Array.from({ length: starCount }, () => ({
-      x: Math.random(),
-      y: Math.random() * 0.45,
-      radius: Math.random() * 1 + 0.5,
-      alpha: Math.random() * 0.5 + 0.3,
-      twinkleSpeed: Math.random() * 0.01 + 0.002,
+      x: Math.random() * w,
+      y: Math.random() * h * 0.5,
+      radius: Math.random() * 2 + 1, // звезды чуть больше
+      alpha: Math.random() * 0.8 + 0.5, // ярче начальная прозрачность
+      twinkleSpeed: Math.random() * 0.03 + 0.01, // более яркое и заметное мерцание
+      falling: Math.random() < 0.01, // реже падающие звезды (1%)
+      speedY: Math.random() * 5 + 8, // падают быстрее
     }));
 
     const drawStars = () => {
       stars.forEach((s) => {
+        // Мерцание
+        s.alpha += s.twinkleSpeed;
+        if (s.alpha > 1 || s.alpha < 0.4) s.twinkleSpeed *= -1; // диапазон мерцания больше
+
+        // Падающие звезды
+        if (s.falling) {
+          s.y += s.speedY!;
+          s.x += s.speedY! * 0.5; // небольшой наклон
+          if (s.y > h || s.x > w) {
+            s.y = Math.random() * h * 0.5;
+            s.x = Math.random() * w;
+          }
+        }
+
         ctx.beginPath();
-        ctx.arc(s.x * w, s.y * h, s.radius, 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
         ctx.fill();
-        s.alpha += s.twinkleSpeed;
-        if (s.alpha > 1 || s.alpha < 0.3) s.twinkleSpeed *= -1;
       });
     };
 
-    // ===== Хмари =====
+    // Облака
     const cloudLayers = [
       {
         count: lowEnd ? 3 : 6,
-        speed: 0.0001,
-        alpha: 0.02,
+        speed: lowEnd ? 0.0015 : 0.003,
+        alpha: 0.05,
         widthRange: [150, 250],
         heightRange: [25, 50],
       },
     ];
-    const clouds: Cloud[] = [];
-    cloudLayers.forEach((layer) => {
-      for (let i = 0; i < layer.count; i++) {
-        const wC =
-          layer.widthRange[0] +
-          Math.random() * (layer.widthRange[1] - layer.widthRange[0]);
-        const hC =
-          layer.heightRange[0] +
-          Math.random() * (layer.heightRange[1] - layer.heightRange[0]);
-        clouds.push({
-          x: Math.random(),
-          y: Math.random() * 0.18 + 0.02,
-          width: wC,
-          height: hC,
-          alpha: layer.alpha,
-          speed: layer.speed,
-          swayAngle: Math.random() * Math.PI * 2,
-          swayAmount: Math.random() * 0.03 + 0.02,
-        });
-      }
-    });
 
-    const drawClouds = () => {
-      clouds.forEach((c) => {
-        c.swayAngle += 0.0005;
-        const wMod = c.width * (0.95 + c.swayAmount * Math.sin(c.swayAngle));
-        const hMod =
-          c.height * (0.95 + c.swayAmount * Math.sin(c.swayAngle * 1.2));
-        const grad = ctx.createRadialGradient(
-          c.x * w,
-          c.y * h,
-          wMod * 0.1,
-          c.x * w,
-          c.y * h,
-          wMod
-        );
-        grad.addColorStop(0, `rgba(255,255,255,${c.alpha})`);
-        grad.addColorStop(1, `rgba(255,255,255,0)`);
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.ellipse(c.x * w, c.y * h, wMod, hMod, 0, 0, Math.PI * 2);
-        ctx.fill();
+    // const clouds: Cloud[] = [];
+    // cloudLayers.forEach((layer) => {
+    //   for (let i = 0; i < layer.count; i++) {
+    //     const wC =
+    //       layer.widthRange[0] +
+    //       Math.random() * (layer.widthRange[1] - layer.widthRange[0]);
+    //     const hC =
+    //       layer.heightRange[0] +
+    //       Math.random() * (layer.heightRange[1] - layer.heightRange[0]);
+    //     clouds.push({
+    //       x: Math.random() * w,
+    //       y: Math.random() * h * 0.2,
+    //       width: wC,
+    //       height: hC,
+    //       alpha: layer.alpha,
+    //       speed: layer.speed,
+    //       swayAngle: Math.random() * Math.PI * 2,
+    //       swayAmount: Math.random() * 0.03 + 0.02,
+    //     });
+    //   }
+    // });
 
-        c.x -= c.speed;
-        if (c.x < -0.2) c.x = 1.2;
-      });
-    };
+    // const drawClouds = () => {
+    //   clouds.forEach((c) => {
+    //     c.swayAngle += 0.005;
+    //     const wMod = c.width * (0.95 + c.swayAmount * Math.sin(c.swayAngle));
+    //     const hMod =
+    //       c.height * (0.95 + c.swayAmount * Math.sin(c.swayAngle * 1.2));
+    //     const grad = ctx.createRadialGradient(
+    //       c.x,
+    //       c.y,
+    //       wMod * 0.1,
+    //       c.x,
+    //       c.y,
+    //       wMod
+    //     );
+    //     grad.addColorStop(0, `rgba(255,255,255,${c.alpha})`);
+    //     grad.addColorStop(1, `rgba(255,255,255,0)`);
+    //     ctx.fillStyle = grad;
+    //     ctx.beginPath();
+    //     ctx.ellipse(c.x, c.y, wMod, hMod, 0, 0, Math.PI * 2);
+    //     ctx.fill();
 
-    // ===== Фон =====
+    //     c.x -= c.speed * w;
+    //     if (c.x + c.width < 0) c.x = w + Math.random() * 100;
+    //   });
+    // };
+
     const drawBackground = () => {
       const grad = ctx.createLinearGradient(0, 0, 0, h);
       grad.addColorStop(0, "#111122");
@@ -145,18 +157,14 @@ export const NightCloudySky: React.FC<NightSkyProps> = ({ width, height }) => {
       ctx.fillRect(0, 0, w, h);
     };
 
-    // ===== Основной цикл =====
-    const loop = (time: number) => {
-      if (time - last < 1000 / FPS) {
-        requestAnimationFrame(loop);
-        return;
-      }
-      last = time;
+    const loop = () => {
+      ctx.clearRect(0, 0, w, h);
       drawBackground();
       drawStars();
-      drawClouds();
+      // drawClouds();
       requestAnimationFrame(loop);
     };
+
     requestAnimationFrame(loop);
 
     return () => window.removeEventListener("resize", resize);
@@ -165,7 +173,7 @@ export const NightCloudySky: React.FC<NightSkyProps> = ({ width, height }) => {
   return (
     <canvas
       ref={canvasRef}
-      style={{ display: "block", width: "100%", height: "100%" }}
+      className="absolute top-0 left-0 w-full h-full pointer-events-none z-[1]"
     />
   );
 };

@@ -19,7 +19,7 @@ export const WeatherHeadline: React.FC<Props> = ({
   MinTemperature,
   MaxTemperature,
 }) => {
- const getWeatherText = (code: number) => {
+  const getWeatherText = (code: number) => {
     const map: Record<number, string> = {
       0: "Ясно",
       1: "Майже ясно",
@@ -51,22 +51,36 @@ export const WeatherHeadline: React.FC<Props> = ({
     return map[code] || "Невідомо";
   };
   return (
-     <div className={className}>
+    <div className={className}>
       <div className="flex flex-col items-center gap-2 mt-9 mb-9">
-        <h1 className="text-3xl font-bold text-shadow">{city}</h1>
+        <h1
+          className="text-3xl font-bold text-shadow"
+          style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
+        >
+          {city}
+        </h1>
 
         {/* Поточна температура */}
-        <h2 className="text-7xl">
+        <h2
+          className="text-7xl"
+          style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
+        >
           {temperature ? `${Math.round(temperature)}°` : "--"}
         </h2>
 
         {/* Погода зараз */}
-        <p className="text-lg text-muted-foreground text-shadow text-center">
+        <p
+          className="text-lg text-shadow-muted-foreground text-shadow text-center"
+          style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
+        >
           {`${getWeatherText(weather)}, відчувається як ${Math.round(isFelt)}°`}
         </p>
 
         {/* Мінімальна / максимальна температура */}
-        <div className="flex gap-4 text-lg text-shadow">
+        <div
+          className="flex gap-4 text-lg "
+          style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
+        >
           <p>В: {Math.round(MaxTemperature)}°</p>
           <p>Н: {Math.round(MinTemperature)}°</p>
         </div>
