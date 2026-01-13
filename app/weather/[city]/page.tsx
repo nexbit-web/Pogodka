@@ -5,7 +5,6 @@ import { WeatherHeadline } from "@/components/shared/Weather-headline";
 interface PageProps {
   params: Promise<{ city: string }>;
 }
-
 interface ApiResponse {
   misto: string;
   oblast: string;
@@ -16,43 +15,29 @@ interface ApiResponse {
 }
 
 export default async function WeatherPage({ params }: PageProps) {
-  const { city: encodedCityName } = await params;
-  const cityName = decodeURIComponent(encodedCityName);
+   const { city } = await params;
+  const cityName = decodeURIComponent(city);
 
-  const baseUrl =
-    process.env.NODE_ENV === "development"
-      ? "http://localhost:3000"
-      : process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : "https://pogodka.vercel.app";
+  // const baseUrl =
+  //   process.env.NODE_ENV === "development"
+  //     ? "http://localhost:3000"
+  //     : process.env.VERCEL_URL
+  //     ? `https://${process.env.VERCEL_URL}`
+  //     : "https://pogodka.vercel.app";
 
   let data: ApiResponse;
 
   try {
-    const apiRes = await fetch(
-      `${baseUrl}/api/pogoda?city=${encodeURIComponent(cityName)}`,
-      { cache: "no-store" }
-    );
+  const apiRes = await fetch(
+  `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
+  { cache: "no-store" }
+);
 
     if (!apiRes.ok) {
-      const json = await apiRes.json();
-      return (
-        <h1 className="text-center mt-10 text-xl">
-          {json.error || "Не вдалося отримати дані погоди"}
-        </h1>
-      );
+      throw new Error("API error");
     }
 
     data = await apiRes.json();
-
-    if (
-      !data.weather?.hourly?.time?.length ||
-      !data.weather?.daily?.time?.length
-    ) {
-      return (
-        <h1 className="text-center mt-10 text-xl">Дані погоди відсутні</h1>
-      );
-    }
   } catch (error) {
     console.error("Помилка при завантаженні даних:", error);
     return (
