@@ -1,7 +1,7 @@
 import { Container } from "@/components/shared/Container";
 import { HourlyWeather } from "@/components/shared/Hourly-weather";
 import { WeatherHeadline } from "@/components/shared/Weather-headline";
-
+import { DateTime } from "luxon";
 interface PageProps {
   params: Promise<{ city: string }>;
 }
@@ -15,7 +15,7 @@ interface ApiResponse {
 }
 
 export default async function WeatherPage({ params }: PageProps) {
-   const { city } = await params;
+  const { city } = await params;
   const cityName = decodeURIComponent(city);
 
   // const baseUrl =
@@ -28,16 +28,17 @@ export default async function WeatherPage({ params }: PageProps) {
   let data: ApiResponse;
 
   try {
-  const apiRes = await fetch(
-  `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
-  { cache: "no-store" }
-);
+    const apiRes = await fetch(
+      `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(
+        cityName
+      )}`,
+      { cache: "no-store" }
+    );
 
     if (!apiRes.ok) {
       throw new Error("API error");
     }
 
-    
     data = await apiRes.json();
   } catch (error) {
     console.error("Помилка при завантаженні даних:", error);
@@ -48,14 +49,15 @@ export default async function WeatherPage({ params }: PageProps) {
 
   const { weather } = data;
 
-  const now = new Date();
-  const today = now.toISOString().split("T")[0];
-  const currentHour = now.getUTCHours();
+  const kievNow = DateTime.now().setZone("Europe/Kyiv");
 
-  const hourIndex = weather.hourly.time.findIndex(
-    (time: string) =>
-      time.startsWith(today) && new Date(time).getUTCHours() === currentHour
-  );
+  const today = kievNow.toISODate()!;
+  const currentHour = kievNow.hour;
+
+  const hourIndex = weather.hourly.time.findIndex((time: string) => {
+    const hour = DateTime.fromISO(time, { zone: "Europe/Kyiv" }).hour;
+    return time.startsWith(today) && hour === currentHour;
+  });
 
   const currentTemp =
     weather.hourly.temperature_2m[hourIndex >= 0 ? hourIndex : 0] ?? 0;
