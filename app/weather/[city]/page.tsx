@@ -26,10 +26,10 @@ export default async function WeatherPage({ params }: PageProps) {
       : "https://pogodka.vercel.app";
 
   let data: ApiResponse;
-  
+
   try {
     const apiRes = await fetch(
-      `${baseUrl}/api/pogoda?city=${encodeURIComponent(cityName)}`,
+      `$https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
       { cache: "no-store" }
     );
 
