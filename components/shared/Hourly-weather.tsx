@@ -1,4 +1,4 @@
-"use client"; // это обязательно для useEffect
+"use client"; 
 
 import Image from "next/image";
 import React, { useRef, useEffect } from "react";
@@ -32,17 +32,20 @@ export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
   const currentHour = kievNow.hour;
   const currentHourRef = useRef<HTMLDivElement | null>(null);
 
-  // Формируем массив часов с типом Hour
+// Формуємо масив годинника для поточного дня
   const hours: Hour[] = days.hourly.time
     .map((time, idx) => ({
       time,
-      temp: days.hourly.temperature_2m[idx],
-      wind: days.hourly.wind_speed_10m[idx],
-      precip: days.hourly.precipitation[idx],
-      code: days.hourly.weathercode[idx],
+      temp: days.hourly.temperature_2m[idx] ?? 0,
+      wind: days.hourly.wind_speed_10m?.[idx] ?? 0, 
+      precip: days.hourly.precipitation[idx] ?? 0,
+      code: days.hourly.weathercode[idx] ?? 0,
     }))
-    .filter((hour) => hour.time.split("T")[0] === today)
-    .slice(0, 24); // максимум 24 часа
+    .filter(
+      (hour) =>
+        DateTime.fromISO(hour.time).setZone("Europe/Kyiv").toISODate() === today
+    )
+    .slice(0, 24);
 
   const getWeatherIcon = (code: number) => {
     const map: Record<number, string> = {
@@ -76,7 +79,7 @@ export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
     return map[code] || "/icons/unknown.svg";
   };
 
-  // Автоскролл к текущему часу
+  // Автоскролл до поточної години
   useEffect(() => {
     if (currentHourRef.current) {
       currentHourRef.current.scrollIntoView({

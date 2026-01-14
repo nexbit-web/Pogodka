@@ -68,7 +68,7 @@ export const WeeklyForecast: React.FC<Props> = ({ days, className }) => {
   return (
     <div
       className={cn(
-        "rounded-2xl bg-black/5 backdrop-blur-md border border-white/10 shadow-md",
+        "rounded-2xl bg-black/5 backdrop-blur-md border border-white/10 shadow-md pb-1",
         className
       )}
     >
