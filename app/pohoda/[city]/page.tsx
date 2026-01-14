@@ -85,8 +85,9 @@ export default async function WeatherPage({ params }: PageProps) {
 
   return (
     <>
-      <NightCloudySky />
+      {/* <NightCloudySky /> */}
       {/* <CloudyDaySky/> */}
+
       <Container className="relative z-10">
         <div className="flex flex-1 flex-col gap-6 p-0 sm:p-4 w-full">
           <WeatherHeadline
@@ -99,7 +100,6 @@ export default async function WeatherPage({ params }: PageProps) {
           />
 
           <HourlyWeather days={weather} />
-          <p>{currentWeather.gusts}</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-min">
             <div className="row-span-2 md:row-span-3">

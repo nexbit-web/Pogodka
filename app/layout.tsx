@@ -83,7 +83,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${sfuiDisplay.variable} antialiased`}>
+      <body className={`${sfuiDisplay.variable} antialiased `}>
         <NextTopLoader
           color="var(--primary)"
           height={3}
@@ -102,7 +102,9 @@ export default function RootLayout({
             <SidebarInset>
               <div className="flex flex-col h-screen">
                 <Header />
-                <main className="flex-1 overflow-auto">{children}</main>
+                <main className="flex-1 overflow-auto bg-gradient-to-b from-[rgba(7,76,143,1)] to-[rgba(147,185,222,1)] bg-fixed  ">
+                  {children}
+                </main>
               </div>
             </SidebarInset>
           </SidebarProvider>
