@@ -5,6 +5,11 @@ import { WeeklyForecast } from "@/components/shared/Weekly-forecast";
 import { CloudyDaySky } from "@/components/weather_backgrounds/Cloudy-day-sky";
 import { NightCloudySky } from "@/components/weather_backgrounds/Night-cloudy-sky";
 import { DateTime } from "luxon";
+import { getCurrentWeather, CurrentWeather } from "@/utils/weather";
+import { WindBlock } from "@/components/shared/WindBlock";
+import { Visibility } from "@/components/shared/Visibility";
+import { Humidity } from "@/components/shared/Humidity";
+
 interface PageProps {
   params: Promise<{ city: string }>;
 }
@@ -66,13 +71,7 @@ export default async function WeatherPage({ params }: PageProps) {
     return time.startsWith(today) && hour === currentHour;
   });
 
-  // Поточна погода
-  const currentTemp =
-    weather.hourly.temperature_2m[hourIndex >= 0 ? hourIndex : 0] ?? 0;
-  const currentFeels =
-    weather.hourly.apparent_temperature[hourIndex >= 0 ? hourIndex : 0] ?? 0;
-  const currentCode =
-    weather.hourly.weathercode[hourIndex >= 0 ? hourIndex : 0] ?? 0;
+  const currentWeather: CurrentWeather = getCurrentWeather(weather, hourIndex);
 
   //  7 денний прогноз
   const weeklyDays = weather.daily.time.map((date: string, idx: number) => ({
@@ -86,57 +85,46 @@ export default async function WeatherPage({ params }: PageProps) {
 
   return (
     <>
-      {/* <NightCloudySky /> */}
+      <NightCloudySky />
       {/* <CloudyDaySky/> */}
       <Container className="relative z-10">
         <div className="flex flex-1 flex-col gap-6 p-0 sm:p-4 w-full">
           <WeatherHeadline
             city={data.misto}
-            temperature={currentTemp}
-            weather={currentCode}
-            isFelt={currentFeels}
+            temperature={currentWeather.temp}
+            weather={currentWeather.code}
+            isFelt={currentWeather.feels}
             MinTemperature={weather.daily.temperature_2m_min[0] ?? 0}
             MaxTemperature={weather.daily.temperature_2m_max[0] ?? 0}
           />
 
           <HourlyWeather days={weather} />
+          <p>{currentWeather.gusts}</p>
 
-          {/* <section className="mt-4">
-          <h2 className="text-2xl font-semibold">Щоденні дані</h2>
-          <table className="mt-2 border border-gray-300 w-full text-center">
-            <thead>
-              <tr>
-                <th className="px-2 border">Дата</th>
-                <th className="px-2 border">Макс.°C</th>
-                <th className="px-2 border">Мін.°C</th>
-                <th className="px-2 border">Опади мм</th>
-                <th className="px-2 border">Погода</th>
-              </tr>
-            </thead>
-            <tbody>
-              {weather.daily.time.map((date: string, idx: number) => (
-                <tr key={date}>
-                  <td className="px-2 border">{date}</td>
-                  <td className="px-2 border">
-                    {Math.round(weather.daily.temperature_2m_max[idx] ?? 0)}
-                  </td>
-                  <td className="px-2 border">
-                    {Math.round(weather.daily.temperature_2m_min[idx] ?? 0)}
-                  </td>
-                  <td className="px-2 border">
-                    {weather.daily.precipitation_sum[idx] ?? 0}
-                  </td>
-                  <td className="px-2 border">
-                    {getWeatherText(weather.daily.weathercode[idx] ?? 0)}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section> */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-min">
+            <div className="row-span-2 md:row-span-3">
+              <WeeklyForecast days={weeklyDays} />
+            </div>
+            <div>
+              <WindBlock
+                WindValues={currentWeather.wind}
+                GustsValues={currentWeather.gusts}
+                DirectionValues={currentWeather.windDir ?? 0}
+              />
+            </div>
+            <div className="">
+              <Visibility VisibilityValues={currentWeather.visibility} />
+            </div>
 
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <WeeklyForecast days={weeklyDays} />
+            <div className="">
+              <Humidity
+                HumidityValues={currentWeather.humidity}
+                DewPointValues={currentWeather.dewPoint}
+              />
+            </div>
+            {/* <div className="">
+              
+            </div> */}
           </div>
         </div>
       </Container>

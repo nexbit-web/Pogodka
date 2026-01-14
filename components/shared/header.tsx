@@ -29,7 +29,7 @@ export const Header: React.FC<Props> = ({ className }) => {
   const [query, setQuery] = React.useState("");
   const [cities, setCities] = React.useState<City[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const [debouncedQuery] = useDebounce(query.toLowerCase(), 200);
+  const [debouncedQuery] = useDebounce(query.toLowerCase(), 500);
   React.useEffect(() => {
     if (query.length < 2) {
       setCities([]);
@@ -100,7 +100,7 @@ export const Header: React.FC<Props> = ({ className }) => {
           {cities.map((city) => (
             <Link
               key={city.id}
-              href={`/weather/${encodeURIComponent(city.nameUa)}`}
+              href={`/pohoda/${encodeURIComponent(city.nameEn.toLowerCase())}`}
               onClick={() => {
                 setQuery("");
                 setFocused(false);
