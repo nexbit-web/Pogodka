@@ -21,12 +21,12 @@ export const Visibility: React.FC<Props> = ({
   return (
     <div
       className={cn(
-        "rounded-2xl bg-black/5 backdrop-blur-md border border-white/10 shadow-md",
+        "rounded-2xl bg-black/40 backdrop-blur-md border border-white/30 shadow-md",
         className
       )}
     >
       {/* Заголовок */}
-      <span className="flex gap-1 items-center pl-5 pt-2 font-medium text-muted-foreground">
+      <span className="flex gap-1 items-center pl-5 pt-2 font-medium text-shadow-muted-foreground">
         <Eye size={20} /> ВИДИМІСТЬ
       </span>
 
@@ -34,7 +34,7 @@ export const Visibility: React.FC<Props> = ({
         {roundedVisibility} км
       </div>
 
-      <div className="text-sm text-muted-foreground mb-2 pl-5 pt-2 ">
+      <div className="text-sm text-shadow-muted-foreground mb-2 pl-5 pt-2 ">
         {visibilityText}
       </div>
     </div>

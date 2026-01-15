@@ -94,7 +94,7 @@ export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
     <div>
       <div
         className="flex gap-1 justify-evenly rounded-2xl overflow-x-auto scroll-on-hover
-                bg-black/5 backdrop-blur-md border border-white/10 shadow-md py-1"
+                bg-black/40 backdrop-blur-md border border-white/30 shadow-md py-0.5"
         style={{ scrollBehavior: "smooth" }}
       >
         {hours.length > 0 &&

@@ -9,6 +9,9 @@ import { getCurrentWeather, CurrentWeather } from "@/utils/weather";
 import { WindBlock } from "@/components/shared/WindBlock";
 import { Visibility } from "@/components/shared/Visibility";
 import { Humidity } from "@/components/shared/Humidity";
+import { Precipitation } from "@/components/shared/Precipitation";
+import { Pressure } from "@/components/shared/Atmospheric-pressure";
+import { Footer } from "@/components/shared/Footer";
 
 interface PageProps {
   params: Promise<{ city: string }>;
@@ -41,9 +44,7 @@ export default async function WeatherPage({ params }: PageProps) {
   // http://localhost:3000
   try {
     const apiRes = await fetch(
-      `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(
-        cityName
-      )}`,
+      `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
       { cache: "no-store" }
     );
 
@@ -87,7 +88,18 @@ export default async function WeatherPage({ params }: PageProps) {
     <>
       {/* <NightCloudySky /> */}
       {/* <CloudyDaySky/> */}
-
+      {/* from-[rgba(7,76,143,1)] */}
+      {/* to-[rgba(147,185,222,1)] */}rgba(4, 5, 26, 1)
+      <div
+        className="bg-gradient-to-b from-[#04051A] to-[#2A3855] bg-fixed  "
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+        }}
+      ></div>
       <Container className="relative z-10">
         <div className="flex flex-1 flex-col gap-6 p-0 sm:p-4 w-full">
           <WeatherHeadline
@@ -102,7 +114,7 @@ export default async function WeatherPage({ params }: PageProps) {
           <HourlyWeather days={weather} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-min">
-            <div className="row-span-2 md:row-span-3">
+            <div className="row-span-2 md:row-span-3 lg:row-span-3 h-full">
               <WeeklyForecast days={weeklyDays} />
             </div>
             <div>
@@ -112,21 +124,23 @@ export default async function WeatherPage({ params }: PageProps) {
                 DirectionValues={currentWeather.windDir ?? 0}
               />
             </div>
-            <div className="">
-              <Visibility VisibilityValues={currentWeather.visibility} />
-            </div>
 
-            <div className="">
+            <div className="grid grid-cols-2 gap-4 h-full">
               <Humidity
                 HumidityValues={currentWeather.humidity}
                 DewPointValues={currentWeather.dewPoint}
               />
+              <Visibility VisibilityValues={currentWeather.visibility} />
             </div>
-            {/* <div className="">
-              
-            </div> */}
+            <div className="grid grid-cols-2 gap-4 h-full">
+              <Precipitation
+                PrecipitationValues={currentWeather.precipitation}
+              />
+              <Pressure PressureValues={currentWeather.pressure} />
+            </div>
           </div>
         </div>
+        <Footer />
       </Container>
     </>
   );
