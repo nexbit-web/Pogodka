@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 
 import Image from "next/image";
 import React, { useRef, useEffect } from "react";
@@ -29,23 +29,25 @@ export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
   const kievNow = DateTime.now().setZone("Europe/Kyiv");
 
   const today = kievNow.toISODate()!; // YYYY-MM-DD, тип string
-  const currentHour = kievNow.hour;
+  const kievNowHour = kievNow.startOf("hour");
   const currentHourRef = useRef<HTMLDivElement | null>(null);
 
-// Формуємо масив годинника для поточного дня
+  // Формуємо масив годинника для поточного дня
   const hours: Hour[] = days.hourly.time
     .map((time, idx) => ({
       time,
       temp: days.hourly.temperature_2m[idx] ?? 0,
-      wind: days.hourly.wind_speed_10m?.[idx] ?? 0, 
+      wind: days.hourly.wind_speed_10m?.[idx] ?? 0,
       precip: days.hourly.precipitation[idx] ?? 0,
       code: days.hourly.weathercode[idx] ?? 0,
     }))
-    .filter(
-      (hour) =>
-        DateTime.fromISO(hour.time).setZone("Europe/Kyiv").toISODate() === today
-    )
-    .slice(0, 24);
+    .filter((hour) => {
+      const hourDate = DateTime.fromISO(hour.time)
+        .setZone("Europe/Kyiv")
+        .startOf("hour");
+      return hourDate >= kievNowHour; // фільтруємо години від поточного часу і далі
+    })
+    .slice(0, 17); // Обмежуємо до наступних 17 годин
 
   const getWeatherIcon = (code: number) => {
     const map: Record<number, string> = {
@@ -79,7 +81,7 @@ export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
     return map[code] || "/icons/unknown.svg";
   };
 
-  // Автоскролл до поточної години
+  // Прокрутка до поточної години після рендерингу
   useEffect(() => {
     if (currentHourRef.current) {
       currentHourRef.current.scrollIntoView({
@@ -93,45 +95,44 @@ export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
   return (
     <div>
       <div
-        className="flex gap-1 justify-evenly rounded-2xl overflow-x-auto scroll-on-hover
-                bg-black/40 backdrop-blur-md border border-white/30 shadow-md py-0.5"
+        className="flex gap-1 justify-evenly overflow-x-auto scroll-on-hover py-0.5"
         style={{ scrollBehavior: "smooth" }}
       >
-        {hours.length > 0 &&
-          hours.map((hour: Hour) => {
-            const hourTime = new Date(hour.time).getHours();
-            const isCurrent = hourTime === currentHour;
-
-            return (
-              <div
-                key={hour.time}
-                ref={isCurrent ? currentHourRef : null} // <-- ref текущего часа
-                className={`flex flex-col gap-2 items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-0.5  ${
-                  isCurrent ? "bg-[color:var(--primary)] text-white" : ""
-                }`}
+        {hours.map((hour, idx) => {
+          const hourTime = DateTime.fromISO(hour.time).setZone(
+            "Europe/Kyiv"
+          ).hour;
+          const isCurrent = idx === 0; // перша година в списку - поточна година
+          return (
+            <div
+              key={hour.time}
+              ref={isCurrent ? currentHourRef : null} // <-- ref для поточної години
+              className={`flex flex-col gap-2 items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-0.5  ${
+                isCurrent ? "bg-[color:var(--primary)] text-white" : ""
+              }`}
+            >
+              <p
+                className="text-lg font-medium"
+                style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
               >
-                <p
-                  className="text-lg font-medium"
-                  style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
-                >
-                  {hourTime}
-                </p>
-                <Image
-                  className="mx-1"
-                  src={getWeatherIcon(hour.code)}
-                  alt="Weather icon"
-                  width={35}
-                  height={38}
-                />
-                <p
-                  className="text-lg font-semibold"
-                  style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
-                >
-                  {Math.round(hour.temp)}°
-                </p>
-              </div>
-            );
-          })}
+                {hourTime}
+              </p>
+              <Image
+                className="mx-1"
+                src={getWeatherIcon(hour.code)}
+                alt="Weather icon"
+                width={35}
+                height={38}
+              />
+              <p
+                className="text-lg font-semibold"
+                style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
+              >
+                {Math.round(hour.temp)}°
+              </p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -1,186 +1,124 @@
-"use client";
 import { Container } from "@/components/shared/Container";
+import { HourlyWeather } from "@/components/shared/Hourly-weather";
+import { WeeklyForecast } from "@/components/shared/Weekly-forecast";
+import { DateTime } from "luxon";
+import { getCurrentWeather, CurrentWeather } from "@/utils/weather";
 import { Footer } from "@/components/shared/Footer";
-import { CalendarDays } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { WeatherHeadline } from "@/components/shared/Weather-headline";
+import { WindBlock } from "@/components/shared/WindBlock";
+import { Pressure } from "@/components/shared/Atmospheric-pressure";
+import { Precipitation } from "@/components/shared/Precipitation";
+import { Visibility } from "@/components/shared/Visibility";
+import { Humidity } from "@/components/shared/Humidity";
 
-type Condition = {
-  text: string;
-  icon: string;
-};
+interface ApiResponse {
+  misto: string;
+  oblast: string;
+  kraina: string;
+  latitude: number;
+  longitude: number;
+  weather: any;
+}
 
-type Hour = {
-  time: string;
-  temp_c: number;
-  condition: Condition;
-};
+export default async function Home() {
+  const city = "Київ";
 
-type Day = {
-  date: string;
-  day: {
-    maxtemp_c: number;
-    mintemp_c: number;
-    condition: Condition;
-  };
-  hour: Hour[];
-};
+  const cityName = decodeURIComponent(city);
 
-type CurrentWeather = {
-  temp_c: number;
-  feelslike_c: number;
-  condition: {
-    text: string;
-    icon: string;
-  };
-  humidity: number;
-  wind_kph: number;
-};
+  let data: ApiResponse;
 
-export default function Home() {
-  const [days, setDays] = useState<Day[]>([]);
-  const [current, setCurrent] = useState<CurrentWeather | null>(null);
-  const currentHourRef = useRef<HTMLDivElement>(null);
-  const [location, setLocation] = useState<{ name: string } | null>(null);
+  try {
+    const apiRes = await fetch(
+      `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
+      { cache: "no-store" }
+    );
 
-  useEffect(() => {
-    fetch(
-      "https://api.weatherapi.com/v1/forecast.json?key=9bba8ac20f324fab876193656252310&q=46.8486,30.0792&days=7&lang=uk"
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        setDays(data.forecast.forecastday); // прогноз на 7 днів
-        setCurrent(data.current); // поточна погода
-        setLocation(data.location); // назва міста
-      })
-      .catch(console.error);
-  }, []);
-
-  // Прокрутка до поточного часу
-  useEffect(() => {
-    if (currentHourRef.current) {
-      currentHourRef.current.scrollIntoView({
-        behavior: "smooth",
-        inline: "center",
-        block: "nearest",
-      });
+    if (!apiRes.ok) {
+      throw new Error("API error");
     }
-  }, [days]);
 
-  const now = new Date();
-  const currentHour = now.getHours();
-
-  // Функція для дня неділі
-  function getDayLabel(dateString: string) {
-    const today = new Date();
-    const date = new Date(dateString);
-
-    today.setHours(0, 0, 0, 0);
-    date.setHours(0, 0, 0, 0);
-
-    if (date.getTime() === today.getTime()) return "Сьогодні";
-    if (date.getTime() === today.getTime() + 86400000) return "Завтра";
-
-    return date.toLocaleDateString("uk-UA", { weekday: "long" });
+    data = await apiRes.json();
+  } catch (error) {
+    console.error("Помилка при завантаженні даних:", error);
+    return (
+      <h1 className="text-center mt-10 text-xl">Помилка завантаження даних</h1>
+    );
   }
 
+  const { weather } = data;
+  // Поточний час у Києві
+  const kievNow = DateTime.now().setZone("Europe/Kyiv");
+  const today = kievNow.toISODate()!;
+  const currentHour = kievNow.hour;
+
+  // Індекс поточного часу в масиві годин
+  const hourIndex = weather.hourly.time.findIndex((time: string) => {
+    const hour = DateTime.fromISO(time, { zone: "Europe/Kyiv" }).hour;
+    return time.startsWith(today) && hour === currentHour;
+  });
+
+  // Поточна погода
+  const currentWeather: CurrentWeather = getCurrentWeather(weather, hourIndex);
+
+  //  7 денний прогноз
+  const weeklyDays = weather.daily.time.map((date: string, idx: number) => ({
+    date,
+    day: {
+      code: weather.daily.weathercode[idx] ?? 0,
+      mintemp_c: weather.daily.temperature_2m_min[idx] ?? 0,
+      maxtemp_c: weather.daily.temperature_2m_max[idx] ?? 0,
+    },
+  }));
+
   return (
-    <>
-      <Container>
-        <div className="flex flex-1 flex-col gap-6 p-0 sm:p-4 w-full">
-          <div className="flex mt-9 mb-9 flex-col items-center">
-            <h1 className="text-3xl font-bold text-shadow">
-              {location ? location.name : "--"}
-            </h1>
+    <Container>
+      <WeatherHeadline
+        city={data.misto}
+        temperature={currentWeather.temp}
+        weather={currentWeather.code}
+        isFelt={currentWeather.feels}
+        MinTemperature={weather.daily.temperature_2m_min[0] ?? 0}
+        MaxTemperature={weather.daily.temperature_2m_max[0] ?? 0}
+      />
 
-            {/* Поточна температура */}
-            <h2 className="text-7xl">
-              {current ? `${Math.round(current.temp_c)}°` : "--"}
-            </h2>
-
-            {/* Погода зараз */}
-            <p className="text-lg text-muted-foreground text-shadow">
-              {current
-                ? `${current.condition.text}, відчувається як ${Math.round(
-                    current.feelslike_c
-                  )}°`
-                : "--"}
-            </p>
-
-            {/* Мінімум/максимум сьогодні з прогнозу */}
-            <div className="flex gap-4 text-lg text-shadow">
-              {days[0] ? (
-                <>
-                  <p>B: {Math.round(days[0].day.mintemp_c)}°</p>{" "}
-                  {/* мінімальна температура */}
-                  <p>H: {Math.round(days[0].day.maxtemp_c)}°</p>
-                </>
-              ) : (
-                <p>--</p>
-              )}
-            </div>
-          </div>
-          <div className="">
-            <div
-              className="flex justify-between bg-muted/50 rounded-4xl overflow-x-auto scroll-on-hover"
-              style={{ scrollBehavior: "smooth" }} // плавная прокрутка
-            >
-              {days.length > 0 &&
-                days[0].hour.slice(0, 24).map((hour: any) => {
-                  const hourTime = new Date(hour.time).getHours();
-                  const isCurrent = hourTime === currentHour;
-
-                  return (
-                    <div
-                      key={hour.time}
-                      ref={isCurrent ? currentHourRef : null}
-                      className={`flex flex-col items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-3 ${
-                        isCurrent ? "bg-[color:var(--primary)] text-white" : ""
-                      }`}
-                    >
-                      <p className="text-sm font-medium">{hourTime}:00</p>
-                      <img
-                        src={`https:${hour.condition.icon}`}
-                        alt="Weather icon"
-                        className="w-12 h-12"
-                      />
-                      <p className="text-lg font-semibold">
-                        {Math.round(Number(hour.temp_c))}°
-                      </p>
-                    </div>
-                  );
-                })}
-            </div>
-          </div>
-
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="bg-muted/50 aspect-video rounded-4xl">
-              <span className="flex gap-1 items-center pl-5 pt-2 font-medium   text-muted-foreground">
-                <CalendarDays size={20} /> 7-денний прогноз
-              </span>
-              {days.map((day) => (
-                <div
-                  key={day.date}
-                  className="flex justify-around border-t mt-2 pt-2"
-                >
-                  <h3 className="capitalize">{getDayLabel(day.date)}</h3>
-                  <img
-                    className="w-8 h-8"
-                    src={`https:${day.day.condition.icon}`}
-                    alt={day.day.condition.text}
-                  />
-                  <span>
-                    B: {Math.round(day.day.mintemp_c)}° / H:{" "}
-                    {Math.round(day.day.maxtemp_c)}°
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="bg-muted/50 aspect-video rounded-4xl" />
-            <div className="bg-muted/50 aspect-video rounded-4xl" />
-          </div>
+      <div className="container">
+        <div className="card post-card">
+          <WeeklyForecast days={weeklyDays} />
         </div>
-      </Container>
+
+        <div className="card todo-card-2">
+          <HourlyWeather days={weather} />
+        </div>
+
+        <div className="card messages-card-3">
+          <WindBlock
+            WindValues={currentWeather.wind}
+            GustsValues={currentWeather.gusts}
+            DirectionValues={currentWeather.windDir ?? 0}
+          />
+        </div>
+
+        <div className="card welcome-card-4">
+          <Humidity
+            HumidityValues={currentWeather.humidity}
+            DewPointValues={currentWeather.dewPoint}
+          />
+        </div>
+
+        <div className="card friends-card-5">
+          <Precipitation PrecipitationValues={currentWeather.precipitation} />
+        </div>
+
+        <div className="card contact-card-6">
+          <Visibility VisibilityValues={currentWeather.visibility} />
+        </div>
+
+        <div className="card contact-card-7">
+          <Pressure PressureValues={currentWeather.pressure} />
+        </div>
+      </div>
+
       <Footer />
-    </>
+    </Container>
   );
 }

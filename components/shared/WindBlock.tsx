@@ -40,25 +40,27 @@ export const WindBlock: React.FC<Props> = ({
   return (
     <div
       className={cn(
-        "flex justify-between rounded-2xl bg-black/40 backdrop-blur-md border border-white/30 shadow-md",
+        "flex justify-between items-stretch rounded-2xl h-full",
         className
       )}
     >
-      <div className="m-0 p-0 w-[60%]">
+      <div className="flex flex-col justify-between m-0 p-0 w-[60%] h-full">
         {/* Заголовок */}
-        <span className="flex gap-1 items-center pl-5 pt-2 font-medium text-shadow-muted-foreground">
+        <span className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground mt-0 sticky">
           <Wind size={20} /> ВІТЕР
         </span>
 
-        <div className="pl-5 pt-5 flex justify-between gap-4">
+        <div className="pl-3 pt-2 flex justify-between gap-4">
           <span className="font-bold">Вітер</span>
           <samp className="text-shadow-muted-foreground">{WindValues} м/с</samp>
         </div>
-        <div className="pl-5 pt-5 flex justify-between gap-4">
+        <div className="pl-3 pt-2 flex justify-between gap-4">
           <span className="font-bold">Пориви</span>
-          <samp className="text-shadow-muted-foreground">{GustsValues} м/с</samp>
+          <samp className="text-shadow-muted-foreground">
+            {GustsValues} м/с
+          </samp>
         </div>
-        <div className="pl-5 pt-5 flex justify-between gap-4 mb-4">
+        <div className="pl-3 pt-2 flex justify-between gap-4 mb-4">
           <span className="font-bold">Напрямок</span>
           <samp className="text-shadow-muted-foreground">
             {DirectionValues}° {degToCompass(DirectionValues)}

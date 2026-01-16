@@ -2,8 +2,6 @@ import { Container } from "@/components/shared/Container";
 import { HourlyWeather } from "@/components/shared/Hourly-weather";
 import { WeatherHeadline } from "@/components/shared/Weather-headline";
 import { WeeklyForecast } from "@/components/shared/Weekly-forecast";
-import { CloudyDaySky } from "@/components/weather_backgrounds/Cloudy-day-sky";
-import { NightCloudySky } from "@/components/weather_backgrounds/Night-cloudy-sky";
 import { DateTime } from "luxon";
 import { getCurrentWeather, CurrentWeather } from "@/utils/weather";
 import { WindBlock } from "@/components/shared/WindBlock";
@@ -32,13 +30,6 @@ export default async function WeatherPage({ params }: PageProps) {
   // Декодуємо назву міста
   const cityName = decodeURIComponent(city);
 
-  // const baseUrl =
-  //   process.env.NODE_ENV === "development"
-  //     ? "http://localhost:3000"
-  //     : process.env.VERCEL_URL
-  //     ? `https://${process.env.VERCEL_URL}`
-  //     : "https://pogodka.vercel.app";
-
   let data: ApiResponse;
   // https://pogodka.vercel.app
   // http://localhost:3000
@@ -61,6 +52,7 @@ export default async function WeatherPage({ params }: PageProps) {
   }
 
   const { weather } = data;
+
   // Поточний час у Києві
   const kievNow = DateTime.now().setZone("Europe/Kyiv");
   const today = kievNow.toISODate()!;
@@ -85,63 +77,53 @@ export default async function WeatherPage({ params }: PageProps) {
   }));
 
   return (
-    <>
-      {/* <NightCloudySky /> */}
-      {/* <CloudyDaySky/> */}
-      {/* from-[rgba(7,76,143,1)] */}
-      {/* to-[rgba(147,185,222,1)] */}rgba(4, 5, 26, 1)
-      <div
-        className="bg-gradient-to-b from-[#04051A] to-[#2A3855] bg-fixed  "
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-        }}
-      ></div>
-      <Container className="relative z-10">
-        <div className="flex flex-1 flex-col gap-6 p-0 sm:p-4 w-full">
-          <WeatherHeadline
-            city={data.misto}
-            temperature={currentWeather.temp}
-            weather={currentWeather.code}
-            isFelt={currentWeather.feels}
-            MinTemperature={weather.daily.temperature_2m_min[0] ?? 0}
-            MaxTemperature={weather.daily.temperature_2m_max[0] ?? 0}
-          />
+    <Container className="relative z-10">
+      <WeatherHeadline
+        city={data.misto}
+        temperature={currentWeather.temp}
+        weather={currentWeather.code}
+        isFelt={currentWeather.feels}
+        MinTemperature={weather.daily.temperature_2m_min[0] ?? 0}
+        MaxTemperature={weather.daily.temperature_2m_max[0] ?? 0}
+      />
 
-          <HourlyWeather days={weather} />
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-min">
-            <div className="row-span-2 md:row-span-3 lg:row-span-3 h-full">
-              <WeeklyForecast days={weeklyDays} />
-            </div>
-            <div>
-              <WindBlock
-                WindValues={currentWeather.wind}
-                GustsValues={currentWeather.gusts}
-                DirectionValues={currentWeather.windDir ?? 0}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 h-full">
-              <Humidity
-                HumidityValues={currentWeather.humidity}
-                DewPointValues={currentWeather.dewPoint}
-              />
-              <Visibility VisibilityValues={currentWeather.visibility} />
-            </div>
-            <div className="grid grid-cols-2 gap-4 h-full">
-              <Precipitation
-                PrecipitationValues={currentWeather.precipitation}
-              />
-              <Pressure PressureValues={currentWeather.pressure} />
-            </div>
-          </div>
+      <div className="container">
+        <div className="card post-card">
+          <WeeklyForecast days={weeklyDays} />
         </div>
-        <Footer />
-      </Container>
-    </>
+
+        <div className="card todo-card-2">
+          <HourlyWeather days={weather} />
+        </div>
+
+        <div className="card messages-card-3">
+          <WindBlock
+            WindValues={currentWeather.wind}
+            GustsValues={currentWeather.gusts}
+            DirectionValues={currentWeather.windDir ?? 0}
+          />
+        </div>
+
+        <div className="card welcome-card-4">
+          <Humidity
+            HumidityValues={currentWeather.humidity}
+            DewPointValues={currentWeather.dewPoint}
+          />
+        </div>
+
+        <div className="card friends-card-5">
+          <Precipitation PrecipitationValues={currentWeather.precipitation} />
+        </div>
+
+        <div className="card contact-card-6">
+          <Visibility VisibilityValues={currentWeather.visibility} />
+        </div>
+
+        <div className="card contact-card-7">
+          <Pressure PressureValues={currentWeather.pressure} />
+        </div>
+      </div>
+      <Footer />
+    </Container>
   );
 }

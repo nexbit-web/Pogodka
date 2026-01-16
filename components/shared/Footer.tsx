@@ -8,28 +8,31 @@ export const Footer: React.FC = () => {
     <footer className="">
       <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
         {/* Бренд */}
-        <div className="flex items-center gap-2 text-white text-sm">
+        <div className="flex items-center gap-2 text-sm">
           <span>Pogodka.org</span>
-          <span className="ml-2 text-gray-300">© 2026</span>
+          <span className="ml-2 ">© 2026</span>
           {/* Версія сайту */}
-          <span className=" text-gray-400 text-xs">v{APP_VERSION}</span>
+          <span className=" text-gray-500 text-xs">v{APP_VERSION}</span>
         </div>
 
         {/* Навигація */}
-        <div className="flex gap-6 text-gray-300 text-sm flex-wrap justify-center">
+        <div className="flex gap-6 text-sm flex-wrap justify-center">
           <Link
             href="/agreement"
-            className="hover:text-white transition-colors"
+            className="hover:text-primary border-b border-transparent  transition-colors duration-200"
           >
             Угода користувача
           </Link>
-          <a href="/privacypolicy" className="hover:text-white transition-colors">
+          <a
+            href="/privacypolicy"
+            className="hover:text-primary border-b border-transparent  transition-colors duration-200"
+          >
             Угода про конфіденційність
           </a>
-          <a href="/privacy" className="hover:text-white transition-colors">
+          <a href="/privacy" className="hover:text-primary border-b border-transparent  transition-colors duration-200">
             Техпідтримка
           </a>
-          <a href="/privacy" className="hover:text-white transition-colors">
+          <a href="/privacy" className="hover:text-primary border-b border-transparent  transition-colors duration-200">
             Реклама
           </a>
         </div>
