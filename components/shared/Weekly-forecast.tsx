@@ -68,12 +68,12 @@ export const WeeklyForecast: React.FC<Props> = ({ days, className }) => {
   return (
     <div
       className={cn(
-        "rounded-2xl bg-black/40 backdrop-blur-md border border-white/30 shadow-md pb-1",
+        "flex flex-col justify-between rounded-2xl pb-1 h-full",
         className
       )}
     >
       {/* Заголовок */}
-      <span className="flex gap-1 items-center pl-5 pt-2 font-medium text-shadow-muted-foreground">
+      <span className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground">
         <CalendarDays size={20} /> 7-денний прогноз
       </span>
 
@@ -81,7 +81,7 @@ export const WeeklyForecast: React.FC<Props> = ({ days, className }) => {
       {days.map((day) => (
         <div
           key={day.date}
-          className="flex justify-around border-t border-white/5 mt-2 pt-2"
+          className="flex items-center justify-around border-t border-black/5   pt-1"
         >
           <h3
             className="capitalize font-bold"
@@ -94,7 +94,10 @@ export const WeeklyForecast: React.FC<Props> = ({ days, className }) => {
             src={getWeatherIcon(day.day.code)}
             alt={`Погода ${day.day.code}`}
           />
-          <span className="font-bold" style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}>
+          <span
+            className="font-bold"
+            style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
+          >
             B: {Math.round(day.day.maxtemp_c)}° / H:{" "}
             {Math.round(day.day.mintemp_c)}°
           </span>

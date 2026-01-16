@@ -41,20 +41,20 @@ export const Pressure: React.FC<Props> = ({ className, PressureValues }) => {
   return (
     <div
       className={cn(
-        "rounded-2xl bg-black/40 backdrop-blur-md border border-white/30 shadow-md",
+        "flex flex-col justify-between rounded-2xl h-full",
         className
       )}
     >
       {/* Заголовок */}
-      <span className="flex gap-1 items-center pl-5 pt-2 font-medium text-shadow-muted-foreground">
+      <span className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground">
         <Gauge size={20} /> ТИСК
       </span>
 
-      <div className="text-3xl font-semibold mb-2 pl-5 pt-2 flex flex-col items-start">
+      <div className="text-3xl font-semibold mb-2 pl-3 pt-2 flex flex-col items-start">
         {pressureValue} <span className="p-0 m-0">гПа</span>
       </div>
 
-      <div className="text-sm text-shadow-muted-foreground mb-2 pl-5 pt-2">
+      <div className="text-sm text-shadow-muted-foreground mb-2 pl-3 pt-2">
         {getPressureText(PressureValues)}
       </div>
     </div>
