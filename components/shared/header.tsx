@@ -8,7 +8,8 @@ import { ModeToggle } from "./mode-toggle";
 import { useDebounce } from "use-debounce";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/spinner";
-import { CircleAlert } from "lucide-react";
+import { CircleAlert, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 interface Props {
   className?: string;
 }
@@ -56,10 +57,19 @@ export const Header: React.FC<Props> = ({ className }) => {
     <header
       className={cn(
         "flex items-center h-14 px-4  border-border bg-background",
-        className
+        className,
       )}
     >
-      <SidebarTrigger className="-ml-1 cursor-pointer z-10" />
+      <div
+        className={cn(
+          "transition-all duration-200 ease-out",
+          focused
+            ? "opacity-0 pointer-events-none absolute"
+            : "relative opacity-100",
+        )}
+      >
+        <SidebarTrigger className="-ml-1 cursor-pointer z-10" />
+      </div>
 
       {focused && (
         <div
@@ -69,11 +79,22 @@ export const Header: React.FC<Props> = ({ className }) => {
       )}
 
       <div className="flex-1 flex justify-center px-1.5 relative z-31">
-        <Input
-          value={query}
-          onChange={handleInputChange}
-          placeholder="Введіть назву міста..."
+        <div
           className="
+        flex gap-1.5 rounded-2xl relative
+    w-full
+    sm:max-w-md
+    md:max-w-lg
+    lg:max-w-xl
+    xl:max-w-2xl
+    mx-auto
+        "
+        >
+          <Input
+            value={query}
+            onChange={handleInputChange}
+            placeholder="Введіть назву міста..."
+            className="
         rounded-2xl
         w-full
         max-w-sm
@@ -83,13 +104,31 @@ export const Header: React.FC<Props> = ({ className }) => {
         xl:max-w-2xl
         relative
       "
-          onFocus={() => setFocused(true)}
-        />
+            onFocus={() => setFocused(true)}
+          />
+          <div
+            className={cn(
+              "  transition-all duration-200 ease-out",
+              focused
+                ? "w-9 opacity-100 translate-x-0"
+                : "w-0 opacity-0 translate-x-3 pointer-events-none",
+            )}
+          >
+            <Button
+              onClick={() => setFocused(false)}
+              variant="outline"
+              size="icon"
+              className="rounded-full cursor-pointer z-32"
+            >
+              <X />
+            </Button>
+          </div>
+        </div>
 
         <div
           className={cn(
             "absolute w-full bg-muted  max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl  rounded-2xl top-14 shadow-md transition-all duration-200 invisible opacity-0 z-31",
-            focused && "visible opacity-100 top-11"
+            focused && "visible opacity-100 top-11",
           )}
         >
           {loading && (
@@ -127,7 +166,15 @@ export const Header: React.FC<Props> = ({ className }) => {
           ) : null}
         </div>
       </div>
-      <div className="z-10">
+
+      <div
+        className={cn(
+          "transition-all duration-300 ease-in-out z-10",
+          focused
+            ? "opacity-0 pointer-events-none absolute right-0"
+            : "relative opacity-100",
+        )}
+      >
         <ModeToggle />
       </div>
     </header>
