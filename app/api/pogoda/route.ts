@@ -15,6 +15,7 @@ export async function GET(req: Request) {
         { nameUa: { equals: cityName, mode: "insensitive" } },
         { nameRu: { equals: cityName, mode: "insensitive" } },
         { nameEn: { equals: cityName, mode: "insensitive" } },
+        { slug: { equals: cityName, mode: "insensitive" } },
       ],
     },
     select: {
@@ -23,6 +24,7 @@ export async function GET(req: Request) {
       countryUa: true,
       latitude: true,
       longitude: true,
+      slug: true,
     },
   });
 
@@ -56,7 +58,7 @@ export async function GET(req: Request) {
   if (!res.ok) {
     return NextResponse.json(
       { error: "Не удалось получить данные погоды" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 

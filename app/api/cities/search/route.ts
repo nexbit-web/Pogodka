@@ -20,6 +20,7 @@ export async function GET(request: Request) {
     },
     select: {
       id: true,
+      slug: true,
       nameUa: true,
       nameRu: true,
       nameEn: true,

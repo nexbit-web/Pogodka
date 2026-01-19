@@ -15,6 +15,7 @@ interface Props {
 
 type City = {
   id: number;
+  slug: string;
   nameUa: string;
   nameRu: string;
   nameEn: string;
@@ -100,7 +101,7 @@ export const Header: React.FC<Props> = ({ className }) => {
           {cities.map((city) => (
             <Link
               key={city.id}
-              href={`/pohoda/${encodeURIComponent(city.nameEn.toLowerCase())}`}
+              href={`/pohoda/${city.slug}`}
               onClick={() => {
                 setQuery("");
                 setFocused(false);

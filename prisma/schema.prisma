@@ -5,18 +5,19 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
 model City {
-  id        Int     @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   nameUa    String
   nameRu    String
-  nameEn    String
+  nameEn    String @unique
   region    String
   countryUa String
   countryEn String
   latitude  Float
   longitude Float
+  slug      String @unique
 
-  @@unique([nameEn])
   @@index([nameUa])
   @@index([nameRu])
   @@index([region])
