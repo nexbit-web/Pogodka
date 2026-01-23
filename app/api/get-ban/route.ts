@@ -10,24 +10,25 @@ export async function GET(req: Request) {
   const ban = await prisma.botBan.findFirst({ where: { ip } });
   if (!ban) return NextResponse.json(null, { status: 200 });
 
-  // 🔹 Берем Киевское время
+  // Текущее киевское время
   const nowKyiv = DateTime.now().setZone("Europe/Kyiv").toMillis();
 
-  // 🔹 Время окончания бана (создано + TTL) тоже в Киевском времени
+  // Время окончания бана
   const banCreatedKyiv = DateTime.fromJSDate(ban.createdAt)
     .setZone("Europe/Kyiv")
     .toMillis();
   const banEnd = banCreatedKyiv + BAN.ttlSeconds * 1000;
 
-  // 🔹 Если бан закончился — удаляем запись
+  // Если бан закончился — удаляем его на сервере
   if (nowKyiv > banEnd) {
     await prisma.botBan.deleteMany({ where: { ip } });
     return NextResponse.json(null, { status: 200 });
   }
 
+  // Иначе возвращаем данные о бане
   return NextResponse.json({
     ip,
     reason: ban.reason,
-    banEnd, // timestamp в миллисекундах
+    banEnd, // timestamp по Киеву
   });
 }
