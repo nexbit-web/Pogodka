@@ -1,3 +1,4 @@
+import { DateTime } from "luxon";
 import { BAN } from "@/config/ban";
 import prisma from "@/lib/prisma";
 
@@ -5,14 +6,15 @@ export async function antiBot(req: Request, city: string) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
   const ua = req.headers.get("user-agent")?.toLowerCase() || "";
 
-  const now = Math.floor(Date.now() / 1000); // timestamp в секундах
+  // 🔹 Берем текущий timestamp в секундах по киевскому времени
+  const now = Math.floor(DateTime.now().setZone("Europe/Kyiv").toSeconds());
 
   // ======================
-  // 🔹 Все TTL
+  // 🔹 TTL
   // ======================
-  const BAN_TTL = BAN.ttlSeconds; // берется из конфигурации
-  const BOT_HIT_TTL = 24 * 60 * 60; // время жизни хита для ограничения скорости (24 часа)
-  const CITY_HIT_TTL = 10 * 60; // время жизни хита по городам (10 минут)
+  const BAN_TTL = BAN.ttlSeconds; // TTL для бана
+  const BOT_HIT_TTL = 24 * 60 * 60; // 24 часа для ограничения скорости
+  const CITY_HIT_TTL = 10 * 60; // 10 минут для городов
 
   // ======================
   // SEO WHITELIST
@@ -22,13 +24,15 @@ export async function antiBot(req: Request, city: string) {
     ua.includes("bingbot") ||
     ua.includes("yandex") ||
     ua.includes("duckduckbot");
-
-  if (isSearchBot) return null; // поисковиков пропускаем
+  if (isSearchBot) return null;
 
   // ======================
   // Чистим устаревшие данные
   // ======================
-  const expiredBan = new Date(Date.now() - BAN_TTL * 1000);
+  const expiredBan = DateTime.now()
+    .setZone("Europe/Kyiv")
+    .minus({ seconds: BAN_TTL })
+    .toJSDate();
   await prisma.botBan.deleteMany({ where: { createdAt: { lt: expiredBan } } });
 
   await prisma.botHit.deleteMany({
