@@ -34,6 +34,8 @@ export default async function WeatherPage({ params }: PageProps) {
   let data: ApiResponse;
 
   // 🔹 Сначала проверяем бан
+  // https://pogodka.vercel.app
+  // http://localhost:3000
   const apiResForBanCheck = await fetch(
     `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
     { cache: "no-store" },
