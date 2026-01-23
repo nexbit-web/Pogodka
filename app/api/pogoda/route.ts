@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { antiBot } from "@/lib/antiBot";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -7,6 +8,10 @@ export async function GET(req: Request) {
 
   if (!cityName)
     return NextResponse.json({ error: "Не вказано місто" }, { status: 400 });
+
+  // Перевірка на ботів
+  const botResponse = await antiBot(req, cityName);
+  if (botResponse) return botResponse;
 
   // Шукаємо місто
   const city = await prisma.city.findFirst({
@@ -73,3 +78,25 @@ export async function GET(req: Request) {
     weather,
   });
 }
+
+// const url =
+//     `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}` +
+//     `&hourly=` +
+//     `temperature_2m,` +
+//     `apparent_temperature,` +
+//     `weathercode,` +
+//     `windspeed_10m,` +
+//     `windgusts_10m,` +
+//     `winddirection_10m,` +
+//     `relativehumidity_2m,` +
+//     `dewpoint_2m,` +
+//     `visibility,` +
+//     `precipitation,` +
+//     `pressure_msl` +
+//     `&daily=` +
+//     `temperature_2m_max,` +
+//     `temperature_2m_min,` +
+//     `precipitation_sum,` +
+//     `weathercode` +
+//     `&forecast_days=7` +
+//     `&timezone=Europe/Kyiv`;

@@ -29,7 +29,7 @@ export const Footer: React.FC = () => {
           >
             Угода про конфіденційність
           </a>
-          <a href="/privacy" className="hover:text-primary border-b border-transparent  transition-colors duration-200">
+          <a href="/support" className="hover:text-primary border-b border-transparent  transition-colors duration-200">
             Техпідтримка
           </a>
           <a href="/privacy" className="hover:text-primary border-b border-transparent  transition-colors duration-200">

@@ -81,7 +81,7 @@ export const Header: React.FC<Props> = ({ className }) => {
       <div className="flex-1 flex justify-center px-1.5 relative z-31">
         <div
           className="
-        flex gap-1.5 rounded-2xl relative
+        flex gap-2.5 rounded-2xl relative
     w-full
     sm:max-w-md
     md:max-w-lg
