@@ -22,3 +22,21 @@ model City {
   @@index([nameRu])
   @@index([region])
 }
+
+model BotBan {
+  ip        String   @id
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+model BotHit {
+  ip        String @id
+  timestamp Int
+}
+
+model BotCityHit {
+  id        Int    @id @default(autoincrement())
+  ip        String
+  city      String
+  timestamp Int
+}

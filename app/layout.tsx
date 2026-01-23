@@ -6,7 +6,7 @@ import { AppSidebar } from "@/components/shared/app-sidebar";
 import { Header } from "@/components/shared/header";
 import { sfuiDisplay } from "./fonts";
 import NextTopLoader from "nextjs-toploader";
-
+import { Toaster } from "react-hot-toast";
 export const metadata: Metadata = {
   title: "Pogodka",
   description:
@@ -84,6 +84,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${sfuiDisplay.variable} antialiased `}>
+        <Toaster />
         <NextTopLoader
           color="var(--primary)"
           height={3}

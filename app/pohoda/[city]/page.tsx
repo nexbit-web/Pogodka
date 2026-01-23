@@ -10,6 +10,7 @@ import { Humidity } from "@/components/shared/Humidity";
 import { Precipitation } from "@/components/shared/Precipitation";
 import { Pressure } from "@/components/shared/Atmospheric-pressure";
 import { Footer } from "@/components/shared/Footer";
+import { redirect } from "next/navigation";
 
 interface PageProps {
   params: Promise<{ city: string }>;
@@ -31,26 +32,34 @@ export default async function WeatherPage({ params }: PageProps) {
   const cityName = decodeURIComponent(city);
 
   let data: ApiResponse;
-  // https://pogodka.vercel.app
-  // http://localhost:3000
-  try {
-    const apiRes = await fetch(
-      `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
-      { cache: "no-store" }
-    );
 
-    if (!apiRes.ok) {
-      throw new Error("API error");
+  // 🔹 Сначала проверяем бан
+  const apiResForBanCheck = await fetch(
+    `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
+    { cache: "no-store" },
+  );
+
+  if (apiResForBanCheck.status === 403 || apiResForBanCheck.status === 429) {
+    redirect(`/banned?city=${encodeURIComponent(cityName)}`);
+  }
+
+  // 🔹 Потом безопасно получаем данные API
+  try {
+    if (!apiResForBanCheck.ok) {
+      throw new Error(`API error: ${apiResForBanCheck.status}`);
     }
 
-    data = await apiRes.json();
+    data = await apiResForBanCheck.json();
   } catch (error) {
     console.error("Помилка при завантаженні даних:", error);
     return (
-      <h1 className="text-center mt-10 text-xl">Помилка завантаження даних</h1>
+      <h1 className="text-center mt-10 text-xl text-red-500">
+        Помилка при завантаженні даних. Спробуйте пізніше.
+      </h1>
     );
   }
 
+  // 🔹 Дальше используем данные
   const { weather } = data;
 
   // Поточний час у Києві
