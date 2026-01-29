@@ -69,6 +69,7 @@ export async function GET(req: Request) {
 
   const weather = await res.json();
 
+  // Возвращаем безопасные данные клиенту
   return NextResponse.json({
     misto: city.nameUa,
     oblast: city.region,

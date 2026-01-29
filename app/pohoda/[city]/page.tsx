@@ -1,140 +1,201 @@
-import { Container } from "@/components/shared/Container";
-import { HourlyWeather } from "@/components/shared/Hourly-weather";
-import { WeatherHeadline } from "@/components/shared/Weather-headline";
-import { WeeklyForecast } from "@/components/shared/Weekly-forecast";
-import { DateTime } from "luxon";
-import { getCurrentWeather, CurrentWeather } from "@/utils/weather";
-import { WindBlock } from "@/components/shared/WindBlock";
-import { Visibility } from "@/components/shared/Visibility";
-import { Humidity } from "@/components/shared/Humidity";
-import { Precipitation } from "@/components/shared/Precipitation";
-import { Pressure } from "@/components/shared/Atmospheric-pressure";
-import { Footer } from "@/components/shared/Footer";
+// app/pohoda/[city]/page.tsx
+import { WeatherLayout } from "@/components/shared/WeatherLayout";
 import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
+import { DateTime } from "luxon";
+import { getCurrentWeather } from "@/utils/weather";
 
 interface PageProps {
   params: Promise<{ city: string }>;
 }
-interface ApiResponse {
-  misto: string;
-  oblast: string;
-  kraina: string;
-  latitude: number;
-  longitude: number;
-  weather: any;
+
+interface WeeklyDay {
+  date: string;
+  day: {
+    code: number;
+    mintemp_c: number;
+    maxtemp_c: number;
+  };
+}
+
+// 🔹 Динамические метаданные
+export async function generateMetadata({ params }: PageProps) {
+  const { city } = await params;
+  const cityName = decodeURIComponent(city);
+
+  const cityData = await prisma.city.findFirst({
+    where: {
+      OR: [
+        { nameUa: { equals: cityName, mode: "insensitive" } },
+        { nameRu: { equals: cityName, mode: "insensitive" } },
+        { nameEn: { equals: cityName, mode: "insensitive" } },
+        { slug: { equals: cityName, mode: "insensitive" } },
+      ],
+    },
+    select: { nameUa: true, slug: true },
+  });
+
+  const titleCity = cityData?.nameUa ?? cityName;
+  const slug = cityData?.slug ?? cityName;
+
+  return {
+    title: `Pogodka: Погода в ${titleCity} (Україна): температура, опади, вітер, вологість, тиск | Прогноз на тиждень`,
+    description: `Актуальний прогноз погоди в місті ${titleCity}: температура, опади, вітер, хмарність, погодинний та 7-денний прогноз онлайн.`,
+
+    canonical: `https://pogodka.ua/pohoda/${slug}`,
+
+    openGraph: {
+      type: "website",
+      locale: "uk_UA",
+      url: `https://pogodka.ua/pohoda/${slug}`,
+      siteName: "Pogodka",
+      title: `Pogodka — точний прогноз погоди в ${titleCity}`,
+      description: `Актуальний прогноз погоди в місті ${titleCity}: температура, опади, вітер, хмарність, погодинний та 7-денний прогноз онлайн.`,
+      images: [
+        {
+          url: "/og/main-weather.jpg",
+          width: 1200,
+          height: 630,
+          alt: `Погода в ${titleCity} — Pogodka`,
+        },
+      ],
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      title: `Pogodka — точний прогноз погоди в ${titleCity}`,
+      description: `Актуальний прогноз погоди в місті ${titleCity}: температура, опади, вітер, хмарність, погодинний та 7-денний прогноз онлайн.`,
+      images: ["/og/main-weather.jpg"],
+    },
+
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-snippet": -1,
+        "max-image-preview": "large",
+        "max-video-preview": -1,
+      },
+    },
+
+    category: "weather",
+  };
 }
 
 export default async function WeatherPage({ params }: PageProps) {
-  // Отримуємо назву міста з параметрів маршруту
   const { city } = await params;
-
-  // Декодуємо назву міста
   const cityName = decodeURIComponent(city);
 
-  let data: ApiResponse;
-
-  // 🔹 Сначала проверяем бан
-  // https://pogodka.vercel.app
-  // http://localhost:3000
-  const apiResForBanCheck = await fetch(
-    `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
+  // 🔹 fetch погоди
+  const res = await fetch(
+    `http://localhost:3000/api/pogoda?city=${encodeURIComponent(cityName)}`,
     { cache: "no-store" },
   );
 
-  if (apiResForBanCheck.status === 403 || apiResForBanCheck.status === 429) {
-    redirect(`/banned?city=${encodeURIComponent(cityName)}`);
+  // 🔹 Якщо банований користувач → редирект на /banned
+  if (res.status === 403 || res.status === 429) {
+    // 🔹 користувач забанений ботом — редирект на сторінку бану
+    return redirect("/banned");
   }
 
-  // 🔹 Потом безопасно получаем данные API
-  try {
-    if (!apiResForBanCheck.ok) {
-      throw new Error(`API error: ${apiResForBanCheck.status}`);
-    }
-
-    data = await apiResForBanCheck.json();
-  } catch (error) {
-    console.error("Помилка при завантаженні даних:", error);
+  // 🔹 если fetch упал по другой причине
+  if (!res.ok) {
     return (
-      <h1 className="text-center mt-10 text-xl text-red-500">
-        Помилка при завантаженні даних. Спробуйте пізніше.
+      <h1 className="text-center mt-10 text-red-500">
+        Помилка при завантаженні даних
       </h1>
     );
   }
 
-  // 🔹 Дальше используем данные
-  const { weather } = data;
+  const data = await res.json();
 
-  // Поточний час у Києві
+  // 🔹 вираховуємо currentWeather
   const kievNow = DateTime.now().setZone("Europe/Kyiv");
   const today = kievNow.toISODate()!;
   const currentHour = kievNow.hour;
 
-  // Індекс поточного часу в масиві годин
-  const hourIndex = weather.hourly.time.findIndex((time: string) => {
+  const hourIndex = data.weather.hourly.time.findIndex((time: string) => {
     const hour = DateTime.fromISO(time, { zone: "Europe/Kyiv" }).hour;
     return time.startsWith(today) && hour === currentHour;
   });
 
-  const currentWeather: CurrentWeather = getCurrentWeather(weather, hourIndex);
+  const currentWeather = getCurrentWeather(data.weather, hourIndex);
 
-  //  7 денний прогноз
-  const weeklyDays = weather.daily.time.map((date: string, idx: number) => ({
-    date,
-    day: {
-      code: weather.daily.weathercode[idx] ?? 0,
-      mintemp_c: weather.daily.temperature_2m_min[idx] ?? 0,
-      maxtemp_c: weather.daily.temperature_2m_max[idx] ?? 0,
+  // 🔹 Формуємо 7-денний прогноз
+  const weeklyDays: WeeklyDay[] = data.weather.daily.time.map(
+    (date: string, idx: number) => ({
+      date,
+      day: {
+        code: data.weather.daily.weathercode[idx] ?? 0,
+        mintemp_c: data.weather.daily.temperature_2m_min[idx] ?? 0,
+        maxtemp_c: data.weather.daily.temperature_2m_max[idx] ?? 0,
+      },
+    }),
+  );
+
+  // 🔹 JSON-LD для пошукачів
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "City",
+    name: data.misto,
+    url: `https://pogodka.ua/pohoda/${cityName}`,
+
+    // Поточна погода
+    weather: {
+      "@type": "WeatherForecast",
+      datePosted: kievNow.toISO(),
+      description: `Поточний прогноз погоди в місті ${data.misto}`,
+      temperature: {
+        "@type": "QuantitativeValue",
+        value: currentWeather.temp,
+        unitCode: "CEL",
+        name: "Температура",
+      },
+      windSpeed: {
+        "@type": "QuantitativeValue",
+        value: currentWeather.wind,
+        unitCode: "KMH",
+        name: "Швидкість вітру",
+      },
+      humidity: {
+        "@type": "QuantitativeValue",
+        value: currentWeather.humidity,
+        unitCode: "P1",
+        name: "Вологість",
+      },
+      feelsLike: {
+        "@type": "QuantitativeValue",
+        value: currentWeather.feels,
+        unitCode: "CEL",
+        name: "Відчувається як",
+      },
     },
-  }));
+
+    // Прогноз на 7 днів
+    dailyForecast: weeklyDays.map((day) => ({
+      "@type": "WeatherForecast",
+      datePosted: day.date,
+      description: `Прогноз погоди на ${day.date} в місті ${data.misto}`,
+      temperature: {
+        "@type": "QuantitativeValue",
+        minValue: day.day.mintemp_c,
+        maxValue: day.day.maxtemp_c,
+        unitCode: "CEL",
+        name: "Температура (мін/макс)",
+      },
+      weatherCode: day.day.code,
+    })),
+  };
 
   return (
-    <Container className="relative z-10">
-      <WeatherHeadline
-        city={data.misto}
-        temperature={currentWeather.temp}
-        weather={currentWeather.code}
-        isFelt={currentWeather.feels}
-        MinTemperature={weather.daily.temperature_2m_min[0] ?? 0}
-        MaxTemperature={weather.daily.temperature_2m_max[0] ?? 0}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-
-      <div className="container">
-        <div className="card post-card">
-          <WeeklyForecast days={weeklyDays} />
-        </div>
-
-        <div className="card todo-card-2">
-          <HourlyWeather days={weather} />
-        </div>
-
-        <div className="card messages-card-3">
-          <WindBlock
-            WindValues={currentWeather.wind}
-            GustsValues={currentWeather.gusts}
-            DirectionValues={currentWeather.windDir ?? 0}
-          />
-        </div>
-
-        <div className="card welcome-card-4">
-          <Humidity
-            HumidityValues={currentWeather.humidity}
-            DewPointValues={currentWeather.dewPoint}
-          />
-        </div>
-
-        <div className="card friends-card-5">
-          <Precipitation PrecipitationValues={currentWeather.precipitation} />
-        </div>
-
-        <div className="card contact-card-6">
-          <Visibility VisibilityValues={currentWeather.visibility} />
-        </div>
-
-        <div className="card contact-card-7">
-          <Pressure PressureValues={currentWeather.pressure} />
-        </div>
-      </div>
-      <Footer />
-    </Container>
+      <WeatherLayout data={data} />
+    </>
   );
 }

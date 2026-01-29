@@ -51,14 +51,14 @@ export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
 
   const getWeatherIcon = (code: number) => {
     const map: Record<number, string> = {
-      0: "/1.svg",
-      1: "/1.svg",
-      2: "/1.svg",
-      3: "/1.svg",
-      45: "/1.svg",
-      48: "/1.svg",
-      51: "/1.svg",
-      53: "/1.svg",
+       0: "/0.svg",
+      1: "/0.svg",
+      2: "/0.svg",
+      3: "/0.svg",
+      45: "/45.svg",
+      48: "/48.svg",
+      51: "/51.svg",
+      53: "/53.svg",
       55: "/1.svg",
       61: "/1.svg",
       63: "/1.svg",

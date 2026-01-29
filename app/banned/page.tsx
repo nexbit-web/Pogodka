@@ -1,106 +1,126 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { DateTime } from "luxon";
+import AnimatedTimer from "@/components/shared/AnimatedTimer";
+import { useEffect, useRef, useState } from "react";
 
-interface BannedInfo {
-  reason: string;
-  banEnd: number; // timestamp в миллисекундах по Киеву
-}
+type BanApiResponse = false | { banned: true; banEnd: number };
 
 export default function BannedPage() {
-  const router = useRouter();
-  const [ban, setBan] = useState<BannedInfo | null>(null);
+  const [banEnd, setBanEnd] = useState<number | null>(null);
   const [secondsLeft, setSecondsLeft] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [reason, setReason] = useState<string | null>(null);
 
-  useEffect(() => {
-    let interval: number;
+  const hasFetched = useRef(false);
 
-    const fetchBan = async () => {
-      try {
-        const res = await fetch("/api/get-ban", { cache: "no-store" });
-        const data: BannedInfo | null = await res.json();
+  const checkBan = async () => {
+    setLoading(true);
+    setError(null);
 
-        // Если бана нет — сразу редирект
-        if (!data) {
-          router.replace("/");
-          return;
-        }
+    try {
+      const res = await fetch("/api/get-ban", { cache: "no-store" });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data: BanApiResponse = await res.json();
 
-        setBan(data);
-
-        const updateTimer = async () => {
-          // Текущее киевское время
-          const nowKyiv = DateTime.now().setZone("Europe/Kyiv").toMillis();
-
-          // Отсчет с +1 секунды, чтобы таймер был чуть больше
-          const remaining = Math.max(
-            Math.floor((data.banEnd - nowKyiv) / 1000) + 3,
-            0,
-          );
-          setSecondsLeft(remaining);
-
-          // Когда таймер закончился, проверяем сервер
-          if (remaining <= 0) {
-            clearInterval(interval);
-
-            try {
-              const check = await fetch("/api/get-ban", { cache: "no-store" });
-              const updatedBan: BannedInfo | null = await check.json();
-
-              // Если бан уже удален на сервере — редирект
-              if (!updatedBan) {
-                router.replace("/");
-                return;
-              }
-
-              // Если бан еще не удален, подождать секунду и проверить снова
-              setTimeout(async () => {
-                const retry = await fetch("/api/get-ban", {
-                  cache: "no-store",
-                });
-                const retryBan: BannedInfo | null = await retry.json();
-                if (!retryBan) router.replace("/");
-              }, 1000);
-            } catch {
-              router.replace("/");
-            }
-          }
-        };
-
-        updateTimer();
-        interval = window.setInterval(updateTimer, 1000);
-      } catch (err) {
-        console.error(err);
-        router.replace("/"); // при любой ошибке редирект
+      if (data === false) {
+        window.location.href = "/";
+        return;
       }
-    };
 
-    fetchBan();
+      const remainingMs = data.banEnd - Date.now();
+      const remainingSec = Math.max(Math.ceil(remainingMs / 1000), 0);
+
+      if (remainingSec <= 0) {
+        window.location.href = "/";
+        return;
+      }
+
+      setBanEnd(data.banEnd);
+      setSecondsLeft(remainingSec + 4); // старт з +4 секунд
+      // 🔹 Сохраняем причину
+      setReason(
+        (data as { banned: true; banEnd: number; reason?: string }).reason ||
+          "Без причини",
+      );
+      setLoading(false);
+    } catch (err) {
+      console.error("Помилка перевірки бана:", err);
+      setError("Не вдалося перевірити статус блокування.");
+      setLoading(false);
+    }
+  };
+
+  // Первинна перевірка
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    checkBan();
+  }, []);
+
+  // Таймер
+  useEffect(() => {
+    if (!banEnd || secondsLeft <= 0) return;
+
+    const interval = setInterval(() => {
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          setLoading(true); // показуємо завантаження
+          checkBan(); // перевірка бану після закінчення таймера
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
     return () => clearInterval(interval);
-  }, [router]);
-
-  if (!ban) return <div className="text-center mt-20">Завантаження...</div>;
+  }, [banEnd]);
 
   const formatTime = (s: number) => {
     const h = Math.floor(s / 3600);
     const m = Math.floor((s % 3600) / 60);
     const sec = s % 60;
-    return `${h.toString().padStart(2, "0")}:${m
-      .toString()
-      .padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
+    return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
   };
 
+  if (loading) {
+    return (
+      <div className="text-center mt-20 text-lg text-gray-500">
+        Перевірка статусу...
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center mt-20 text-lg text-red-600">
+        {error}
+        <div className="mt-3 text-base text-gray-600">
+          Спробуйте оновити сторінку пізніше.
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="text-center mt-20">
-      <h1 className="text-2xl font-bold mb-4">🚫 Ви тимчасово заблоковані</h1>
-      <p className="mb-2">Причина: {ban.reason}</p>
-      <p className="text-lg">
-        Час до кінця бану:{" "}
-        <b>{secondsLeft > 0 ? formatTime(secondsLeft) : "00:00:00"}</b>
-      </p>
+    <div className="flex flex-col justify-center items-center mt-20 px-4 max-w-xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-red-600">
+        🚫 Ви заблоковані
+      </h1>
+
+      {reason && (
+        <p className="text-lg text-gray-700 mb-4">
+          Причина блокування: {reason}
+        </p>
+      )}
+
+      <div className="flex gap-2 text-2xl font-semibold">
+        Залишилось:
+        <span>
+          <AnimatedTimer seconds={secondsLeft} />
+        </span>
+      </div>
     </div>
   );
 }

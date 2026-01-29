@@ -9,8 +9,8 @@ export const Footer: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
         {/* Бренд */}
         <div className="flex items-center gap-2 text-sm">
-          <span>Pogodka.org</span>
           <span className="ml-2 ">© 2026</span>
+          <span>Pogodka.org</span>
           {/* Версія сайту */}
           <span className=" text-gray-500 text-xs">v{APP_VERSION}</span>
         </div>
@@ -29,10 +29,16 @@ export const Footer: React.FC = () => {
           >
             Угода про конфіденційність
           </a>
-          <a href="/support" className="hover:text-primary border-b border-transparent  transition-colors duration-200">
+          <a
+            href="/support"
+            className="hover:text-primary border-b border-transparent  transition-colors duration-200"
+          >
             Техпідтримка
           </a>
-          <a href="/privacy" className="hover:text-primary border-b border-transparent  transition-colors duration-200">
+          <a
+            href="/privacy"
+            className="hover:text-primary border-b border-transparent  transition-colors duration-200"
+          >
             Реклама
           </a>
         </div>

@@ -22,7 +22,7 @@ export const WeeklyForecast: React.FC<Props> = ({ days, className }) => {
   function getDayLabel(dateString: string) {
     const today = DateTime.now().setZone("Europe/Kyiv").startOf("day");
     const date = DateTime.fromISO(dateString, { zone: "Europe/Kyiv" }).startOf(
-      "day"
+      "day",
     );
 
     const diff = date.diff(today, "days").days;
@@ -35,14 +35,14 @@ export const WeeklyForecast: React.FC<Props> = ({ days, className }) => {
 
   const getWeatherIcon = (code: number) => {
     const map: Record<number, string> = {
-      0: "/1.svg",
+      0: "/0.svg",
       1: "/1.svg",
-      2: "/1.svg",
-      3: "/1.svg",
-      45: "/1.svg",
-      48: "/1.svg",
-      51: "/1.svg",
-      53: "/1.svg",
+      2: "/2.svg",
+      3: "/3.svg",
+      45: "/45.svg",
+      48: "/48.svg",
+      51: "/51.svg",
+      53: "/53.svg",
       55: "/1.svg",
       61: "/1.svg",
       63: "/1.svg",
@@ -69,7 +69,7 @@ export const WeeklyForecast: React.FC<Props> = ({ days, className }) => {
     <div
       className={cn(
         "flex flex-col justify-between rounded-2xl pb-1 h-full",
-        className
+        className,
       )}
     >
       {/* Заголовок */}

@@ -1,25 +1,23 @@
-import { DateTime } from "luxon";
-import { BAN } from "@/config/ban";
 import prisma from "@/lib/prisma";
+import { BAN } from "@/config/ban";
+import { fingerprint } from "@/lib/fingerprint";
 
 export async function antiBot(req: Request, city: string) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+
+  // 🔹 fingerprint ТОЛЬКО от IP
+  const fp = fingerprint(ip);
+
+  const nowUtcMs = Date.now();
+  const nowUtcSeconds = Math.floor(nowUtcMs / 1000);
+  const nowUtcDate = new Date(nowUtcMs);
+
+  const BAN_TTL = BAN.ttlSeconds;
+  const BOT_HIT_TTL = 24 * 60 * 60;
+  const CITY_HIT_TTL = 10 * 60;
+
   const ua = req.headers.get("user-agent")?.toLowerCase() || "";
-
-  // 🔹 Текущее киевское время в формате Date
-  const nowKyivDate = DateTime.now().setZone("Europe/Kyiv").toJSDate();
-  const nowKyivSeconds = Math.floor(DateTime.now().setZone("Europe/Kyiv").toSeconds());
-
-  // ======================
-  // TTL
-  // ======================
-  const BAN_TTL = BAN.ttlSeconds; // TTL для бана
-  const BOT_HIT_TTL = 24 * 60 * 60; // 24 часа для ограничения скорости
-  const CITY_HIT_TTL = 10 * 60; // 10 минут для городов
-
-  // ======================
-  // SEO WHITELIST
-  // ======================
   const isSearchBot =
     ua.includes("googlebot") ||
     ua.includes("bingbot") ||
@@ -27,72 +25,70 @@ export async function antiBot(req: Request, city: string) {
     ua.includes("duckduckbot");
   if (isSearchBot) return null;
 
-  // ======================
-  // Чистим устаревшие данные
-  // ======================
-  const expiredBanDate = DateTime.now().setZone("Europe/Kyiv").minus({ seconds: BAN_TTL }).toJSDate();
-
+  // 🧹 Очистка застарілих даних
   await prisma.botBan.deleteMany({
-    where: { createdAt: { lt: expiredBanDate } },
+    where: { createdAt: { lt: new Date(nowUtcMs - BAN_TTL * 1000) } },
   });
-
   await prisma.botHit.deleteMany({
-    where: { timestamp: { lt: nowKyivSeconds - BOT_HIT_TTL } },
+    where: { timestamp: { lt: nowUtcSeconds - BOT_HIT_TTL } },
   });
-
   await prisma.botCityHit.deleteMany({
-    where: { timestamp: { lt: nowKyivSeconds - CITY_HIT_TTL } },
+    where: { timestamp: { lt: nowUtcSeconds - CITY_HIT_TTL } },
   });
 
-  // ======================
-  // 1️⃣ Soft-ban
-  // ======================
-  const ban = await prisma.botBan.findUnique({ where: { ip } });
-  if (ban) return new Response("Blocked", { status: 403 });
+  // 🚫 Перевірка бану
+  const ban = await prisma.botBan.findUnique({ where: { ip: fp } });
+  if (ban) {
+    const banEndMs = ban.createdAt.getTime() + BAN_TTL * 1000;
+    if (Date.now() < banEndMs) {
+      return new Response("Blocked", { status: 403 });
+    }
+    await prisma.botBan.delete({ where: { ip: fp } });
+  }
 
-  // ======================
-  // 2️⃣ Ограничение скорости
-  // ======================
-  const lastHit = await prisma.botHit.findUnique({ where: { ip } });
-  if (lastHit && nowKyivSeconds - lastHit.timestamp < 1) {
+  // ⚡ Rate limit
+  const lastHit = await prisma.botHit.findUnique({ where: { ip: fp } });
+  if (lastHit && nowUtcSeconds - lastHit.timestamp < 1) {
     await prisma.botBan.upsert({
-      where: { ip },
-      update: { reason: "Too fast", createdAt: nowKyivDate },
-      create: { ip, reason: "Too fast", createdAt: nowKyivDate },
+      where: { ip: fp },
+      update: { reason: "Too fast", createdAt: nowUtcDate },
+      create: { ip: fp, reason: "Too fast", createdAt: nowUtcDate },
     });
     return new Response("Too fast, banned", { status: 429 });
   }
 
   await prisma.botHit.upsert({
-    where: { ip },
-    update: { timestamp: nowKyivSeconds },
-    create: { ip, timestamp: nowKyivSeconds },
+    where: { ip: fp },
+    update: { timestamp: nowUtcSeconds },
+    create: { ip: fp, timestamp: nowUtcSeconds },
   });
 
-  // ======================
-  // 3️⃣ Лимит уникальных городов
-  // ======================
+  // 🌍 Ліміт унікальних міст
   const recentCities = await prisma.botCityHit.findMany({
-    where: { ip, timestamp: { gte: nowKyivSeconds - CITY_HIT_TTL } },
+    where: {
+      ip: fp,
+      timestamp: { gte: nowUtcSeconds - CITY_HIT_TTL },
+    },
   });
-
   const uniqueCities = Array.from(new Set(recentCities.map((c) => c.city)));
-  if (!uniqueCities.includes(city) && uniqueCities.length >= 2) {
+  if (!uniqueCities.includes(city) && uniqueCities.length >= 10) {
     await prisma.botBan.upsert({
-      where: { ip },
-      update: { reason: "Too many unique cities", createdAt: nowKyivDate },
-      create: { ip, reason: "Too many unique cities", createdAt: nowKyivDate },
+      where: { ip: fp },
+      update: { reason: "Too many unique cities", createdAt: nowUtcDate },
+      create: {
+        ip: fp,
+        reason: "Too many unique cities",
+        createdAt: nowUtcDate,
+      },
     });
     return new Response("Too many unique cities, banned", { status: 429 });
   }
 
   await prisma.botCityHit.create({
-    data: { ip, city, timestamp: nowKyivSeconds },
+    data: { ip: fp, city, timestamp: nowUtcSeconds },
   });
 
-  // ======================
-  // 4️⃣ Анти-алфавитный перебор
-  // ======================
+  // 🔤 Анти-алфавітний перебір
   const lastCityHit = recentCities.sort((a, b) => b.timestamp - a.timestamp)[0];
   if (lastCityHit && city > lastCityHit.city && city.length > 3) {
     const alphaHits = recentCities.filter(
@@ -100,11 +96,13 @@ export async function antiBot(req: Request, city: string) {
     );
     if (alphaHits.length >= 3) {
       await prisma.botBan.upsert({
-        where: { ip },
-        update: { reason: "Alphabetical scan", createdAt: nowKyivDate },
-        create: { ip, reason: "Alphabetical scan", createdAt: nowKyivDate },
+        where: { ip: fp },
+        update: { reason: "Alphabetical scan", createdAt: nowUtcDate },
+        create: { ip: fp, reason: "Alphabetical scan", createdAt: nowUtcDate },
       });
-      return new Response("Alphabetical scan detected, banned", { status: 429 });
+      return new Response("Alphabetical scan detected, banned", {
+        status: 429,
+      });
     }
   }
 
