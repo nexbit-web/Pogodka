@@ -1,16 +1,15 @@
 import { cn } from "@/lib/utils";
 import { Droplets } from "lucide-react";
-import React from "react";
 
 interface Props {
   className?: string;
   PrecipitationValues: number;
 }
 
-export const Precipitation: React.FC<Props> = ({
+export default function Precipitation({
   className,
   PrecipitationValues = 0,
-}) => {
+}: Props) {
   const value = Number(PrecipitationValues.toFixed(1));
 
   // Автоматичний текст опадів
@@ -25,7 +24,7 @@ export const Precipitation: React.FC<Props> = ({
     <div
       className={cn(
         "flex flex-col justify-between rounded-2xl h-full ",
-        className
+        className,
       )}
     >
       {/* Заголовок */}
@@ -40,4 +39,4 @@ export const Precipitation: React.FC<Props> = ({
       </div>
     </div>
   );
-};
+}

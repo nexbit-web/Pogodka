@@ -71,7 +71,7 @@ export async function antiBot(req: Request, city: string) {
     },
   });
   const uniqueCities = Array.from(new Set(recentCities.map((c) => c.city)));
-  if (!uniqueCities.includes(city) && uniqueCities.length >= 10) {
+  if (!uniqueCities.includes(city) && uniqueCities.length >= 15) {
     await prisma.botBan.upsert({
       where: { ip: fp },
       update: { reason: "Too many unique cities", createdAt: nowUtcDate },

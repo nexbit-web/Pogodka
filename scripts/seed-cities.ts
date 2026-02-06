@@ -1,13 +1,13 @@
-import prisma from '../lib/prisma'; 
+import prisma from "../lib/prisma";
 // $ npm run seed:cities
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 async function main() {
-  console.log('🌆 Начинаем загрузку городов Украины...');
+  console.log("🌆 Начинаем загрузку городов Украины...");
 
-  const filePath = path.join(process.cwd(), 'scripts', 'cities.json');
-  const rawData = fs.readFileSync(filePath, 'utf-8');
+  const filePath = path.join(process.cwd(), "scripts", "cities.json");
+  const rawData = fs.readFileSync(filePath, "utf-8");
   const cities = JSON.parse(rawData);
 
   const result = await prisma.city.createMany({
@@ -20,6 +20,7 @@ async function main() {
       countryEn: city.countryEn,
       latitude: city.latitude,
       longitude: city.longitude,
+      slug: city.slug,
     })),
     skipDuplicates: true,
   });
@@ -29,7 +30,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error('❌ Ошибка при загрузке городов:', e);
+    console.error("❌ Ошибка при загрузке городов:", e);
     process.exit(1);
   })
   .finally(async () => {

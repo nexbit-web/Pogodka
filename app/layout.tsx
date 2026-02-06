@@ -99,7 +99,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SidebarProvider>
-            <AppSidebar />
+            {/* <AppSidebar /> */}
             <SidebarInset>
               <div className="flex flex-col h-screen">
                 <Header />

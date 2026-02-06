@@ -7,22 +7,19 @@ interface Props {
   VisibilityValues: number;
 }
 
-export const Visibility: React.FC<Props> = ({
-  className,
-  VisibilityValues,
-}) => {
+export default function Visibility({ className, VisibilityValues }: Props) {
   const roundedVisibility = Math.round(VisibilityValues);
   const visibilityText =
     VisibilityValues >= 10
       ? "Добра видимість"
       : VisibilityValues >= 5
-      ? "Середня видимість"
-      : "Погана видимість";
+        ? "Середня видимість"
+        : "Погана видимість";
   return (
     <div
       className={cn(
         "flex flex-col justify-between rounded-2xl h-full",
-        className
+        className,
       )}
     >
       {/* Заголовок */}
@@ -39,4 +36,4 @@ export const Visibility: React.FC<Props> = ({
       </div>
     </div>
   );
-};
+}

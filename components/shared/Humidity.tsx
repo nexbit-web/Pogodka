@@ -8,11 +8,11 @@ interface Props {
   DewPointValues: number;
 }
 
-export const Humidity: React.FC<Props> = ({
+export default function Humidity({
   className,
   HumidityValues,
   DewPointValues,
-}) => {
+}: Props) {
   const roundedHumidity = Math.round(HumidityValues);
   const roundedDewPoint = Math.round(DewPointValues);
 
@@ -20,7 +20,7 @@ export const Humidity: React.FC<Props> = ({
     <div
       className={cn(
         "flex flex-col justify-between rounded-2xl h-full",
-        className
+        className,
       )}
     >
       <span className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground">
@@ -36,4 +36,4 @@ export const Humidity: React.FC<Props> = ({
       </div>
     </div>
   );
-};
+}

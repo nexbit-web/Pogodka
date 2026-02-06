@@ -1,18 +1,42 @@
+"use client";
 import { Container } from "./Container";
-import { WeeklyForecast } from "./Weekly-forecast";
-import { HourlyWeather } from "./Hourly-weather";
 import { WeatherHeadline } from "./Weather-headline";
-import { WindBlock } from "./WindBlock";
-import { Humidity } from "./Humidity";
-import { Precipitation } from "./Precipitation";
-import { Visibility } from "./Visibility";
-import { Pressure } from "./Atmospheric-pressure";
 import { Footer } from "./Footer";
 import { DateTime } from "luxon";
 import { getCurrentWeather, CurrentWeather } from "@/utils/weather";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+import HourlyWeather from "./Hourly-weather";
+
+// 🔹 Динамический импорт тяжёлых компонентов с дефолтным экспортом
+const WeeklyForecast = dynamic(() => import("./Weekly-forecast"), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-74" />,
+});
+
+const WindBlock = dynamic(() => import("./WindBlock"), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-full" />,
+});
+const Humidity = dynamic(() => import("./Humidity"), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-33" />,
+});
+const Precipitation = dynamic(() => import("./Precipitation"), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-full" />,
+});
+const Visibility = dynamic(() => import("./Visibility"), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-full" />,
+});
+const Pressure = dynamic(() => import("./Pressure"), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-37" />,
+});
 
 interface WeatherLayoutProps {
-  data: any; 
+  data: any;
 }
 
 export function WeatherLayout({ data }: WeatherLayoutProps) {
@@ -40,6 +64,7 @@ export function WeatherLayout({ data }: WeatherLayoutProps) {
 
   return (
     <Container className="relative z-10">
+      {/* 🔹 Основной контент SSR — показываем сразу */}
       <WeatherHeadline
         city={data.misto}
         temperature={currentWeather.temp}
@@ -64,6 +89,7 @@ export function WeatherLayout({ data }: WeatherLayoutProps) {
           />
         </div>
         <div className="card welcome-card-4">
+          {/* Вологість */}
           <Humidity
             HumidityValues={currentWeather.humidity}
             DewPointValues={currentWeather.dewPoint}
@@ -79,6 +105,7 @@ export function WeatherLayout({ data }: WeatherLayoutProps) {
           <Pressure PressureValues={currentWeather.pressure} />
         </div>
       </div>
+
       <Footer />
     </Container>
   );

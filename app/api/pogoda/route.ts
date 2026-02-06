@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { antiBot } from "@/lib/antiBot";
+import { redisGet, redisIncrWithTTL, redisSet } from "@/lib/upstash";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -9,11 +10,25 @@ export async function GET(req: Request) {
   if (!cityName)
     return NextResponse.json({ error: "Не вказано місто" }, { status: 400 });
 
-  // Перевірка на ботів
-  const botResponse = await antiBot(req, cityName);
-  if (botResponse) return botResponse;
+  // Проверка на ботов
+  // const botResponse = await antiBot(req, cityName);
+  // if (botResponse) return botResponse;
 
-  // Шукаємо місто
+  const key = `weather:${cityName.toLowerCase()}`;
+  const countKey = `count:${cityName.toLowerCase()}`;
+  //Увеличиваем счётчик запросов к городу (TTL 1 день)
+  const count = await redisIncrWithTTL(countKey, 86400);
+
+  //TTL для кэша зависит от популярности
+  const ttl = count > 10 ? 600 : 7200; // >10 запросов → 10 мин, иначе 2 часа
+
+  // Проверяем кэш
+  const cached = await redisGet(key);
+  if (cached) {
+    return NextResponse.json(JSON.parse(cached));
+  }
+
+  // 2️⃣ Ищем город в базе
   const city = await prisma.city.findFirst({
     where: {
       OR: [
@@ -36,7 +51,7 @@ export async function GET(req: Request) {
   if (!city)
     return NextResponse.json({ error: "Місто не знайдено" }, { status: 404 });
 
-  // Ми робимо запит до Open-Meteo
+  // 3️⃣ Запрос к Open-Meteo
   const url =
     `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}` +
     `&hourly=` +
@@ -69,15 +84,19 @@ export async function GET(req: Request) {
 
   const weather = await res.json();
 
-  // Возвращаем безопасные данные клиенту
-  return NextResponse.json({
+  const data = {
     misto: city.nameUa,
     oblast: city.region,
     kraina: city.countryUa,
     latitude: city.latitude,
     longitude: city.longitude,
     weather,
-  });
+  };
+
+  // 7️⃣ Сохраняем данные в Redis с TTL
+  await redisSet(key, JSON.stringify(data), ttl);
+
+  return NextResponse.json(data);
 }
 
 // const url =

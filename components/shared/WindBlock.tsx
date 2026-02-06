@@ -8,12 +8,12 @@ interface Props {
   DirectionValues: number;
 }
 
-export const WindBlock: React.FC<Props> = ({
+export default function WindBlock({
   className,
   WindValues,
   GustsValues,
   DirectionValues,
-}) => {
+}: Props) {
   function degToCompass(deg: number) {
     const directions = ["Пн", "ПнСх", "Сх", "ПдСх", "Пд", "ПдЗх", "Зх", "ПнЗх"];
     const index = Math.round(deg / 45) % 8;
@@ -52,17 +52,10 @@ export const WindBlock: React.FC<Props> = ({
         className="absolute inset-0 flex items-center justify-center transition-transform duration-300"
         style={{ transform: `rotate(${deg}deg)` }}
       >
-        <img
-          src="/Wind-direction-dark.svg"
-          alt="Wind direction"
-          className="w-22 h-22 block dark:hidden"
-        />
-
-        <img
-          src="/Wind-direction-light.svg"
-          alt="Wind direction"
-          className="w-22 h-22 hidden dark:block"
-        />
+        <svg className="text-foreground h-23  ">
+          {/* <use href="/0.svg" /> */}
+          <use href="/icons.svg#wind" />
+        </svg>
       </div>
     </div>
   );
@@ -101,4 +94,4 @@ export const WindBlock: React.FC<Props> = ({
       </div>
     </div>
   );
-};
+}

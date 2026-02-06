@@ -7,7 +7,7 @@ interface Props {
   PressureValues: number;
 }
 
-export const Pressure: React.FC<Props> = ({ className, PressureValues }) => {
+export default function Pressure({ className, PressureValues }: Props) {
   const pressureValue = Math.round(PressureValues);
   const getPressureText = (value: number) => {
     if (value < 1000)
@@ -42,7 +42,7 @@ export const Pressure: React.FC<Props> = ({ className, PressureValues }) => {
     <div
       className={cn(
         "flex flex-col justify-between rounded-2xl h-full",
-        className
+        className,
       )}
     >
       {/* Заголовок */}
@@ -59,4 +59,4 @@ export const Pressure: React.FC<Props> = ({ className, PressureValues }) => {
       </div>
     </div>
   );
-};
+}

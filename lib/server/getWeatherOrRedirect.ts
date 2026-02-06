@@ -12,10 +12,10 @@ interface ApiResponse {
 
 export async function getWeatherOrRedirect(city: string): Promise<ApiResponse> {
   const cityName = decodeURIComponent(city);
-
+  // https://pogodka.vercel.app/
   const res = await fetch(
-    `http://localhost:3000/api/pogoda?city=${encodeURIComponent(cityName)}`,
-    { cache: "no-store" }
+    `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
+    { cache: "no-store" },
   );
 
   if (res.status === 403 || res.status === 429) {
