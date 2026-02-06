@@ -8,12 +8,12 @@ interface Props {
   DirectionValues: number;
 }
 
-export const WindBlock: React.FC<Props> = ({
+export default function WindBlock({
   className,
   WindValues,
   GustsValues,
   DirectionValues,
-}) => {
+}: Props) {
   function degToCompass(deg: number) {
     const directions = ["Пн", "ПнСх", "Сх", "ПдСх", "Пд", "ПдЗх", "Зх", "ПнЗх"];
     const index = Math.round(deg / 45) % 8;
@@ -21,27 +21,49 @@ export const WindBlock: React.FC<Props> = ({
   }
 
   const WindArrow: React.FC<{ deg: number }> = ({ deg }) => (
-    <div className="w-20 h-20" style={{ transform: `rotate(${deg}deg)` }}>
+    <div className="relative w-32 h-32 flex items-center justify-center">
+      {/* КРУГ СО ШТРИХАМИ */}
       <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="currentColor"
-        className="w-full h-full text-blue-500 "
+        viewBox="0 0 100 100"
+        className="absolute inset-0 w-full h-full text-muted-foreground"
       >
-        <path
-          d="M12 2 L12 22 M12 2 L8 6 M12 2 L16 6"
-          stroke="currentColor"
-          strokeWidth="2"
-          fill="none"
-        />
+        {Array.from({ length: 60 }).map((_, i) => {
+          const angle = (i * 360) / 60;
+          const isMain = i % 5 === 0;
+
+          return (
+            <line
+              key={i}
+              x1="50"
+              y1={isMain ? 6 : 10}
+              x2="50"
+              y2={isMain ? 14 : 13}
+              stroke="currentColor"
+              strokeWidth={isMain ? 1.8 : 0.8}
+              opacity={isMain ? 0.8 : 0.4}
+              transform={`rotate(${angle} 50 50)`}
+            />
+          );
+        })}
       </svg>
+
+      {/* СТРЕЛКА */}
+      <div
+        className="absolute inset-0 flex items-center justify-center transition-transform duration-300"
+        style={{ transform: `rotate(${deg}deg)` }}
+      >
+        <svg className="text-foreground h-23  ">
+          {/* <use href="/0.svg" /> */}
+          <use href="/icons.svg#wind" />
+        </svg>
+      </div>
     </div>
   );
   return (
     <div
       className={cn(
         "flex justify-between items-stretch rounded-2xl h-full",
-        className
+        className,
       )}
     >
       <div className="flex flex-col justify-between m-0 p-0 w-[60%] h-full">
@@ -72,4 +94,4 @@ export const WindBlock: React.FC<Props> = ({
       </div>
     </div>
   );
-};
+}

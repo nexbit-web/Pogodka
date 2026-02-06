@@ -1,3 +1,3 @@
 export const BAN = {
-  ttlSeconds: 5, 
+  ttlSeconds: 60 * 60, // 1 година
 };

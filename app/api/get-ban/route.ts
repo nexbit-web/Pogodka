@@ -1,34 +1,35 @@
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { NextResponse } from "next/server";
 import { BAN } from "@/config/ban";
-import { DateTime } from "luxon";
+import { fingerprint } from "@/lib/fingerprint";
 
-export async function GET(req: Request) {
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown";
-  if (!ip || ip === "unknown") return NextResponse.json(null, { status: 200 });
+export async function GET(req: NextRequest) {
+  try {
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const fp = fingerprint(ip);
 
-  const ban = await prisma.botBan.findFirst({ where: { ip } });
-  if (!ban) return NextResponse.json(null, { status: 200 });
+    const banRecord = await prisma.botBan.findUnique({ where: { ip: fp } });
 
-  // Текущее киевское время
-  const nowKyiv = DateTime.now().setZone("Europe/Kyiv").toMillis();
+    // ❌ Бана немає
+    if (!banRecord) return NextResponse.json(false);
 
-  // Время окончания бана
-  const banCreatedKyiv = DateTime.fromJSDate(ban.createdAt)
-    .setZone("Europe/Kyiv")
-    .toMillis();
-  const banEnd = banCreatedKyiv + BAN.ttlSeconds * 1000;
+    const banEnd = banRecord.createdAt.getTime() + BAN.ttlSeconds * 1000;
 
-  // Если бан закончился — удаляем его на сервере
-  if (nowKyiv > banEnd) {
-    await prisma.botBan.deleteMany({ where: { ip } });
-    return NextResponse.json(null, { status: 200 });
+    // ⏱ Бан закінчився → видаляємо без помилок
+    if (Date.now() >= banEnd) {
+      await prisma.botBan.deleteMany({ where: { ip: fp } });
+      return NextResponse.json(false);
+    }
+
+    // ✅ Бан активний — возвращаем причину
+    return NextResponse.json({
+      banned: true,
+      banEnd,
+      reason: banRecord.reason || "Без причини", // если нет reason, ставим дефолт
+    });
+  } catch (err) {
+    console.error("Помилка в /api/get-ban:", err);
+    return NextResponse.json(false, { status: 500 });
   }
-
-  // Иначе возвращаем данные о бане
-  return NextResponse.json({
-    ip,
-    reason: ban.reason,
-    banEnd, // timestamp по Киеву
-  });
 }

@@ -23,7 +23,7 @@ interface HourlyWeatherProps {
   };
 }
 
-export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
+export default function HourlyWeather({ days }: HourlyWeatherProps) {
   if (!days || !days.hourly) return null;
 
   const kievNow = DateTime.now().setZone("Europe/Kyiv");
@@ -49,36 +49,26 @@ export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
     })
     .slice(0, 17); // Обмежуємо до наступних 17 годин
 
-  const getWeatherIcon = (code: number) => {
-    const map: Record<number, string> = {
-      0: "/1.svg",
-      1: "/1.svg",
-      2: "/1.svg",
-      3: "/1.svg",
-      45: "/1.svg",
-      48: "/1.svg",
-      51: "/1.svg",
-      53: "/1.svg",
-      55: "/1.svg",
-      61: "/1.svg",
-      63: "/1.svg",
-      65: "/1.svg",
-      66: "/1.svg",
-      67: "/1.svg",
-      71: "/1.svg",
-      73: "/1.svg",
-      75: "/1.svg",
-      77: "/1.svg",
-      80: "/1.svg",
-      81: "/1.svg",
-      82: "/1.svg",
-      85: "/1.svg",
-      86: "/1.svg",
-      95: "/1.svg",
-      96: "/1.svg",
-      99: "/1.svg",
-    };
-    return map[code] || "/icons/unknown.svg";
+  const getWeatherIconId = (code: number): string => {
+    if (code === undefined || code === null) return "unknown";
+    // Ясно / мало хмар / змінна хмарність / пасмурно
+    if ([0, 1, 2, 3].includes(code)) return "sunny"; // або "clear", "clear-day" — як тобі зручніше
+    // Туман
+    if ([45, 48].includes(code)) return "sunny";
+    // Мряка / дрібний дощ
+    if ([51, 53, 55, 56, 57].includes(code)) return "sunny";
+    // Дощ (включаючи freezing rain)
+    if ([61, 63, 65, 66, 67].includes(code)) return "sunny";
+    // Сніг / крижаний дощ / сніжні зерна
+    if ([71, 73, 75, 77].includes(code)) return "sunny";
+    // Зливи дощу
+    if ([80, 81, 82].includes(code)) return "sunny";
+    // Снігові зливи
+    if ([85, 86].includes(code)) return "sunny";
+    // Гроза (з градом або без)
+    if ([95, 96, 99].includes(code)) return "sunny";
+    // все інше (рідкісні коди або помилка)
+    return "unknown";
   };
 
   // Прокрутка до поточної години після рендерингу
@@ -100,7 +90,7 @@ export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
       >
         {hours.map((hour, idx) => {
           const hourTime = DateTime.fromISO(hour.time).setZone(
-            "Europe/Kyiv"
+            "Europe/Kyiv",
           ).hour;
           const isCurrent = idx === 0; // перша година в списку - поточна година
           return (
@@ -117,13 +107,11 @@ export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
               >
                 {hourTime}
               </p>
-              <Image
-                className="mx-1"
-                src={getWeatherIcon(hour.code)}
-                alt="Weather icon"
-                width={35}
-                height={38}
-              />
+
+              <svg className="mx-1 w-[35px] h-[38px] text-foreground">
+                <use href={`/icons.svg#${getWeatherIconId(hour.code)}`} />
+              </svg>
+
               <p
                 className="text-lg font-semibold"
                 style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
@@ -136,4 +124,4 @@ export const HourlyWeather: React.FC<HourlyWeatherProps> = ({ days }) => {
       </div>
     </div>
   );
-};
+}

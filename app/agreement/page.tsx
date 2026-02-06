@@ -4,20 +4,9 @@ export default function WeatherPage({}) {
   return (
     <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl mb-4">
       <Link href="/" className="flex items-center gap-2 my-8">
-        <Image
-          src="/faviconDark.svg"
-          alt="Pogodka Logo"
-          className="block dark:hidden"
-          width={90}
-          height={90}
-        />
-        <Image
-          src="/favicon.svg"
-          alt="Pogodka Logo"
-          className="hidden dark:block"
-          width={90}
-          height={90}
-        />
+        <svg className="text-foreground w-[90px] h-auto">
+          <use href="/icons.svg#favicon" />
+        </svg>
         <h1 className="text-6xl">Pogodka</h1>
       </Link>
 

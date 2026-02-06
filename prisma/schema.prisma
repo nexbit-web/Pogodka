@@ -10,13 +10,13 @@ model City {
   id        Int    @id @default(autoincrement())
   nameUa    String
   nameRu    String
-  nameEn    String @unique
+  nameEn    String 
   region    String
   countryUa String
   countryEn String
   latitude  Float
   longitude Float
-  slug      String @unique
+  slug      String 
 
   @@index([nameUa])
   @@index([nameRu])
@@ -39,4 +39,100 @@ model BotCityHit {
   ip        String
   city      String
   timestamp Int
+}
+
+// Бан и ограничения безопасности
+model SecurityBan {
+  ip          String   @id
+  reason      String
+  isManual    Boolean  @default(false)
+  isLifetime  Boolean  @default(false) // пожизненный бан
+  expiresAt   DateTime?                // null = навсегда
+  createdAt   DateTime @default(now())
+  createdBy   Int?                     // adminId
+}
+
+// Логи запросов и трафик
+model SecurityRequestLog {
+  id          Int      @id @default(autoincrement())
+  ip          String
+  fingerprint String
+  path        String
+  method      String
+  userAgent   String
+  city        String?
+  country     String?
+  isBot       Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([ip])
+  @@index([createdAt])
+}
+
+// Ежедневная статистика
+model SecurityDailyStats {
+  date          DateTime @id
+  requests      Int      @default(0)
+  uniqueUsers   Int      @default(0)
+  bots          Int      @default(0)
+  adImpressions Int      @default(0)
+  adClicks      Int      @default(0)
+}
+
+// События рекламы
+model AdEvent {
+  id        Int      @id @default(autoincrement())
+  ip        String
+  provider  String   // google_ads, custom и т.д.
+  bannerId  String
+  event     String   // impression | click
+  createdAt DateTime @default(now())
+
+  @@index([provider])
+}
+
+// Администраторы
+model SecurityAdmin {
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  password    String
+  name        String?
+  avatarUrl   String?
+  role        String   @default("admin")
+  createdAt   DateTime @default(now())
+  lastLoginAt DateTime?
+}
+
+model SecurityAdminActionLog {
+  id        Int      @id @default(autoincrement())
+  adminId   Int
+  action    String
+  target    String?
+  reason    String?
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+}
+
+// Технический режим сайта
+model MaintenanceMode {
+  id        Int      @id @default(autoincrement())
+  isActive  Boolean  @default(false)
+  message   String?
+  startedAt DateTime?
+  endsAt    DateTime?
+  createdBy Int?
+}
+
+// Новости и объявления
+model SiteAnnouncement {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  isActive  Boolean  @default(true)
+  showPopup Boolean  @default(true)
+  startsAt  DateTime @default(now())
+  endsAt    DateTime?
+  createdAt DateTime @default(now())
+  createdBy Int?
 }

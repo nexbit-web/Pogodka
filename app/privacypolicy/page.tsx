@@ -4,28 +4,18 @@ export default function WeatherPage({}) {
   return (
     <div className="mx-auto w-full px-4 sm:px-6 lg:px-8 max-w-7xl mb-4">
       <Link href="/" className="flex items-center gap-2 my-8">
-        <Image
-          src="/faviconDark.svg"
-          alt="Pogodka Logo"
-          className="block dark:hidden"
-          width={90}
-          height={90}
-        />
-        <Image
-          src="/favicon.svg"
-          alt="Pogodka Logo"
-          className="hidden dark:block"
-          width={90}
-          height={90}
-        />
+        <svg className="text-foreground w-[90px] h-auto">
+          <use href="/icons.svg#favicon" />
+        </svg>
         <h1 className="text-6xl">Pogodka</h1>
       </Link>
       <h1 className="text-3xl font-bold mb-4">Угода про конфіденційність</h1>
       <p className="mb-2">Останнє оновлення: 15 січня 2026 року</p>
       <p>
-        Ласкаво просимо на вебсайт https://pogodka.org (далі – «Сайт»). Використовуючи
-        Сайт, ви погоджуєтесь із цією Угодою про конфіденційність. Якщо ви не
-        погоджуєтесь з умовами, будь ласка, не використовуйте Сайт.
+        Ласкаво просимо на вебсайт https://pogodka.org (далі – «Сайт»).
+        Використовуючи Сайт, ви погоджуєтесь із цією Угодою про
+        конфіденційність. Якщо ви не погоджуєтесь з умовами, будь ласка, не
+        використовуйте Сайт.
       </p>
       <h2 className="text-2xl font-semibold mt-6 mb-2">
         1. Загальні положення
@@ -110,8 +100,8 @@ export default function WeatherPage({}) {
       </p>
       <h2 className="text-2xl font-semibold mt-6 mb-2">8. Зміни Угоди</h2>
       <p>
-        8.1. Власник Сайту залишає за собою право змінювати цю Угоду у
-        будь-який час.
+        8.1. Власник Сайту залишає за собою право змінювати цю Угоду у будь-який
+        час.
       </p>
       <p>
         8.2. Оновлена версія Угоди публікується на Сайті з новою датою

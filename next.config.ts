@@ -10,6 +10,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async headers() {
+    return [
+      {
+        source: "/icons.svg", // путь к файлу в public
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable", // кэш 1 год
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

@@ -16,13 +16,13 @@ interface Props {
   className?: string;
 }
 
-export const WeeklyForecast: React.FC<Props> = ({ days, className }) => {
+export default function WeeklyForecast({ days, className }: Props) {
   const shortDays = ["Нд", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"];
 
   function getDayLabel(dateString: string) {
     const today = DateTime.now().setZone("Europe/Kyiv").startOf("day");
     const date = DateTime.fromISO(dateString, { zone: "Europe/Kyiv" }).startOf(
-      "day"
+      "day",
     );
 
     const diff = date.diff(today, "days").days;
@@ -32,44 +32,33 @@ export const WeeklyForecast: React.FC<Props> = ({ days, className }) => {
 
     return shortDays[date.weekday % 7];
   }
+const getWeatherIconId = (code: number): string => {
+  // Більшість кодів → sunny (як у тебе зараз)
+  if ([0, 1, 2, 3, 45, 48, 51, 53, 55, 61, 63, 65, 66, 67, 71, 73, 75, 77, 80, 81, 82, 85, 86, 95, 96, 99].includes(code)) {
+    return "sunny";
+  }
+  return "unknown";
+};
 
-  const getWeatherIcon = (code: number) => {
-    const map: Record<number, string> = {
-      0: "/1.svg",
-      1: "/1.svg",
-      2: "/1.svg",
-      3: "/1.svg",
-      45: "/1.svg",
-      48: "/1.svg",
-      51: "/1.svg",
-      53: "/1.svg",
-      55: "/1.svg",
-      61: "/1.svg",
-      63: "/1.svg",
-      65: "/1.svg",
-      66: "/1.svg",
-      67: "/1.svg",
-      71: "/1.svg",
-      73: "/1.svg",
-      75: "/1.svg",
-      77: "/1.svg",
-      80: "/1.svg",
-      81: "/1.svg",
-      82: "/1.svg",
-      85: "/1.svg",
-      86: "/1.svg",
-      95: "/1.svg",
-      96: "/1.svg",
-      99: "/1.svg",
-    };
-    return map[code] || "/icons/unknown.svg";
-  };
+// Або якщо хочеш розширити пізніше:
+// const getWeatherIconId = (code: number): string => {
+//   switch (true) {
+//     case [0, 1, 2, 3].includes(code): return "sunny"; // або "clear-day" тощо
+//     case [45, 48].includes(code): return "fog";
+//     case [51, 53, 55].includes(code): return "drizzle";
+//     case [61, 63, 65].includes(code): return "rain";
+//     case [71, 73, 75, 77].includes(code): return "snow";
+//     case [80, 81, 82].includes(code): return "rain-showers";
+//     case [95, 96, 99].includes(code): return "thunderstorm";
+//     default: return "unknown";
+//   }
+// };
 
   return (
     <div
       className={cn(
         "flex flex-col justify-between rounded-2xl pb-1 h-full",
-        className
+        className,
       )}
     >
       {/* Заголовок */}
@@ -89,11 +78,9 @@ export const WeeklyForecast: React.FC<Props> = ({ days, className }) => {
           >
             {getDayLabel(day.date)}
           </h3>
-          <img
-            className="w-8 h-8"
-            src={getWeatherIcon(day.day.code)}
-            alt={`Погода ${day.day.code}`}
-          />
+          <svg className="w-8 h-8 text-foreground">
+            <use href={`/icons.svg#${getWeatherIconId(day.day.code)}`} />
+          </svg>
           <span
             className="font-bold"
             style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
@@ -105,4 +92,4 @@ export const WeeklyForecast: React.FC<Props> = ({ days, className }) => {
       ))}
     </div>
   );
-};
+}
