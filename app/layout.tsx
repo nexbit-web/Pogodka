@@ -6,6 +6,7 @@ import { sfuiDisplay } from "./fonts";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "react-hot-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import Script from "next/script";
 export const metadata: Metadata = {
   title: "Pogodka",
   description:
@@ -83,6 +84,11 @@ export default function RootLayout({
   return (
     <html lang="uk" suppressHydrationWarning>
       <body className={`${sfuiDisplay.variable} antialiased `}>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4358580854566630"
+          crossOrigin="anonymous"
+        />
         <Toaster />
         <NextTopLoader
           color="var(--primary)"
