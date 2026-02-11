@@ -12,10 +12,10 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import Image from "next/image";
 import { Spinner } from "@/components/ui/spinner";
 import * as Yup from "yup";
 import { Footer } from "@/components/shared/Footer";
+import { cn } from "@/lib/utils";
 
 // Валідація
 const SupportSchema = Yup.object({
@@ -90,6 +90,8 @@ export default function SupportPage() {
       setEmail("");
       setSubject("");
       setMessage("");
+      setTouched({ email: false, subject: false, message: false });
+      setErrors({ email: "", subject: "", message: "" });
       toast.success("Готово! Повідомлення надіслано.");
     } catch {
       toast.error("Помилка відправки.");
@@ -100,11 +102,16 @@ export default function SupportPage() {
 
   return (
     <form onSubmit={handleSubmit}>
-      <FieldGroup className="min-h-screen flex flex-col items-center justify-center px-4 gap-4">
-        {/* Email */}
+      <FieldGroup className="min-h-screen  flex flex-col items-center justify-center px-4 gap-4">
+        {/* Поле Email */}
+
         <Field
-          data-invalid={!!errors.email && touched.email}
-          className="w-full max-w-md"
+          className={cn(
+            "w-full max-w-md transition-colors",
+            touched.email && errors.email
+              ? "border-red-500 focus:border-red-500"
+              : "border-gray-300 focus:border-primary",
+          )}
         >
           <FieldLabel>Email</FieldLabel>
           <Input
@@ -114,21 +121,23 @@ export default function SupportPage() {
             onChange={(e) => setEmail(e.target.value)}
             onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
             aria-invalid={!!errors.email && touched.email}
+            className="transition-colors"
           />
-
-          <FieldDescription
-            className={touched.email && errors.email ? "text-red-600" : ""}
-          >
+          <FieldDescription className="text-sm mt-1">
             {touched.email && errors.email
               ? errors.email
               : "Введіть email, куди нам надіслати відповідь."}
           </FieldDescription>
         </Field>
 
-        {/* Subject */}
+        {/* Поле Тема повідомлення */}
         <Field
-          data-invalid={!!errors.subject && touched.subject}
-          className="w-full max-w-md"
+          className={cn(
+            "w-full max-w-md transition-colors",
+            touched.subject && errors.subject
+              ? "border-red-500 focus:border-red-500"
+              : "border-gray-300 focus:border-primary",
+          )}
         >
           <FieldLabel>Тема повідомлення</FieldLabel>
           <Input
@@ -138,20 +147,23 @@ export default function SupportPage() {
             onChange={(e) => setSubject(e.target.value)}
             onBlur={() => setTouched((prev) => ({ ...prev, subject: true }))}
             aria-invalid={!!errors.subject && touched.subject}
+            className="transition-colors"
           />
-          <FieldDescription
-            className={touched.subject && errors.subject ? "text-red-600" : ""}
-          >
+          <FieldDescription className="text-sm mt-1">
             {touched.subject && errors.subject
               ? errors.subject
-              : "Введіть тему повідомлення"}{" "}
+              : "Введіть тему повідомлення."}
           </FieldDescription>
         </Field>
 
-        {/* Message */}
+        {/* Поле Повідомлення */}
         <Field
-          data-invalid={!!errors.message && touched.message}
-          className="w-full max-w-md"
+          className={cn(
+            "w-full max-w-md transition-colors",
+            touched.message && errors.message
+              ? "border-red-500 focus:border-red-500"
+              : "border-gray-300 focus:border-primary",
+          )}
         >
           <FieldLabel>Ваше питання</FieldLabel>
           <Textarea
@@ -160,18 +172,16 @@ export default function SupportPage() {
             onChange={(e) => setMessage(e.target.value)}
             onBlur={() => setTouched((prev) => ({ ...prev, message: true }))}
             aria-invalid={!!errors.message && touched.message}
+            className="transition-colors"
           />
-
-          <FieldDescription
-            className={touched.message && errors.message ? "text-red-600" : ""}
-          >
+          <FieldDescription className="text-sm mt-1">
             {touched.message && errors.message
               ? errors.message
               : "Введіть тут своє питання."}
           </FieldDescription>
         </Field>
 
-        {/* Submit Button */}
+        {/* Кнопка Відправки */}
         <Field className="w-full max-w-md">
           <Button
             type="submit"
@@ -188,6 +198,8 @@ export default function SupportPage() {
           </Button>
         </Field>
       </FieldGroup>
+
+      {/* Підвал сторінки */}
       <Footer />
     </form>
   );

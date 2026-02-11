@@ -17,23 +17,34 @@ export default function Humidity({
   const roundedDewPoint = Math.round(DewPointValues);
 
   return (
-    <div
+    <section
       className={cn(
         "flex flex-col justify-between rounded-2xl h-full",
         className,
       )}
+      aria-labelledby="humidity-title"
     >
-      <span className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground">
-        <Droplet size={20} /> ВОЛОГІСТЬ
-      </span>
+      {/* Заголовок блоку */}
+      <h3
+        id="humidity-title"
+        className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground"
+      >
+        <Droplet size={20} aria-hidden="true" />
+        Вологість
+      </h3>
 
-      <div className="text-3xl font-semibold mb-2 pl-3 pt-2 ">
+      {/* Основне значення вологості */}
+      <output
+        className="text-3xl font-semibold mb-2 pl-3 pt-2"
+        aria-label={`Вологість ${roundedHumidity} відсотків`}
+      >
         {roundedHumidity}%
-      </div>
+      </output>
 
-      <div className="text-sm text-shadow-muted-foreground mb-2 pl-3 pt-2 ">
+      {/* Додаткова інформація */}
+      <p className="text-sm text-shadow-muted-foreground mb-2 pl-3 pt-2">
         Точка роси зараз {roundedDewPoint}°
-      </div>
-    </div>
+      </p>
+    </section>
   );
 }

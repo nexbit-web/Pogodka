@@ -15,7 +15,6 @@ export async function GET(request: Request) {
         { nameUa: { contains: query, mode: "insensitive" } },
         { nameRu: { contains: query, mode: "insensitive" } },
         { nameEn: { contains: query, mode: "insensitive" } },
-        { region: { contains: query, mode: "insensitive" } },
       ],
     },
     select: {

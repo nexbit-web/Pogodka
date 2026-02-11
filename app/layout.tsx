@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "@/components/shared/app-sidebar";
 import { Header } from "@/components/shared/header";
 import { sfuiDisplay } from "./fonts";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "react-hot-toast";
+import { TooltipProvider } from "@/components/ui/tooltip";
 export const metadata: Metadata = {
   title: "Pogodka",
   description:
@@ -87,7 +86,7 @@ export default function RootLayout({
         <Toaster />
         <NextTopLoader
           color="var(--primary)"
-          height={3}
+          height={2}
           showSpinner={false}
           easing="ease"
           speed={200}
@@ -98,15 +97,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <SidebarProvider>
-            {/* <AppSidebar /> */}
-            <SidebarInset>
-              <div className="flex flex-col h-screen">
-                <Header />
-                <main className="flex-1 overflow-auto">{children}</main>
-              </div>
-            </SidebarInset>
-          </SidebarProvider>
+          <Header />
+          <TooltipProvider>{children}</TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
