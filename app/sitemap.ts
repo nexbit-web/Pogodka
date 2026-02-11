@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
 
   const cityUrls: MetadataRoute.Sitemap = cities.map((city) => ({
-    url: `https://www.pogodka.org/${city.slug}`,
+    url: `https://www.pogodka.org/pohoda/${city.slug}`,
     lastModified: new Date(),
     changeFrequency: "daily",
     priority: 0.8,
