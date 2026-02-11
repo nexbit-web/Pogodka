@@ -42,12 +42,12 @@ export async function generateMetadata({ params }: PageProps) {
     title: `POGODKA: Погода в ${titleCity} (Україна): температура, опади, вітер, вологість, тиск | Прогноз на тиждень`,
     description: `Актуальний прогноз погоди в місті ${titleCity}: температура, опади, вітер, хмарність, погодинний та 7-денний прогноз онлайн.`,
 
-    canonical: `https://pogodka.ua/pohoda/${slug}`,
+    canonical: `https://www.pogodka.org/pohoda/${slug}`,
 
     openGraph: {
       type: "website",
       locale: "uk_UA",
-      url: `https://pogodka.ua/pohoda/${slug}`,
+      url: `https://www.pogodka.org/pohoda/${slug}`,
       siteName: "Pogodka",
       title: `Pogodka — точний прогноз погоди в ${titleCity}`,
       description: `Актуальний прогноз погоди в місті ${titleCity}: температура, опади, вітер, хмарність, погодинний та 7-денний прогноз онлайн.`,
@@ -91,7 +91,7 @@ export default async function WeatherPage({ params }: PageProps) {
   // 🔹 fetch погоди
   // https://pogodka.vercel.app/
   const res = await fetch(
-    `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
+    `https://www.pogodka.org/api/pogoda?city=${encodeURIComponent(cityName)}`,
     { cache: "no-store" },
   );
 
