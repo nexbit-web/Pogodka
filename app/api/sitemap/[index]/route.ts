@@ -1,16 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 const CITIES_PER_FILE = 5000;
 
 export async function GET(
-  req: NextRequest,
-  context: { params: { index: string } },
+  _req: Request,
+  context: { params: Promise<{ index: string }> }
 ) {
-  const { index } = context.params;
+  const { index } = await context.params; // 🔹 теперь await
   const fileIndex = parseInt(index, 10) - 1;
 
-  // Получаем города из базы
   const cities = await prisma.city.findMany({
     select: { slug: true },
     skip: fileIndex * CITIES_PER_FILE,
@@ -28,7 +27,7 @@ export async function GET(
     <lastmod>${now}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
-  </url>`,
+  </url>`
     )
     .join("");
 
