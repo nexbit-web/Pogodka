@@ -52,8 +52,14 @@ export const WeatherHeadline: React.FC<Props> = ({
   };
   return (
     <div className={className}>
-      <div className="flex flex-col items-center gap-2 mt-9 mb-9">
+      {/* Блок поточної погоди */}
+      <section
+        className="flex flex-col items-center gap-2 mt-9 mb-9"
+        aria-labelledby="current-weather-title"
+      >
+        {/* Назва міста */}
         <h1
+          id="current-weather-title"
           className="text-3xl font-bold text-shadow"
           style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
         >
@@ -61,14 +67,15 @@ export const WeatherHeadline: React.FC<Props> = ({
         </h1>
 
         {/* Поточна температура */}
-        <h2
-          className="text-7xl"
+        <p
+          className="text-7xl font-semibold"
           style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
+          aria-label={`Поточна температура ${temperature ? Math.round(temperature) : "--"} градусів`}
         >
           {temperature ? `${Math.round(temperature)}°` : "--"}
-        </h2>
+        </p>
 
-        {/* Погода зараз */}
+        {/* Поточний стан погоди */}
         <p
           className="text-lg text-shadow-muted-foreground text-shadow text-center"
           style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
@@ -76,15 +83,21 @@ export const WeatherHeadline: React.FC<Props> = ({
           {`${getWeatherText(weather)}, відчувається як ${Math.round(isFelt)}°`}
         </p>
 
-        {/* Мінімальна / максимальна температура */}
-        <div
-          className="flex gap-4 text-lg "
+        {/* Мінімальна та максимальна температура */}
+        <dl
+          className="flex gap-4 text-lg"
           style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
         >
-          <p>В: {Math.round(MaxTemperature)}°</p>
-          <p>Н: {Math.round(MinTemperature)}°</p>
-        </div>
-      </div>
+          <div>
+            <dt className="sr-only">Максимальна температура</dt>
+            <dd>В: {Math.round(MaxTemperature)}°</dd>
+          </div>
+          <div>
+            <dt className="sr-only">Мінімальна температура</dt>
+            <dd>Н: {Math.round(MinTemperature)}°</dd>
+          </div>
+        </dl>
+      </section>
     </div>
   );
 };

@@ -16,24 +16,34 @@ export default function Visibility({ className, VisibilityValues }: Props) {
         ? "Середня видимість"
         : "Погана видимість";
   return (
-    <div
+    <section
       className={cn(
         "flex flex-col justify-between rounded-2xl h-full",
         className,
       )}
+      aria-labelledby="visibility-title"
     >
-      {/* Заголовок */}
-      <span className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground">
-        <Eye size={20} /> ВИДИМІСТЬ
-      </span>
+      {/* Заголовок блоку */}
+      <h3
+        id="visibility-title"
+        className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground"
+      >
+        <Eye size={20} aria-hidden="true" />
+        Видимість
+      </h3>
 
-      <div className="text-3xl font-semibold mb-2 pl-3 pt-2 ">
+      {/* Основне значення видимості */}
+      <output
+        className="text-3xl font-semibold mb-2 pl-3 pt-2"
+        aria-label={`Видимість ${roundedVisibility} кілометрів`}
+      >
         {roundedVisibility} км
-      </div>
+      </output>
 
-      <div className="text-sm text-shadow-muted-foreground mb-2 pl-3 pt-2 ">
+      {/* Пояснювальний текст */}
+      <p className="text-sm text-shadow-muted-foreground mb-2 pl-3 pt-2">
         {visibilityText}
-      </div>
-    </div>
+      </p>
+    </section>
   );
 }

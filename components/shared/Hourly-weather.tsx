@@ -30,7 +30,7 @@ export default function HourlyWeather({ days }: HourlyWeatherProps) {
 
   const today = kievNow.toISODate()!; // YYYY-MM-DD, тип string
   const kievNowHour = kievNow.startOf("hour");
-  const currentHourRef = useRef<HTMLDivElement | null>(null);
+  const currentHourRef = useRef<HTMLLIElement | null>(null);
 
   // Формуємо масив годинника для поточного дня
   const hours: Hour[] = days.hourly.time
@@ -84,44 +84,57 @@ export default function HourlyWeather({ days }: HourlyWeatherProps) {
 
   return (
     <div>
-      <div
+      {/* Горизонтальний список погодинного прогнозу */}
+      <ul
         className="flex gap-1 justify-evenly overflow-x-auto scroll-on-hover py-0.5"
         style={{ scrollBehavior: "smooth" }}
+        aria-label="Погодинний прогноз погоди"
       >
         {hours.map((hour, idx) => {
           const hourTime = DateTime.fromISO(hour.time).setZone(
             "Europe/Kyiv",
           ).hour;
-          const isCurrent = idx === 0; // перша година в списку - поточна година
+
+          const isCurrent = idx === 0; // поточна година
+
           return (
-            <div
+            <li
               key={hour.time}
-              ref={isCurrent ? currentHourRef : null} // <-- ref для поточної години
-              className={`flex flex-col gap-2 items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-0.5  ${
+              ref={isCurrent ? currentHourRef : null}
+              aria-current={isCurrent ? "true" : undefined}
+              className={`flex flex-col gap-2 items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-0.5 ${
                 isCurrent ? "bg-[color:var(--primary)] text-white" : ""
               }`}
             >
-              <p
+              {/* Час */}
+              <time
+                dateTime={hour.time}
                 className="text-lg font-medium"
                 style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
               >
                 {hourTime}
-              </p>
+              </time>
 
-              <svg className="mx-1 w-[35px] h-[38px] text-foreground">
-                <use href={`/icons.svg#${getWeatherIconId(hour.code)}`} />
+              {/* Іконка погоди */}
+              <svg
+                className="mx-1 w-[35px] h-[38px] text-foreground"
+                aria-hidden="true"
+              >
+                <title>Стан погоди</title>
+                <use href={`/icons.svg?v=2#${getWeatherIconId(hour.code)}`} />
               </svg>
 
+              {/* Температура */}
               <p
                 className="text-lg font-semibold"
                 style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
               >
                 {Math.round(hour.temp)}°
               </p>
-            </div>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </div>
   );
 }

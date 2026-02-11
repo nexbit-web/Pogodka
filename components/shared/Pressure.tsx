@@ -10,53 +10,68 @@ interface Props {
 export default function Pressure({ className, PressureValues }: Props) {
   const pressureValue = Math.round(PressureValues);
   const getPressureText = (value: number) => {
-    if (value < 1000)
+    if (value < 1000) {
       return (
         <span className="flex items-center p-0 m-0">
-          <MoveDown size={14} />
-          Низький
+          <MoveDown size={14} aria-hidden="true" />
+          <span className="ml-1">Низький</span>
         </span>
       );
-    if (value < 1015)
+    }
+    if (value < 1015) {
       return (
         <span className="flex items-center p-0 m-0">
-          <Dot size={14} /> Норма
+          <Dot size={14} aria-hidden="true" />
+          <span className="ml-1">Норма</span>
         </span>
       );
-    if (value < 1025)
+    }
+    if (value < 1025) {
       return (
         <span className="flex items-center p-0 m-0">
-          <MoveUp size={14} />
-          Високий
+          <MoveUp size={14} aria-hidden="true" />
+          <span className="ml-1">Високий</span>
         </span>
       );
+    }
     return (
       <span className="flex items-center p-0 m-0">
-        <MoveUp size={14} />
-        <MoveUp size={14} /> Дуже високий
+        <MoveUp size={14} aria-hidden="true" />
+        <MoveUp size={14} aria-hidden="true" />
+        <span className="ml-1">Дуже високий</span>
       </span>
     );
   };
 
   return (
-    <div
+    <section
       className={cn(
         "flex flex-col justify-between rounded-2xl h-full",
         className,
       )}
+      aria-labelledby="pressure-title"
     >
-      {/* Заголовок */}
-      <span className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground">
-        <Gauge size={20} /> ТИСК
-      </span>
+      {/* Заголовок блоку */}
+      <h3
+        id="pressure-title"
+        className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground"
+      >
+        <Gauge size={20} aria-hidden="true" />
+        Тиск
+      </h3>
 
-      <div className="text-3xl font-semibold mb-2 pl-3 pt-2 flex flex-col items-start">
+      {/* Основне значення тиску */}
+      <output
+        className="text-3xl font-semibold mb-2 pl-3 pt-2 flex flex-col items-start"
+        aria-label={`Тиск ${pressureValue} гПа`}
+      >
         {pressureValue} <span className="p-0 m-0">гПа</span>
-      </div>
+      </output>
 
-      <div className="text-sm text-shadow-muted-foreground mb-2 pl-3 pt-2">
+      {/* Пояснювальний текст */}
+      <p className="text-sm text-shadow-muted-foreground mb-2 pl-3 pt-2">
         {getPressureText(PressureValues)}
-      </div>
-    </div>
+      </p>
+    </section>
   );
 }

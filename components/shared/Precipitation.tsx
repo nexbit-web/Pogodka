@@ -21,22 +21,34 @@ export default function Precipitation({
     return "Сильні опади";
   };
   return (
-    <div
+    <section
       className={cn(
-        "flex flex-col justify-between rounded-2xl h-full ",
+        "flex flex-col justify-between rounded-2xl h-full",
         className,
       )}
+      aria-labelledby="precipitation-title"
     >
-      {/* Заголовок */}
-      <span className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground">
-        <Droplets size={20} /> ОПАДИ
-      </span>
+      {/* Заголовок блоку */}
+      <h3
+        id="precipitation-title"
+        className="flex gap-1 items-center pl-3 pt-2 font-medium text-shadow-muted-foreground"
+      >
+        <Droplets size={20} aria-hidden="true" />
+        Опади
+      </h3>
 
-      <div className="text-3xl font-semibold mb-2 pl-3 pt-2 ">{value} мм</div>
+      {/* Основне значення опадів */}
+      <output
+        className="text-3xl font-semibold mb-2 pl-3 pt-2"
+        aria-label={`Опади ${value} міліметрів`}
+      >
+        {value} мм
+      </output>
 
-      <div className="text-sm text-shadow-muted-foreground mb-2 pl-3 pt-2 ">
+      {/* Пояснювальний текст */}
+      <p className="text-sm text-shadow-muted-foreground mb-2 pl-3 pt-2">
         {getPrecipitationText(value)}
-      </div>
-    </div>
+      </p>
+    </section>
   );
 }

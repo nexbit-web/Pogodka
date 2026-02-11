@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: PageProps) {
   const slug = cityData?.slug ?? cityName;
 
   return {
-    title: `Pogodka: Погода в ${titleCity} (Україна): температура, опади, вітер, вологість, тиск | Прогноз на тиждень`,
+    title: `POGODKA: Погода в ${titleCity} (Україна): температура, опади, вітер, вологість, тиск | Прогноз на тиждень`,
     description: `Актуальний прогноз погоди в місті ${titleCity}: температура, опади, вітер, хмарність, погодинний та 7-денний прогноз онлайн.`,
 
     canonical: `https://pogodka.ua/pohoda/${slug}`,

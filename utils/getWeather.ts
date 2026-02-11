@@ -16,9 +16,9 @@ export interface ApiResponse {
  */
 export async function getWeather(city: string): Promise<ApiResponse> {
   const cityName = decodeURIComponent(city);
-  // https://pogodka.vercel.app/
+// https://pogodka.vercel.app/
   const res = await fetch(
-    `https://pogodka.vercel.app/api/pogoda?city=${encodeURIComponent(cityName)}`,
+    `http://localhost:3000/api/pogoda?city=${encodeURIComponent(cityName)}`,
     { cache: "no-store" },
   );
 
