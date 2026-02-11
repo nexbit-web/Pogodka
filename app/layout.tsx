@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "uk_UA",
-    url: "https://pogodka.ua",
+    url: "https://www.pogodka.org",
     siteName: "Pogodka",
     title: "Pogodka — точний прогноз погоди в Україні",
     description:
@@ -81,7 +81,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="uk" suppressHydrationWarning>
       <body className={`${sfuiDisplay.variable} antialiased `}>
         <Toaster />
         <NextTopLoader
