@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
-const TOTAL_FILES = 5; // 25 000 городов / 5000
+const CITIES_PER_FILE = 5000;
 
 export async function GET() {
+  const totalCities = await prisma.city.count();
+  const numFiles = Math.ceil(totalCities / CITIES_PER_FILE);
+
   const sitemaps = Array.from(
-    { length: TOTAL_FILES },
+    { length: numFiles },
     (_, i) => `
     <sitemap>
       <loc>https://www.pogodka.org/api/sitemap/${i + 1}</loc>

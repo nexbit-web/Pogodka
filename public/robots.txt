@@ -1,7 +1,9 @@
 User-agent: *
 Crawl-delay: 10
 Allow: /
-Sitemap: https://www.pogodka.org/sitemap.xml
+
+Sitemap: https://www.pogodka.org/api/sitemap.xml
+
 Disallow: /agreement/
 Disallow: /privacypolicy/
 Disallow: /support/

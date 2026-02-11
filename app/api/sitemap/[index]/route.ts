@@ -1,14 +1,16 @@
-import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma"; // или импорт твоей базы городов
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
 
 const CITIES_PER_FILE = 5000;
 
 export async function GET(
-  req: Request,
-  { params }: { params: { index: string } },
+  req: NextRequest,
+  context: { params: { index: string } },
 ) {
-  const fileIndex = parseInt(params.index, 10) - 1; // 1 → 0
+  const { index } = context.params;
+  const fileIndex = parseInt(index, 10) - 1;
 
+  // Получаем города из базы
   const cities = await prisma.city.findMany({
     select: { slug: true },
     skip: fileIndex * CITIES_PER_FILE,
