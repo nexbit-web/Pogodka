@@ -7,6 +7,7 @@ import { getCurrentWeather, CurrentWeather } from "@/utils/weather";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import HourlyWeather from "./Hourly-weather";
+import React from "react";
 
 // 🔹 Динамический импорт тяжёлых компонентов с дефолтным экспортом
 const WeeklyForecast = dynamic(() => import("./Weekly-forecast"), {
@@ -61,6 +62,10 @@ export function WeatherLayout({ data }: WeatherLayoutProps) {
       maxtemp_c: weather.daily.temperature_2m_max[idx] ?? 0,
     },
   }));
+
+  React.useEffect(() => {
+    fetch("/api/logDailyStats", { method: "POST" }).catch(console.error);
+  }, []);
 
   return (
     <Container className="relative z-10">

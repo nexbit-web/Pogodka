@@ -1,4 +1,3 @@
-// utils/getWeather.ts
 import { redirect } from "next/navigation";
 
 export interface ApiResponse {
@@ -10,28 +9,28 @@ export interface ApiResponse {
   weather: any;
 }
 
-/**
- * Получаем погоду для города.
- * Если бан — делаем редирект на /banned.
- */
-export async function getWeather(city: string): Promise<ApiResponse> {
+export async function getWeather(city: string): Promise<ApiResponse | void> {
   const cityName = decodeURIComponent(city);
-// https://pogodka.vercel.app/
+
   const res = await fetch(
     `https://www.pogodka.org/api/pogoda?city=${encodeURIComponent(cityName)}`,
     { cache: "no-store" },
   );
 
+  // 🔹 Если пользователь забанен, делаем редирект
   if (res.status === 403 || res.status === 429) {
-    // 🔹 користувач забанений ботом — редирект на сторінку бану
-    return redirect("/banned");
+    // Не парсим JSON — сразу редиректим
+    redirect("/banned");
+    return;
   }
 
+  // Проверяем, что ответ валиден
+  const text = await res.text();
   try {
-    const data: ApiResponse = await res.json();
+    const data: ApiResponse = JSON.parse(text);
     return data;
   } catch (error) {
-    console.error("Помилка при завантаженні даних:", error);
+    console.error("Помилка при завантаженні даних:", text, error);
     throw new Error("Помилка при завантаженні даних");
   }
 }
