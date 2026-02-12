@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { antiBot } from "@/lib/antiBot";
+// import { antiBot } from "@/lib/antiBot";
 import { redisGet, redisSet } from "@/lib/upstash";
 
 export async function GET(req: Request) {
@@ -10,9 +10,9 @@ export async function GET(req: Request) {
   if (!cityName)
     return NextResponse.json({ error: "Не вказано місто" }, { status: 400 });
 
-  // Проверка на ботов
-  const botResponse = await antiBot(req);
-  if (botResponse) return botResponse;
+  // // Проверка на ботов
+  // const botResponse = await antiBot(req);
+  // if (botResponse) return botResponse;
 
   // ключ = только название города
   const key = cityName.toLowerCase().trim();

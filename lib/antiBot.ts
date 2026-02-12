@@ -7,9 +7,9 @@ export async function antiBot(req: Request) {
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
   const fp = fingerprint(ip);
 
-  const nowSec = Math.floor(Date.now() / 1000); // в секундах
+  const nowSec = Math.floor(Date.now() / 1000); // текущее время в секундах
   const BAN_TTL_SEC = 10 * 60; // 10 минут
-  const MIN_INTERVAL_SEC = 0.5; // 0.5 секунды
+  const MIN_INTERVAL_SEC = 2; // минимальный интервал между запросами (1 секунда)
 
   const ua = req.headers.get("user-agent")?.toLowerCase() || "";
   if (
