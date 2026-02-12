@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { antiBot } from "@/lib/antiBot";
-import { redisGet, redisIncrWithTTL, redisSet } from "@/lib/upstash";
+import { redisGet, redisSet } from "@/lib/upstash";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -11,18 +11,16 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Не вказано місто" }, { status: 400 });
 
   // Проверка на ботов
-  // const botResponse = await antiBot(req, cityName);
-  // if (botResponse) return botResponse;
+  const botResponse = await antiBot(req);
+  if (botResponse) return botResponse;
 
-  const key = `weather:${cityName.toLowerCase()}`;
-  const countKey = `count:${cityName.toLowerCase()}`;
-  //Увеличиваем счётчик запросов к городу (TTL 1 день)
-  const count = await redisIncrWithTTL(countKey, 86400);
+  // ключ = только название города
+  const key = cityName.toLowerCase().trim();
 
-  //TTL для кэша зависит от популярности
-  const ttl = count > 10 ? 600 : 7200; // >10 запросов → 10 мин, иначе 2 часа
+  // TTL 50 часов
+  const TTL = 50 * 60 * 60; // 180000 секунд
 
-  // Проверяем кэш
+  // 1️⃣ Проверяем кэш
   const cached = await redisGet(key);
   if (cached) {
     return NextResponse.json(JSON.parse(cached));
@@ -93,8 +91,8 @@ export async function GET(req: Request) {
     weather,
   };
 
-  // 7️⃣ Сохраняем данные в Redis с TTL
-  await redisSet(key, JSON.stringify(data), ttl);
+  // 4️⃣ Сохраняем в Redis на 50 часов
+  await redisSet(key, JSON.stringify(data), TTL);
 
   return NextResponse.json(data);
 }

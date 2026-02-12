@@ -89,7 +89,8 @@ export default async function WeatherPage({ params }: PageProps) {
   const cityName = decodeURIComponent(city);
 
   // 🔹 fetch погоди
-  // https://pogodka.vercel.app/
+  // http://localhost:3000
+  // https://www.pogodka.org
   const res = await fetch(
     `https://www.pogodka.org/api/pogoda?city=${encodeURIComponent(cityName)}`,
     { cache: "no-store" },
