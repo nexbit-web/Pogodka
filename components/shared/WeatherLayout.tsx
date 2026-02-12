@@ -6,6 +6,7 @@ import { getCurrentWeather, CurrentWeather } from "@/utils/weather";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import HourlyWeather from "./Hourly-weather";
+import { Footer } from "./Footer";
 
 // Динамічний імпорт компонентів з скелетонами для SSR
 const WeeklyForecast = dynamic(() => import("./Weekly-forecast"), {
@@ -104,6 +105,7 @@ export function WeatherLayout({ data }: WeatherLayoutProps) {
           <Pressure PressureValues={currentWeather.pressure} />
         </div>
       </div>
+      <Footer />
     </Container>
   );
 }
