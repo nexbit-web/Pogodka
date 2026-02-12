@@ -1,5 +1,3 @@
-import { redirect } from "next/navigation";
-
 export interface ApiResponse {
   misto: string;
   oblast: string;
@@ -16,13 +14,6 @@ export async function getWeather(city: string): Promise<ApiResponse | void> {
     `https://www.pogodka.org/api/pogoda?city=${encodeURIComponent(cityName)}`,
     { cache: "no-store" },
   );
-
-  // 🔹 Если пользователь забанен, делаем редирект
-  if (res.status === 403 || res.status === 429) {
-    // Не парсим JSON — сразу редиректим
-    redirect("/banned");
-    return;
-  }
 
   // Проверяем, что ответ валиден
   const text = await res.text();

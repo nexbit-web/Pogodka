@@ -12,9 +12,9 @@ export async function GET(request: Request) {
   const cities = await prisma.city.findMany({
     where: {
       OR: [
-        { nameUa: { contains: query, mode: "insensitive" } },
-        { nameRu: { contains: query, mode: "insensitive" } },
-        { nameEn: { contains: query, mode: "insensitive" } },
+        { nameUa: { startsWith: query, mode: "insensitive" } },
+        { nameRu: { startsWith: query, mode: "insensitive" } },
+        { nameEn: { startsWith: query, mode: "insensitive" } },
       ],
     },
     select: {
@@ -27,7 +27,7 @@ export async function GET(request: Request) {
       latitude: true,
       longitude: true,
     },
-    take: 7, // лимит, чтобы не перегружать
+    take: 7,
     orderBy: { nameEn: "asc" },
   });
 

@@ -3,11 +3,12 @@ import prisma from "@/lib/prisma";
 
 const CITIES_PER_FILE = 5000;
 
+// Фнкція для генерації XML
 export async function GET(
   _req: Request,
-  context: { params: Promise<{ index: string }> }
+  context: { params: Promise<{ index: string }> },
 ) {
-  const { index } = await context.params; // 🔹 теперь await
+  const { index } = await context.params;
   const fileIndex = parseInt(index, 10) - 1;
 
   const cities = await prisma.city.findMany({
@@ -27,7 +28,7 @@ export async function GET(
     <lastmod>${now}</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
-  </url>`
+  </url>`,
     )
     .join("");
 

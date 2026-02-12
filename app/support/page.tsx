@@ -14,7 +14,6 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Spinner } from "@/components/ui/spinner";
 import * as Yup from "yup";
-import { Footer } from "@/components/shared/Footer";
 import { cn } from "@/lib/utils";
 
 // Валідація
@@ -49,7 +48,7 @@ export default function SupportPage() {
   });
   const [isValid, setIsValid] = React.useState(false);
 
-  // Проверка валидности через Yup
+// Автоматична валідація при зміні полів
   React.useEffect(() => {
     async function validate() {
       try {
@@ -198,9 +197,6 @@ export default function SupportPage() {
           </Button>
         </Field>
       </FieldGroup>
-
-      {/* Підвал сторінки */}
-      <Footer />
     </form>
   );
 }

@@ -46,31 +46,3 @@ export function getCurrentWeather(
     pressure: surface_pressure?.[index] ?? pressure_msl?.[index] ?? 0, // Атмосферний тиск (гПа)
   };
 }
-
-// // Поточна погода
-//   const currentTemp =
-//     weather.hourly.temperature_2m[hourIndex >= 0 ? hourIndex : 0] ?? 0;
-//   const currentFeels =
-//     weather.hourly.apparent_temperature[hourIndex >= 0 ? hourIndex : 0] ?? 0;
-//   const currentCode =
-//     weather.hourly.weathercode[hourIndex >= 0 ? hourIndex : 0] ?? 0;
-
-//   // Відносна вологість
-//   const currentHumidity =
-//     weather.hourly.relativehumidity_2m[hourIndex >= 0 ? hourIndex : 0] ?? 0;
-//   //  Вітер
-//   const currentWind =
-//     weather.hourly.windspeed_10m[hourIndex >= 0 ? hourIndex : 0] ?? 0;
-//   const currentWindGusts =
-//     weather.hourly.windgusts_10m[hourIndex >= 0 ? hourIndex : 0] ?? 0;
-//   //  Видимість
-//   const currentVisibility =
-//     (weather.hourly.visibility?.[hourIndex >= 0 ? hourIndex : 0] ?? 0) / 1000; // в км
-//   //  Опади
-//   const currentPrecipitation =
-//     weather.hourly.precipitation?.[hourIndex >= 0 ? hourIndex : 0] ?? 0;
-// //  Тиск
-//     const currentPressure =
-//   weather.hourly.surface_pressure?.[hourIndex >= 0 ? hourIndex : 0] ??
-//   weather.hourly.pressure_msl?.[hourIndex >= 0 ? hourIndex : 0] ??
-//   0;

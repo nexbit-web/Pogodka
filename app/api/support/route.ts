@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 
+// Цей API-роут приймає POST-запити з даними форми підтримки і надсилає їх у Telegram-чат техпідтримки.
 export async function POST(req: Request) {
   const { email, subject, message } = await req.json();
 
   if (!email || !subject || !message) {
     return NextResponse.json(
-      { error: "Заполнены не все поля" },
+      { error: "Заповнені не всі поля" },
       { status: 400 },
     );
   }

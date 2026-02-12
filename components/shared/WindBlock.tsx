@@ -26,7 +26,7 @@ export default function WindBlock({
       role="img"
       aria-label={`Напрямок вітру ${deg} градусів`}
     >
-      {/* КРУГ СО ШТРИХАМИ */}
+      {/* Коло зі штрих-кодом */}
       <svg
         viewBox="0 0 100 100"
         className="absolute inset-0 w-full h-full text-muted-foreground"
@@ -52,7 +52,7 @@ export default function WindBlock({
         })}
       </svg>
 
-      {/* СТРЕЛКА */}
+      {/* Стрілка */}
       <div
         className="absolute inset-0 flex items-center justify-center transition-transform duration-300"
         style={{ transform: `rotate(${deg}deg)` }}

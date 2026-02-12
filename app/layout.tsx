@@ -6,6 +6,7 @@ import { sfuiDisplay } from "./fonts";
 import NextTopLoader from "nextjs-toploader";
 import { Toaster } from "react-hot-toast";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Footer } from "@/components/shared/Footer";
 export const metadata: Metadata = {
   title: "Pogodka",
   description:
@@ -104,6 +105,7 @@ export default function RootLayout({
         >
           <Header />
           <TooltipProvider>{children}</TooltipProvider>
+          <Footer />
         </ThemeProvider>
       </body>
     </html>
