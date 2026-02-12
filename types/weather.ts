@@ -8,5 +8,5 @@ export interface ApiResponse {
 }
 
 export interface PageProps {
-  params: { city: string }; // не Promise!
+  params: { city: string };
 }

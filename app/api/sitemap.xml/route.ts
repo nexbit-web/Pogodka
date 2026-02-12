@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 
 const CITIES_PER_FILE = 5000;
 
+// Функція для генерації sitemap.xml
 export async function GET() {
   const totalCities = await prisma.city.count();
   const numFiles = Math.ceil(totalCities / CITIES_PER_FILE);

@@ -1,15 +1,14 @@
 "use client";
 import { Container } from "./Container";
 import { WeatherHeadline } from "./Weather-headline";
-import { Footer } from "./Footer";
 import { DateTime } from "luxon";
 import { getCurrentWeather, CurrentWeather } from "@/utils/weather";
 import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import HourlyWeather from "./Hourly-weather";
-import React from "react";
+import { Footer } from "./Footer";
 
-// 🔹 Динамический импорт тяжёлых компонентов с дефолтным экспортом
+// Динамічний імпорт компонентів з скелетонами для SSR
 const WeeklyForecast = dynamic(() => import("./Weekly-forecast"), {
   ssr: false,
   loading: () => <Skeleton className="w-full h-74" />,
@@ -63,13 +62,9 @@ export function WeatherLayout({ data }: WeatherLayoutProps) {
     },
   }));
 
-  React.useEffect(() => {
-    fetch("/api/logDailyStats", { method: "POST" }).catch(console.error);
-  }, []);
-
   return (
     <Container className="relative z-10">
-      {/* 🔹 Основной контент SSR — показываем сразу */}
+      {/*Основний зміст SSR - ми показуємо його одразу*/}
       <WeatherHeadline
         city={data.misto}
         temperature={currentWeather.temp}
@@ -110,7 +105,6 @@ export function WeatherLayout({ data }: WeatherLayoutProps) {
           <Pressure PressureValues={currentWeather.pressure} />
         </div>
       </div>
-
       <Footer />
     </Container>
   );

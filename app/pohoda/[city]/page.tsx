@@ -1,6 +1,4 @@
-// app/pohoda/[city]/page.tsx
 import { WeatherLayout } from "@/components/shared/WeatherLayout";
-import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { DateTime } from "luxon";
 import { getCurrentWeather } from "@/utils/weather";
@@ -18,7 +16,7 @@ interface WeeklyDay {
   };
 }
 
-// 🔹 Динамические метаданные
+// Генерація метаданих для сторінки погоди в місті
 export async function generateMetadata({ params }: PageProps) {
   const { city } = await params;
   const cityName = decodeURIComponent(city);
@@ -96,13 +94,7 @@ export default async function WeatherPage({ params }: PageProps) {
     { cache: "no-store" },
   );
 
-  // 🔹 Якщо банований користувач → редирект на /banned
-  if (res.status === 403 || res.status === 429) {
-    // 🔹 користувач забанений ботом — редирект на сторінку бану
-    return redirect("/banned");
-  }
-
-  // 🔹 если fetch упал по другой причине
+  // Якщо відповідь не ок, показуємо помилку
   if (!res.ok) {
     return (
       <h1 className="text-center mt-10 text-red-500">
@@ -113,7 +105,7 @@ export default async function WeatherPage({ params }: PageProps) {
 
   const data = await res.json();
 
-  // 🔹 вираховуємо currentWeather
+// Визначаємо поточну погоду на основі погодинного прогнозу
   const kievNow = DateTime.now().setZone("Europe/Kyiv");
   const today = kievNow.toISODate()!;
   const currentHour = kievNow.hour;
@@ -125,7 +117,7 @@ export default async function WeatherPage({ params }: PageProps) {
 
   const currentWeather = getCurrentWeather(data.weather, hourIndex);
 
-  // 🔹 Формуємо 7-денний прогноз
+  // Формуємо 7-денний прогноз
   const weeklyDays: WeeklyDay[] = data.weather.daily.time.map(
     (date: string, idx: number) => ({
       date,
