@@ -31,32 +31,41 @@ export default function WeeklyForecast({ days, className }: Props) {
 
     return shortDays[date.weekday % 7];
   }
-  const getWeatherIconId = (code: number): string => {
-    // Більшість кодів → sunny (як у тебе зараз)
-    if (
-      [
-        0, 1, 2, 3, 45, 48, 51, 53, 55, 61, 63, 65, 66, 67, 71, 73, 75, 77, 80,
-        81, 82, 85, 86, 95, 96, 99,
-      ].includes(code)
-    ) {
-      return "sunny";
-    }
-    return "unknown";
-  };
 
   // Або якщо хочеш розширити пізніше:
-  // const getWeatherIconId = (code: number): string => {
-  //   switch (true) {
-  //     case [0, 1, 2, 3].includes(code): return "sunny"; // або "clear-day" тощо
-  //     case [45, 48].includes(code): return "fog";
-  //     case [51, 53, 55].includes(code): return "drizzle";
-  //     case [61, 63, 65].includes(code): return "rain";
-  //     case [71, 73, 75, 77].includes(code): return "snow";
-  //     case [80, 81, 82].includes(code): return "rain-showers";
-  //     case [95, 96, 99].includes(code): return "thunderstorm";
-  //     default: return "unknown";
-  //   }
-  // };
+  // Функция возвращает id иконки погоды по коду Open-Meteo
+  const getWeatherIconId = (code: number): string => {
+    // 0 — полностью ясное небо
+    if (code === 0) return "clear";
+    // 1,2 — малооблачно / переменная облачность
+    // солнце видно, но есть облака
+    if ([1, 2].includes(code)) return "partly-cloudy";
+    // 3 — сплошная облачность
+    // небо полностью в облаках
+    if (code === 3) return "cloudy";
+    // 45,48 — туман или туман с изморозью
+    if ([45, 48].includes(code)) return "fog";
+    // 51,53,55 — моросящий дождь (очень слабый дождь)
+    if ([51, 53, 55].includes(code)) return "drizzle";
+    // 56,57 — ледяная морось
+    // 61,63,65 — обычный дождь слабый/средний/сильный
+    // 66,67 — ледяной дождь
+    // 80,81,82 — ливневые дожди
+    // всё объединяем в одну иконку "дождь"
+    if ([56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "rain";
+    // 71,73,75 — снег слабый/средний/сильный
+    // 77 — снежные зёрна
+    // 85,86 — снегопады
+    // объединяем в одну иконку "снег"
+    if ([71, 73, 75, 77].includes(code)) return "snow";
+    // 85,86 — снегопады
+    if ([85, 86].includes(code)) return "snowfall";
+    // 95 — обычная гроза без града
+    if (code === 95) return "thunderstorm";
+    // гроза с градом
+    if ([96, 99].includes(code)) return "thunderstorm-hail";
+    return "unknown";
+  };
 
   return (
     <section
@@ -93,7 +102,7 @@ export default function WeeklyForecast({ days, className }: Props) {
 
             {/* Іконка погоди */}
             <svg className="w-8 h-8 text-foreground" aria-hidden="true">
-              <use href={`/icons.svg?v=2#${getWeatherIconId(day.day.code)}`} />
+              <use href={`/icons.svg?v=4#${getWeatherIconId(day.day.code)}`} />
             </svg>
 
             {/* Мін/макс температура */}
