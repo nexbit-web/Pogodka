@@ -49,25 +49,59 @@ export default function HourlyWeather({ days }: HourlyWeatherProps) {
     })
     .slice(0, 17); // Обмежуємо до наступних 17 годин
 
+  // const getWeatherIconId = (code: number): string => {
+  //   if (code === undefined || code === null) return "unknown";
+  //   // Ясно / мало хмар / змінна хмарність / пасмурно
+  //   if ([0, 1, 2, 3].includes(code)) return "sunny"; // або "clear", "clear-day" — як тобі зручніше
+  //   // Туман
+  //   if ([45, 48].includes(code)) return "sunny";
+  //   // Мряка / дрібний дощ
+  //   if ([51, 53, 55, 56, 57].includes(code)) return "sunny";
+  //   // Дощ (включаючи freezing rain)
+  //   if ([61, 63, 65, 66, 67].includes(code)) return "sunny";
+  //   // Сніг / крижаний дощ / сніжні зерна
+  //   if ([71, 73, 75, 77].includes(code)) return "sunny";
+  //   // Зливи дощу
+  //   if ([80, 81, 82].includes(code)) return "sunny";
+  //   // Снігові зливи
+  //   if ([85, 86].includes(code)) return "sunny";
+  //   // Гроза (з градом або без)
+
+  //   if ([95, 96, 99].includes(code)) return "sunny";
+  //   // все інше (рідкісні коди або помилка)
+  //   return "unknown";
+  // };
+
   const getWeatherIconId = (code: number): string => {
-    if (code === undefined || code === null) return "unknown";
-    // Ясно / мало хмар / змінна хмарність / пасмурно
-    if ([0, 1, 2, 3].includes(code)) return "sunny"; // або "clear", "clear-day" — як тобі зручніше
-    // Туман
-    if ([45, 48].includes(code)) return "sunny";
-    // Мряка / дрібний дощ
-    if ([51, 53, 55, 56, 57].includes(code)) return "sunny";
-    // Дощ (включаючи freezing rain)
-    if ([61, 63, 65, 66, 67].includes(code)) return "sunny";
-    // Сніг / крижаний дощ / сніжні зерна
-    if ([71, 73, 75, 77].includes(code)) return "sunny";
-    // Зливи дощу
-    if ([80, 81, 82].includes(code)) return "sunny";
-    // Снігові зливи
-    if ([85, 86].includes(code)) return "sunny";
-    // Гроза (з градом або без)
-    if ([95, 96, 99].includes(code)) return "sunny";
-    // все інше (рідкісні коди або помилка)
+    // 0 — полностью ясное небо
+    if (code === 0) return "clear";
+    // 1,2 — малооблачно / переменная облачность
+    // солнце видно, но есть облака
+    if ([1, 2].includes(code)) return "partly-cloudy";
+    // 3 — сплошная облачность
+    // небо полностью в облаках
+    if (code === 3) return "cloudy";
+    // 45,48 — туман или туман с изморозью
+    if ([45, 48].includes(code)) return "fog";
+    // 51,53,55 — моросящий дождь (очень слабый дождь)
+    if ([51, 53, 55].includes(code)) return "drizzle";
+    // 56,57 — ледяная морось
+    // 61,63,65 — обычный дождь слабый/средний/сильный
+    // 66,67 — ледяной дождь
+    // 80,81,82 — ливневые дожди
+    // всё объединяем в одну иконку "дождь"
+    if ([56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "rain";
+    // 71,73,75 — снег слабый/средний/сильный
+    // 77 — снежные зёрна
+    // 85,86 — снегопады
+    // объединяем в одну иконку "снег"
+    if ([71, 73, 75, 77].includes(code)) return "snow";
+    // 85,86 — снегопады
+    if ([85, 86].includes(code)) return "snowfall";
+    // 95 — обычная гроза без града
+    if (code === 95) return "thunderstorm";
+    // гроза с градом
+    if ([96, 99].includes(code)) return "thunderstorm-hail";
     return "unknown";
   };
 
@@ -121,7 +155,7 @@ export default function HourlyWeather({ days }: HourlyWeatherProps) {
                 aria-hidden="true"
               >
                 <title>Стан погоди</title>
-                <use href={`/icons.svg?v=2#${getWeatherIconId(hour.code)}`} />
+                <use href={`/icons.svg?v=4#${getWeatherIconId(hour.code)}`} />
               </svg>
 
               {/* Температура */}
