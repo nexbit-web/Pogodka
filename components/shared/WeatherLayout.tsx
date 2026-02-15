@@ -41,6 +41,7 @@ const WeatherAnalytics = dynamic(
     loading: () => null,
   },
 );
+
 interface WeatherLayoutProps {
   data: any;
 }
