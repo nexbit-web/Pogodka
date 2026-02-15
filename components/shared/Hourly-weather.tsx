@@ -120,7 +120,7 @@ export default function HourlyWeather({ days }: HourlyWeatherProps) {
     <div>
       {/* Горизонтальний список погодинного прогнозу */}
       <ul
-        className="flex gap-1 justify-evenly overflow-x-auto scroll-on-hover py-0.5"
+        className="flex gap-1 justify-between overflow-x-auto scroll-on-hover py-0.5 px-0.5"
         style={{ scrollBehavior: "smooth" }}
         aria-label="Погодинний прогноз погоди"
       >
@@ -136,7 +136,7 @@ export default function HourlyWeather({ days }: HourlyWeatherProps) {
               key={hour.time}
               ref={isCurrent ? currentHourRef : null}
               aria-current={isCurrent ? "true" : undefined}
-              className={`flex flex-col gap-2 items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-0.5 ${
+              className={`flex flex-col gap-2 items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-0.5 px-0.5 ${
                 isCurrent ? "bg-[color:var(--primary)] text-white" : ""
               }`}
             >
@@ -151,11 +151,11 @@ export default function HourlyWeather({ days }: HourlyWeatherProps) {
 
               {/* Іконка погоди */}
               <svg
-                className="mx-1 w-[35px] h-[38px] text-foreground"
+                className="mx-1 w-8 h-8  text-foreground"
                 aria-hidden="true"
               >
                 <title>Стан погоди</title>
-                <use href={`/icons.svg?v=4#${getWeatherIconId(hour.code)}`} />
+                <use href={`/icons.svg?v=10#${getWeatherIconId(hour.code)}`} />
               </svg>
 
               {/* Температура */}

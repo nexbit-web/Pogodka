@@ -89,7 +89,7 @@ export default function WeeklyForecast({ days, className }: Props) {
         {days.map((day) => (
           <li
             key={day.date}
-            className="flex items-center justify-between border-t border-black/5 pt-1 px-3"
+            className="flex items-center justify-between border-t border-black/5 py-1 px-3"
           >
             {/* День тижня */}
             <span
@@ -101,8 +101,8 @@ export default function WeeklyForecast({ days, className }: Props) {
             </span>
 
             {/* Іконка погоди */}
-            <svg className="w-8 h-8 text-foreground" aria-hidden="true">
-              <use href={`/icons.svg?v=4#${getWeatherIconId(day.day.code)}`} />
+            <svg className="w-7 h-7 text-foreground" aria-hidden="true">
+              <use href={`/icons.svg?v=6#${getWeatherIconId(day.day.code)}`} />
             </svg>
 
             {/* Мін/макс температура */}
