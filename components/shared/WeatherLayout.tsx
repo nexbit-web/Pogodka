@@ -107,7 +107,7 @@ export function WeatherLayout({ data }: WeatherLayoutProps) {
         </div>
       </div>
       {/* Аналітіка */}
-      {/* <WeatherAnalytics /> */}
+      <WeatherAnalytics />
       <Footer />
     </Container>
   );
