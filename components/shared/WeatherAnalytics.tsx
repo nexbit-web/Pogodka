@@ -1,23 +1,17 @@
+// components/WeatherAnalyticsDynamic.tsx
 "use client";
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 export function WeatherAnalytics() {
-  useEffect(() => {
-    const handleLoad = () => {
-      try {
-        navigator.sendBeacon(
-          "https://crm-pogodka.vercel.app/api/track?p=" + location.pathname,
-        );
-      } catch {}
-    };
+  const pathname = usePathname();
 
-    if (document.readyState === "complete") {
-      handleLoad();
-    } else {
-      window.addEventListener("load", handleLoad);
-      return () => window.removeEventListener("load", handleLoad);
-    }
-  }, []);
+  useEffect(() => {
+    // Отправка события без ожидания ответа
+    navigator.sendBeacon(
+      `https://crm-pogodka.vercel.app/api/track?p=${pathname}`,
+    );
+  }, [pathname]);
 
   return null;
 }
