@@ -60,7 +60,7 @@ export const WeatherHeadline: React.FC<Props> = ({
         {/* Назва міста */}
         <h1
           id="current-weather-title"
-          className="text-3xl font-bold text-shadow"
+          className="text-3xl font-bold"
           style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
         >
           {city}
@@ -77,7 +77,7 @@ export const WeatherHeadline: React.FC<Props> = ({
 
         {/* Поточний стан погоди */}
         <p
-          className="text-lg text-shadow-muted-foreground text-shadow text-center"
+          className="text-lg text-shadow-muted-foreground text-center"
           style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
         >
           {`${getWeatherText(weather)}, відчувається як ${Math.round(isFelt)}°`}
