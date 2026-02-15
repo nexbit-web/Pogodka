@@ -89,7 +89,6 @@ export default function RootLayout({
           strategy="afterInteractive"
           crossOrigin="anonymous"
         />
-        <Toaster />
         <NextTopLoader
           color="var(--primary)"
           height={2}
