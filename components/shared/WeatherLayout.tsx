@@ -7,7 +7,6 @@ import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import HourlyWeather from "./Hourly-weather";
 import { Footer } from "./Footer";
-import { WeatherAnalytics } from "./WeatherAnalytics";
 
 // Динамічний імпорт компонентів з скелетонами для SSR
 const WeeklyForecast = dynamic(() => import("./Weekly-forecast"), {
@@ -35,7 +34,13 @@ const Pressure = dynamic(() => import("./Pressure"), {
   ssr: false,
   loading: () => <Skeleton className="w-full h-37" />,
 });
-
+const WeatherAnalytics = dynamic(
+  () => import("./WeatherAnalytics").then((mod) => mod.WeatherAnalytics),
+  {
+    ssr: false,
+    loading: () => null,
+  },
+);
 interface WeatherLayoutProps {
   data: any;
 }
