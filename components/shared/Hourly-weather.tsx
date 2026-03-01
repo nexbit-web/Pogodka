@@ -136,24 +136,19 @@ export default function HourlyWeather({ days }: HourlyWeatherProps) {
               key={hour.time}
               ref={isCurrent ? currentHourRef : null}
               aria-current={isCurrent ? "true" : undefined}
-              className={`flex flex-col gap-2 items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-0.5 px-0.5 ${
-                isCurrent ? "bg-[color:var(--primary)] text-white" : ""
-              }`}
+              className="flex flex-col gap-2 items-center hover:bg-muted/70 rounded-xl text-shadow flex-shrink-0 py-0.5 px-0.5"
             >
               {/* Час */}
               <time
                 dateTime={hour.time}
-                className="text-lg font-medium"
+                className="text-lg font-medium "
                 style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.2)" }}
               >
-                {hourTime}
+                {isCurrent ? "Зараз" : hourTime}
               </time>
 
               {/* Іконка погоди */}
-              <svg
-                className="mx-1 w-8 h-8  text-foreground"
-                aria-hidden="true"
-              >
+              <svg className="mx-1 w-8 h-8  text-foreground" aria-hidden="true">
                 <title>Стан погоди</title>
                 <use href={`/icons.svg?v=10#${getWeatherIconId(hour.code)}`} />
               </svg>

@@ -34,13 +34,6 @@ const Pressure = dynamic(() => import("./Pressure"), {
   ssr: false,
   loading: () => <Skeleton className="w-full h-37" />,
 });
-const WeatherAnalytics = dynamic(
-  () => import("./WeatherAnalytics").then((mod) => mod.WeatherAnalytics),
-  {
-    ssr: false,
-    loading: () => null,
-  },
-);
 
 interface WeatherLayoutProps {
   data: any;
@@ -113,7 +106,7 @@ export function WeatherLayout({ data }: WeatherLayoutProps) {
         </div>
       </div>
       {/* Аналітіка */}
-      <WeatherAnalytics />
+      {/* <WeatherAnalytics /> */}
       <Footer />
     </Container>
   );
