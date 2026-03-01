@@ -7,8 +7,9 @@ import { ModeToggle } from "./mode-toggle";
 import { useDebounce } from "use-debounce";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/spinner";
-import { CircleAlert, X } from "lucide-react";
+import { CircleAlert, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+
 interface Props {
   className?: string;
 }
@@ -24,33 +25,96 @@ type City = {
   longitude: number;
 };
 
+// Передзавантажуємо популярні міста відразу при імпорті модуля (один раз)
+let preloadedPopular: City[] | null = null;
+let preloadPromise: Promise<void> | null = null;
+
+function preloadPopularCities() {
+  if (preloadedPopular || preloadPromise) return;
+  preloadPromise = fetch("/api/cities/search?q=")
+    .then((r) => r.json())
+    .then((data) => {
+      preloadedPopular = data;
+    })
+    .catch(() => {});
+}
+
+// Запускаємо передзавантаження відразу
+if (typeof window !== "undefined") {
+  preloadPopularCities();
+}
+
 export const Header: React.FC<Props> = ({ className }) => {
   const [focused, setFocused] = React.useState(false);
-
   const [query, setQuery] = React.useState("");
   const [cities, setCities] = React.useState<City[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const [debouncedQuery] = useDebounce(query.toLowerCase(), 500);
+  const [popularCities, setPopularCities] = React.useState<City[]>(
+    preloadedPopular ?? [],
+  );
+
+  const [debouncedQuery] = useDebounce(query, 400);
+
+  // Завантажуємо популярні якщо ще не завантажені
   React.useEffect(() => {
-    if (query.length < 2) {
+    if (preloadedPopular) {
+      setPopularCities(preloadedPopular);
+      return;
+    }
+    preloadPromise?.then(() => {
+      if (preloadedPopular) setPopularCities(preloadedPopular);
+    });
+  }, []);
+
+  // Пошук міст
+  React.useEffect(() => {
+    if (debouncedQuery.length < 2) {
       setCities([]);
+      setLoading(false);
       return;
     }
 
     setLoading(true);
-    fetch(`/api/cities/search?q=${encodeURIComponent(query)}`)
+    const controller = new AbortController();
+
+    fetch(`/api/cities/search?q=${encodeURIComponent(debouncedQuery)}`, {
+      signal: controller.signal,
+    })
       .then((res) => res.json())
       .then((data) => {
         setCities(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        if (err.name !== "AbortError") setLoading(false);
+      });
+
+    return () => controller.abort();
   }, [debouncedQuery]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Приводимо введений текст до нижнього реєстру
-    setQuery(e.target.value.toLowerCase());
+    setQuery(e.target.value);
   };
+
+  const handleClear = () => {
+    setQuery("");
+    setCities([]);
+  };
+
+  const handleClose = () => {
+    setFocused(false);
+    handleClear();
+  };
+
+  const handleSelect = () => {
+    setQuery("");
+    setCities([]);
+    setFocused(false);
+  };
+
+  // Що показувати у дропдауні
+  const showPopular = query.length < 2;
+  const displayCities = showPopular ? popularCities : cities;
 
   return (
     <header
@@ -60,6 +124,7 @@ export const Header: React.FC<Props> = ({ className }) => {
       )}
       role="banner"
     >
+      {/* Логотип */}
       <div
         className={cn(
           "transition-all duration-200 ease-out",
@@ -68,60 +133,65 @@ export const Header: React.FC<Props> = ({ className }) => {
             : "relative opacity-100",
         )}
       >
-        {/* <svg className="text-foreground  w-40" aria-hidden="true">
-          <use href="/icons.svg?v=4#logo" />
-        </svg> */}
+        {/* Логотип тут */}
       </div>
 
-      {/* Затемнення фону при активному пошуку */}
+      {/* Затемнення фону */}
       {focused && (
         <div
-          onClick={() => setFocused(false)}
+          onClick={handleClose}
           className="fixed inset-0 bg-black/50 z-30"
           aria-hidden="true"
         />
       )}
 
-      {/* Блок пошуку */}
+      {/* Пошук */}
       <div className="flex-1 flex justify-center px-1.5 relative z-40">
         <form
           role="search"
-          className="
-        flex gap-2.5 rounded-2xl relative
-        w-full
-        sm:max-w-md
-        md:max-w-lg
-        lg:max-w-xl
-        xl:max-w-2xl
-        mx-auto
-      "
+          className="flex gap-2.5 rounded-2xl relative w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl mx-auto"
           onSubmit={(e) => e.preventDefault()}
         >
-          {/* Прихований label для доступності та SEO */}
           <label htmlFor="city-search" className="sr-only">
             Пошук міста по Україні
           </label>
 
-          {/* Поле введення пошуку */}
-          <Input
-            id="city-search"
-            type="search"
-            autoComplete="off"
-            value={query}
-            onChange={handleInputChange}
-            placeholder="Введіть назву міста..."
-            onFocus={() => setFocused(true)}
-            aria-expanded={focused}
-            aria-controls="search-results"
-            aria-autocomplete="list"
-            className="
-          rounded-2xl
-          w-full
-          relative
-        "
-          />
+          {/* Wrapper з піктограмою пошуку та хрестиком */}
+          <div className="relative w-full">
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none z-50"
+              size={16}
+              aria-hidden="true"
+            />
 
-          {/* Кнопка закриття пошуку */}
+            <Input
+              id="city-search"
+              type="search"
+              autoComplete="off"
+              value={query}
+              onChange={handleInputChange}
+              placeholder="Введіть назву міста..."
+              onFocus={() => setFocused(true)}
+              aria-expanded={focused}
+              aria-controls="search-results"
+              aria-autocomplete="list"
+              className="rounded-2xl w-full pl-9 pr-9"
+            />
+
+            {/* Хрестик праворуч - тільки якщо є текст */}
+            {query.length > 0 && (
+              <button
+                type="button"
+                onClick={handleClear}
+                aria-label="Очистити пошук"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer z-50"
+              >
+                <X size={16} />
+              </button>
+            )}
+          </div>
+
+          {/* Кнопка закрити (X) — з'являється під час фокусування */}
           <div
             className={cn(
               "transition-all duration-200 ease-out",
@@ -132,7 +202,7 @@ export const Header: React.FC<Props> = ({ className }) => {
           >
             <Button
               type="button"
-              onClick={() => setFocused(false)}
+              onClick={handleClose}
               variant="outline"
               size="icon"
               aria-label="Закрити пошук"
@@ -143,7 +213,7 @@ export const Header: React.FC<Props> = ({ className }) => {
           </div>
         </form>
 
-        {/* Випадаючий список результатів */}
+        {/* Дропдаун із результатами */}
         <div
           id="search-results"
           role="listbox"
@@ -154,7 +224,15 @@ export const Header: React.FC<Props> = ({ className }) => {
             focused && "visible opacity-100 top-11",
           )}
         >
-          {/* Індикатор завантаження */}
+          {/* Скрольований контейнер */}
+          <style>{`
+            .cities-scroll::-webkit-scrollbar { width: 4px; }
+            .cities-scroll::-webkit-scrollbar-thumb { background: transparent; border-radius: 4px; transition: background 0.2s; }
+            .cities-scroll:hover::-webkit-scrollbar-thumb { background: hsl(var(--border)); }
+            .cities-scroll { scrollbar-width: none; }
+            .cities-scroll:hover { scrollbar-width: thin; scrollbar-color: hsl(var(--border)) transparent; }
+          `}</style>
+          {/* Завантаження */}
           {loading && (
             <p className="flex items-center gap-1 px-3 py-2 rounded-2xl">
               <Spinner className="size-5" />
@@ -162,37 +240,38 @@ export const Header: React.FC<Props> = ({ className }) => {
             </p>
           )}
 
-          {/* Список знайдених міст */}
-          {cities.map((city) => (
-            <Link
-              key={city.id}
-              href={`/pohoda/${city.slug}`}
-              role="option"
-              onClick={() => {
-                setQuery("");
-                setFocused(false);
-              }}
-            >
+          {/* Список міст зі скролом */}
+          {!loading && displayCities.length > 0 && (
+            <div className="overflow-hidden rounded-2xl">
               <div
-                className="
-              px-3 py-2 hover:bg-primary/10 rounded-2xl
-              whitespace-nowrap overflow-hidden text-ellipsis
-            "
+                className="cities-scroll overflow-y-auto"
+                style={{ maxHeight: "calc(7 * 40px)" }}
               >
-                🇺🇦 {city.nameUa}, {city.region}
+                {displayCities.map((city) => (
+                  <Link
+                    key={city.id}
+                    href={`/pohoda/${city.slug}`}
+                    role="option"
+                    onClick={handleSelect}
+                    prefetch={false}
+                  >
+                    <div
+                      className="px-3 py-2 hover:bg-primary/10 whitespace-nowrap overflow-hidden text-ellipsis"
+                      style={{ height: 40, lineHeight: "24px" }}
+                    >
+                      🇺🇦 {city.nameUa},{" "}
+                      <span className="text-muted-foreground">
+                        {city.region}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
               </div>
-            </Link>
-          ))}
-
-          {/* Повідомлення якщо введено мало символів */}
-          {query.length < 2 && !loading && (
-            <p className="px-3 py-2 rounded-2xl text-gray-500">
-              Введіть мінімум 2 символи
-            </p>
+            </div>
           )}
 
-          {/* Повідомлення якщо нічого не знайдено */}
-          {query.length >= 2 && cities.length === 0 && !loading && (
+          {/* Нічого не знайдено */}
+          {!loading && !showPopular && cities.length === 0 && (
             <p className="flex gap-1 items-center px-3 py-2 rounded-2xl text-red-500">
               <CircleAlert size={18} />
               Місто не знайдено
@@ -201,7 +280,7 @@ export const Header: React.FC<Props> = ({ className }) => {
         </div>
       </div>
 
-      {/* Перемикач теми праворуч */}
+      {/* Перемикач теми */}
       <div
         className={cn(
           "transition-all duration-300 ease-in-out z-20",
