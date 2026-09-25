@@ -1,0 +1,253 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   Типографіка
+   На пристроях Apple беремо справжній SF Pro із системи,
+   на решті платформ — Inter, найближчий за рисунком гротеск.
+   ============================================================ */
+@theme inline {
+	--font-sans:
+		-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Segoe UI', Roboto,
+		Helvetica, Arial, sans-serif;
+
+	/* shadcn-токени — дивляться на палітру нижче */
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+
+	/* Власні семантичні токени */
+	--color-fill: var(--fill);
+	--color-separator: var(--separator);
+	--color-tertiary: var(--text-tertiary);
+
+	/* Кольори погодних умов */
+	--color-w-sun: var(--w-sun);
+	--color-w-cloud: var(--w-cloud);
+	--color-w-rain: var(--w-rain);
+	--color-w-snow: var(--w-snow);
+	--color-w-storm: var(--w-storm);
+	--color-w-fog: var(--w-fog);
+
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ============================================================
+   Світла тема — чистий білий, як на apple.com
+   ============================================================ */
+:root {
+	--radius: 0.75rem;
+
+	--background: #ffffff;
+	--foreground: #1d1d1f;
+
+	/* Другорядна поверхня: фірмовий світло-сірий Apple */
+	--fill: #f5f5f7;
+
+	--card: #ffffff;
+	--card-foreground: #1d1d1f;
+	--popover: #ffffff;
+	--popover-foreground: #1d1d1f;
+
+	--primary: #0071e3;
+	--primary-foreground: #ffffff;
+
+	--secondary: #f5f5f7;
+	--secondary-foreground: #1d1d1f;
+
+	--muted: #f5f5f7;
+	--muted-foreground: #6e6e73;
+	--text-tertiary: #86868b;
+
+	--accent: #f5f5f7;
+	--accent-foreground: #1d1d1f;
+
+	--destructive: #ff3b30;
+
+	/* Волосяна лінія — основний спосіб розділяти секції */
+	--separator: #d2d2d7;
+	--border: #d2d2d7;
+	--input: #d2d2d7;
+	--ring: #0071e3;
+
+	/* Напівпрозора шапка */
+	--nav-bg: rgba(255, 255, 255, 0.72);
+
+	/* Погодні умови */
+	--w-sun: #f5a623;
+	--w-cloud: #86868b;
+	--w-rain: #0a84ff;
+	--w-snow: #3ab8e0;
+	--w-storm: #a259e6;
+	--w-fog: #98989d;
+}
+
+/* ============================================================
+   Темна тема — справжній чорний, як в Apple
+   ============================================================ */
+.dark {
+	--background: #000000;
+	--foreground: #f5f5f7;
+
+	--fill: #1d1d1f;
+
+	--card: #1d1d1f;
+	--card-foreground: #f5f5f7;
+	--popover: #1d1d1f;
+	--popover-foreground: #f5f5f7;
+
+	--primary: #2997ff;
+	--primary-foreground: #ffffff;
+
+	--secondary: #1d1d1f;
+	--secondary-foreground: #f5f5f7;
+
+	--muted: #1d1d1f;
+	--muted-foreground: #a1a1a6;
+	--text-tertiary: #86868b;
+
+	--accent: #2c2c2e;
+	--accent-foreground: #f5f5f7;
+
+	--destructive: #ff453a;
+
+	--separator: #424245;
+	--border: #424245;
+	--input: #424245;
+	--ring: #2997ff;
+
+	--nav-bg: rgba(0, 0, 0, 0.72);
+
+	--w-sun: #ffb340;
+	--w-cloud: #98989d;
+	--w-rain: #4aa8ff;
+	--w-snow: #64d2ff;
+	--w-storm: #bf5af2;
+	--w-fog: #aeaeb2;
+}
+
+@layer base {
+	* {
+		@apply border-border;
+	}
+
+	body {
+		@apply bg-background font-sans text-foreground antialiased;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+		margin: 0;
+		padding: 0;
+		letter-spacing: -0.01em;
+	}
+
+	/* Заголовки Apple завжди щільніші за замовчуванням */
+	h1,
+	h2,
+	h3 {
+		letter-spacing: -0.022em;
+	}
+
+	:focus-visible {
+		outline: 2px solid var(--ring);
+		outline-offset: 2px;
+		border-radius: 4px;
+	}
+}
+
+/* ============================================================
+   Утиліти
+   ============================================================ */
+
+/* Напівпрозора шапка з розмиттям — підпис Apple */
+.nav-blur {
+	background-color: var(--nav-bg);
+	backdrop-filter: saturate(180%) blur(20px);
+	-webkit-backdrop-filter: saturate(180%) blur(20px);
+}
+
+/* Горизонтальний скрол без смуги, що зʼявляється на ховер */
+.scroll-x {
+	overflow-x: auto;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+.scroll-x::-webkit-scrollbar {
+	height: 0;
+}
+.scroll-x:hover {
+	scrollbar-width: thin;
+	scrollbar-color: var(--separator) transparent;
+}
+.scroll-x:hover::-webkit-scrollbar {
+	height: 5px;
+}
+.scroll-x::-webkit-scrollbar-thumb {
+	background-color: var(--separator);
+	border-radius: 9999px;
+}
+.scroll-x::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+/* Вертикальний скрол у випадайці пошуку */
+.scroll-y {
+	overflow-y: auto;
+	scrollbar-width: none;
+}
+.scroll-y:hover {
+	scrollbar-width: thin;
+	scrollbar-color: var(--separator) transparent;
+}
+.scroll-y::-webkit-scrollbar {
+	width: 5px;
+}
+.scroll-y::-webkit-scrollbar-thumb {
+	background-color: transparent;
+	border-radius: 9999px;
+}
+.scroll-y:hover::-webkit-scrollbar-thumb {
+	background-color: var(--separator);
+}
+
+/* Показник температури в 10-денному прогнозі */
+.temp-track {
+	background: color-mix(in oklab, var(--separator) 55%, transparent);
+}
+
+/* Прибираємо нативний хрестик у полі пошуку */
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-decoration {
+	-webkit-appearance: none;
+	appearance: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
