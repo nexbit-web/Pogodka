@@ -106,22 +106,24 @@ export async function nearbyCities(
 	}));
 }
 
-// Повний список адрес для sitemap: 24 тисячі рядків, тримаємо в памʼяті 6 годин
-let allPathsCache: string[] | null = null;
-let allPathsTime = 0;
+/** Кількість сторінок населених пунктів: усі з бази плюс столиця */
+export const cityPageCount = async () => (await prisma.city.count()) + 1;
 
-/** Канонічні адреси всіх населених пунктів, столиця першою, далі за id */
-export async function allCityPaths(): Promise<string[]> {
-	if (allPathsCache && Date.now() - allPathsTime < 6 * 3_600_000) return allPathsCache;
+/**
+ * Канонічні адреси частини списку населених пунктів: столиця першою, далі за id.
+ * Адреса залежить лише від однойменних, а attachPaths бере всю їхню групу,
+ * тож частина збігається з повним списком і не потребує всіх 24 тисяч рядків.
+ */
+export async function cityPathsSlice(offset: number, limit: number): Promise<string[]> {
+	const withCapital = offset === 0;
 
 	const rows: Base[] = await prisma.city.findMany({
 		select: { id: true, slug: true, nameUa: true, region: true },
-		orderBy: { id: 'asc' }
+		orderBy: { id: 'asc' },
+		skip: withCapital ? 0 : offset - 1,
+		take: withCapital ? limit - 1 : limit
 	});
-	const all = [capital(), ...rows];
-	const paths = assignPaths(all);
 
-	allPathsCache = all.map((c) => paths.get(c.id) ?? c.slug);
-	allPathsTime = Date.now();
-	return allPathsCache;
+	const withPaths = await attachPaths(withCapital ? [capital(), ...rows] : rows);
+	return withPaths.map((c) => c.path);
 }

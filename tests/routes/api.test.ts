@@ -200,35 +200,50 @@ describe('POST /api/support', () => {
 });
 
 describe('Карта сайту', () => {
-	// 12 001 населений пункт у базі + столиця + головна
+	// Імітація бази: вибірка частини за id і пошук однойменних за слагами
+	const useTable = (table: ReturnType<typeof row>[]) => {
+		prisma.city.count.mockResolvedValue(table.length);
+		prisma.city.findMany.mockImplementation(
+			async (args: { where?: { slug?: { in: string[] } }; skip?: number; take?: number }) => {
+				if (args.where?.slug) return table.filter((c) => args.where!.slug!.in.includes(c.slug));
+				const skip = args.skip ?? 0;
+				return table.slice(skip, skip + (args.take ?? table.length));
+			}
+		);
+	};
+
+	// 2 500 населених пунктів у базі + столиця + головна й «Про нас» = 2 503 адреси
 	const manyCities = () =>
-		Array.from({ length: 12001 }, (_, i) =>
+		Array.from({ length: 2500 }, (_, i) =>
 			row(i + 1, `city-${i + 1}`, `Місто${i + 1}`, 'Київська область')
 		);
 
-	it('/sitemap.xml — індекс файлів по 10 000 адрес, поза закритим /api/', async () => {
-		prisma.city.findMany.mockResolvedValue(manyCities());
+	const locsOf = (xml: string) => [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1]);
+
+	it('/sitemap.xml — індекс файлів по 1 000 адрес, поза закритим /api/', async () => {
+		useTable(manyCities());
 		const { GET } = await import('../../src/routes/sitemap.xml/+server');
 
 		const res = await GET(event({}));
 		const xml = await res.text();
 
 		expect(res.headers.get('Content-Type')).toContain('application/xml');
-		expect(xml.match(/<sitemap>/g)).toHaveLength(2);
-		expect(xml).toContain('<loc>https://www.pogodka.org/sitemaps/2.xml</loc>');
+		expect(xml.match(/<sitemap>/g)).toHaveLength(3);
+		expect(xml).toContain('<loc>https://www.pogodka.org/sitemaps/3.xml</loc>');
 		expect(xml).not.toContain('/api/');
+		// Індексу досить підрахунку — усі рядки з бази не читаються
+		expect(prisma.city.findMany).not.toHaveBeenCalled();
 	});
 
 	it('перший файл: головна, «Про нас», столиця, далі населені пункти — без дублів', async () => {
-		prisma.city.findMany.mockResolvedValue([
+		useTable([
 			row(2732, 'lviv', 'Львів', 'Дніпропетровська область'),
 			row(11272, 'lviv', 'Львів', 'Львівська область'),
 			row(12405, 'kyiv', 'Київ', 'Миколаївська область')
 		]);
 		const { GET } = await import('../../src/routes/sitemaps/[file]/+server');
 
-		const xml = await (await GET(event({ params: { file: '1.xml' } }))).text();
-		const locs = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1]);
+		const locs = locsOf(await (await GET(event({ params: { file: '1.xml' } }))).text());
 
 		expect(locs).toEqual([
 			'https://www.pogodka.org',
@@ -241,11 +256,30 @@ describe('Карта сайту', () => {
 		expect(new Set(locs).size).toBe(locs.length);
 	});
 
-	it.each(['0.xml', '3.xml', 'abc', '1', '-1.xml'])('невідомий файл «%s» — 404', async (file) => {
-		prisma.city.findMany.mockResolvedValue(manyCities());
+	it('файли разом містять кожну адресу рівно один раз, у кожному не більше 1 000', async () => {
+		useTable(manyCities());
 		const { GET } = await import('../../src/routes/sitemaps/[file]/+server');
-		await expect(GET(event({ params: { file } }))).rejects.toMatchObject({ status: 404 });
+
+		const files = await Promise.all(
+			['1.xml', '2.xml', '3.xml'].map(async (file) =>
+				locsOf(await (await GET(event({ params: { file } }))).text())
+			)
+		);
+
+		expect(files.map((f) => f.length)).toEqual([1000, 1000, 503]);
+		const all = files.flat();
+		expect(new Set(all).size).toBe(2503);
+		expect(all.at(-1)).toBe('https://www.pogodka.org/pohoda/city-2500');
 	});
+
+	it.each(['0.xml', '4.xml', '10000.xml', 'abc', '1', '-1.xml'])(
+		'невідомий файл «%s» — 404',
+		async (file) => {
+			useTable(manyCities());
+			const { GET } = await import('../../src/routes/sitemaps/[file]/+server');
+			await expect(GET(event({ params: { file } }))).rejects.toMatchObject({ status: 404 });
+		}
+	);
 
 	it('старі адреси /api/sitemap… переадресовують на /sitemap.xml', async () => {
 		const index = await import('../../src/routes/api/sitemap.xml/+server');

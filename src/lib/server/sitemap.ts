@@ -1,13 +1,14 @@
 import { SITE_URL } from '$lib/config';
-import { allCityPaths } from './cities';
+import { cityPageCount, cityPathsSlice } from './cities';
 
 /*
 	Карта сайту: індекс /sitemap.xml і файли /sitemaps/1.xml, /sitemaps/2.xml…
 	Лежить поза /api/, бо robots.txt закриває /api/ від роботів.
-	Google приймає до 50 000 адрес у файлі; беремо 10 000, щоб файли були легкими.
+	Google приймає до 50 000 адрес у файлі, але беремо 1 000: файл важить ~150 КБ
+	і швидко відкривається, а з бази читається лише його частина населених пунктів.
 */
 
-export const URLS_PER_FILE = 10_000;
+export const URLS_PER_FILE = 1_000;
 
 // Сторінки поза містами: лише ті, що мають потрапляти в пошук
 const STATIC_PAGES = [
@@ -21,18 +22,33 @@ export interface SitemapEntry {
 	changefreq: 'hourly' | 'daily' | 'monthly';
 }
 
-export async function sitemapEntries(): Promise<SitemapEntry[]> {
-	const cities = await allCityPaths();
+/** Скільки файлів у карті сайту — для індексу досить одного підрахунку рядків */
+export async function sitemapFileCount(): Promise<number> {
+	const total = STATIC_PAGES.length + (await cityPageCount());
+	return Math.max(1, Math.ceil(total / URLS_PER_FILE));
+}
+
+/** Адреси одного файлу карти сайту (index від 0): спершу головна й «Про нас», далі населені пункти */
+export async function sitemapChunk(index: number): Promise<SitemapEntry[]> {
+	const start = index * URLS_PER_FILE;
+	const end = start + URLS_PER_FILE;
+
+	const statics = STATIC_PAGES.slice(start, end).map((p) => ({
+		loc: `${SITE_URL}${p.path === '/' ? '' : p.path}`,
+		priority: p.priority,
+		changefreq: p.changefreq
+	}));
+
+	const cityStart = Math.max(0, start - STATIC_PAGES.length);
+	const cityLimit = end - STATIC_PAGES.length - cityStart;
+	const cities = cityLimit > 0 ? await cityPathsSlice(cityStart, cityLimit) : [];
+
 	return [
-		...STATIC_PAGES.map((p) => ({
-			loc: `${SITE_URL}${p.path === '/' ? '' : p.path}`,
-			priority: p.priority,
-			changefreq: p.changefreq
-		})),
+		...statics,
 		...cities.map((path, i) => ({
 			loc: `${SITE_URL}/pohoda/${encodeURIComponent(path)}`,
-			// Столиця й перші за порядком (обласні центри мають найменші id) — вище
-			priority: i === 0 ? '0.9' : '0.8',
+			// Столиця — вище за інші населені пункти
+			priority: cityStart + i === 0 ? '0.9' : '0.8',
 			changefreq: 'hourly' as const
 		}))
 	];

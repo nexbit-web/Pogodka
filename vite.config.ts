@@ -13,7 +13,10 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter(),
+			// Функції у Франкфурті: там само база Neon і Redis Upstash (eu-central-1)
+			// і найближчий до України регіон. За замовчуванням Vercel ставить iad1 (США),
+			// і кожен запит до бази перетинав Атлантику.
+			adapter: adapter({ regions: ['fra1'] }),
 			// Посилання від кореня (/pohoda/lviv), а не відносні (./pohoda/lviv): однакові на кожній сторінці
 			paths: { relative: false }
 		})

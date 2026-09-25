@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { prisma } = vi.hoisted(() => ({ prisma: { city: { findMany: vi.fn() } } }));
+const { prisma } = vi.hoisted(() => ({ prisma: { city: { findMany: vi.fn(), count: vi.fn() } } }));
 vi.mock('$lib/server/prisma', () => ({ default: prisma }));
 
-const { distanceKm, nearbyCities, allCityPaths } = await import('$lib/server/cities');
+const { distanceKm, nearbyCities, cityPathsSlice, cityPageCount } =
+	await import('$lib/server/cities');
 
 const row = (
 	id: number,
@@ -23,6 +24,7 @@ const row = (
 
 beforeEach(() => {
 	prisma.city.findMany.mockReset();
+	prisma.city.count.mockReset();
 });
 
 describe('distanceKm', () => {
@@ -68,19 +70,48 @@ describe('nearbyCities', () => {
 	});
 });
 
-describe('allCityPaths', () => {
-	it('усі адреси унікальні, столиця першою', async () => {
-		prisma.city.findMany.mockResolvedValue([
-			row(2732, 'lviv', 'Львів', 'Дніпропетровська область', 0, 0),
-			row(11272, 'lviv', 'Львів', 'Львівська область', 0, 0),
-			row(12405, 'kyiv', 'Київ', 'Миколаївська область', 0, 0)
+describe('cityPathsSlice', () => {
+	// Імітація бази: відповідає і на вибірку частини за id, і на пошук однойменних
+	const table = [
+		row(2732, 'lviv', 'Львів', 'Дніпропетровська область', 0, 0),
+		row(11272, 'lviv', 'Львів', 'Львівська область', 0, 0),
+		row(12405, 'kyiv', 'Київ', 'Миколаївська область', 0, 0)
+	];
+	const db = (args: { where?: { slug?: { in: string[] } }; skip?: number; take?: number }) => {
+		if (args.where?.slug) return table.filter((c) => args.where!.slug!.in.includes(c.slug));
+		const skip = args.skip ?? 0;
+		return table.slice(skip, skip + (args.take ?? table.length));
+	};
+
+	it('столиця першою, адреси збігаються з повним списком', async () => {
+		prisma.city.findMany.mockImplementation(async (args) => db(args));
+
+		expect(await cityPathsSlice(0, 10)).toEqual([
+			'kyiv',
+			'lviv-dnipropetrovska',
+			'lviv',
+			'kyiv-mykolaivska'
 		]);
+	});
 
-		const paths = await allCityPaths();
-		expect(paths).toEqual(['kyiv', 'lviv-dnipropetrovska', 'lviv', 'kyiv-mykolaivska']);
+	it('частина зі зсувом бере з бази лише свої рядки, але адреси — з урахуванням усіх однойменних', async () => {
+		prisma.city.findMany.mockImplementation(async (args) => db(args));
 
-		// Кеш: другий виклик не йде в базу
-		await allCityPaths();
-		expect(prisma.city.findMany).toHaveBeenCalledTimes(1);
+		// Позиції 1–2: столиця (0) пропущена, отже з бази рядки 0–1
+		expect(await cityPathsSlice(1, 2)).toEqual(['lviv-dnipropetrovska', 'lviv']);
+		expect(prisma.city.findMany.mock.calls[0][0]).toMatchObject({ skip: 0, take: 2 });
+
+		// Друга частина не бачить Львова Дніпропетровського, але Київ-село все одно з областю
+		expect(await cityPathsSlice(3, 2)).toEqual(['kyiv-mykolaivska']);
+	});
+
+	it('за межами списку — порожньо', async () => {
+		prisma.city.findMany.mockImplementation(async (args) => db(args));
+		expect(await cityPathsSlice(50, 10)).toEqual([]);
+	});
+
+	it('кількість сторінок — рядки бази плюс столиця', async () => {
+		prisma.city.count.mockResolvedValue(24164);
+		expect(await cityPageCount()).toBe(24165);
 	});
 });
