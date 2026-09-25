@@ -87,7 +87,7 @@ describe('WeatherHeadline', () => {
 
 		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Харків');
 		expect(screen.getAllByText(/^17°?$/).length).toBeGreaterThan(0);
-		expect(screen.getAllByText('Пасмурно').length).toBeGreaterThan(0);
+		expect(screen.getAllByText('Похмуро').length).toBeGreaterThan(0);
 		expect(screen.getByText('Відчувається як 15°')).toBeInTheDocument();
 	});
 

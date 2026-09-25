@@ -27,7 +27,7 @@
 	const H_EXPANDED = 204; // повна висота розгорнутої шапки
 	const H_COLLAPSED = 91; // місто + рядок + повітря до контенту
 	const CITY_BOTTOM = 48; // низ назви міста
-	const LINE_BOTTOM = 84; // низ рядка «18° | Пасмурно»
+	const LINE_BOTTOM = 84; // низ рядка «18° | Похмуро»
 	// Мʼякий край під згорнутою шапкою: контент під ним розмивається і тане
 	const EDGE_H = 18;
 	// Висота навігації сайту (h-14): тут стоїть шар до першого виміру
@@ -194,7 +194,7 @@
 			>
 		</h1>
 
-		<!-- Згорнутий рядок: 18° | Пасмурно -->
+		<!-- Згорнутий рядок: 18° | Похмуро -->
 		<p
 			class="absolute inset-x-4 top-[50px] flex items-center justify-center gap-2 text-[15px] leading-[24px] font-medium sm:inset-x-6 sm:text-[17px]"
 			style="opacity: {lineOpacity}; transform: translateY({(1 - lineOpacity) * 6}px)"

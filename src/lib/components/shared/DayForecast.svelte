@@ -23,6 +23,7 @@
 	import TempCurve from './TempCurve.svelte';
 	import {
 		buildForecastDays,
+		buildTableSlots,
 		getConditionTint,
 		getWeatherIconId,
 		isNightHour,
@@ -35,15 +36,25 @@
 	import { clock, dayOfMonth, isWeekend, kyivNow, monthName, weekdayName } from '$lib/date';
 	import type { OpenMeteoWeather } from '$lib/types';
 
-	let { weather, city = '' }: { weather: OpenMeteoWeather; city?: string } = $props();
+	let {
+		weather,
+		city = '',
+		now = kyivNow()
+	}: {
+		weather: OpenMeteoWeather;
+		city?: string;
+		/** Поточні дата й година в Києві — спільні з шапкою сторінки */
+		now?: { date: string; hour: number };
+	} = $props();
 
-	const days = $derived(buildForecastDays(weather));
+	const todayIso = $derived(now.date);
+	// Дні до сьогодні (прогноз, отриманий до півночі) не показуємо
+	const days = $derived.by(() => {
+		const all = buildForecastDays(weather);
+		const upcoming = all.filter((d) => d.date >= todayIso);
+		return upcoming.length > 0 ? upcoming : all;
+	});
 	let selected = $state(0);
-
-	const now = kyivNow();
-	const todayIso = now.date;
-	// Поточний тригодинний проміжок — підсвічується в таблиці сьогоднішнього дня
-	const currentSlot = Math.floor(now.hour / 3) * 3;
 
 	const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -51,13 +62,13 @@
 	const isToday = $derived(day?.date === todayIso);
 	const weekend = $derived(day ? isWeekend(day.date) : false);
 
-	// Таблиця як на Синоптику: кожні 3 години
-	const slots = $derived(day ? day.hours.filter((h) => h.hour % 3 === 0) : []);
+	// Таблиця як на Синоптику: кожні 3 години, колонка «Зараз» — поточна година
+	const slots = $derived(day ? buildTableSlots(day.hours, isToday ? now.hour : undefined) : []);
 
 	// Години до сходу й після заходу сонця — з нічними іконками
 	const nightOf = (slot: (typeof slots)[number]) =>
 		isNightHour(slot.time, day?.sunrise, day?.sunset);
-	const currentIndex = $derived(isToday ? slots.findIndex((s) => s.hour === currentSlot) : -1);
+	const currentIndex = $derived(slots.findIndex((s) => s.now));
 	const hasProbability = $derived(slots.some((s) => s.precipProb !== undefined));
 
 	const insights = $derived(

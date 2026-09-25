@@ -11,7 +11,8 @@ import {
 	hpaToMmHg,
 	isNightHour,
 	uvText,
-	windDirectionText
+	windDirectionText,
+	buildTableSlots
 } from '$lib/weather';
 import { makeForecast } from '../fixtures/forecast';
 
@@ -268,5 +269,70 @@ describe('isNightHour', () => {
 		expect(isNightHour('2026-09-25T06:00')).toBe(false);
 		expect(isNightHour('2026-09-25T20:00')).toBe(false);
 		expect(isNightHour('2026-09-25T21:00')).toBe(true);
+	});
+});
+
+describe('buildTableSlots — колонки погодинної таблиці', () => {
+	// Реальний випадок (Роздільна, 25.09): дощ 0,1 мм лише о 16:00, між колонками 15:00 і 18:00
+	const hours = () =>
+		buildForecastDays(
+			makeForecast({
+				start: '2026-09-25',
+				days: 1,
+				hour: (_, hr) =>
+					hr === 16
+						? { code: 61, precip: 0.1, precipProb: 5 }
+						: hr === 17
+							? { code: 3, precipProb: 10 }
+							: { code: 3, precip: 0, precipProb: 0 }
+			})
+		)[0].hours;
+
+	it('кожні 3 години, 8 колонок', () => {
+		expect(buildTableSlots(hours()).map((s) => s.hour)).toEqual([0, 3, 6, 9, 12, 15, 18, 21]);
+	});
+
+	it('опади між колонками не губляться: сума, найбільша ймовірність і іконка дощу', () => {
+		const at15 = buildTableSlots(hours()).find((s) => s.hour === 15)!;
+
+		expect(at15.precip).toBe(0.1);
+		expect(at15.precipProb).toBe(10);
+		expect(at15.code).toBe(61);
+		// Сусідня колонка лишається сухою
+		expect(buildTableSlots(hours()).find((s) => s.hour === 18)!.precip).toBe(0);
+	});
+
+	it('колонка «Зараз» — саме поточна година, ті самі дані, що й у шапці', () => {
+		const list = hours();
+		const slots = buildTableSlots(list, 20);
+		const now = slots.find((s) => s.now)!;
+		const hour20 = list.find((h) => h.hour === 20)!;
+
+		expect(slots.filter((s) => s.now)).toHaveLength(1);
+		expect(now.time).toBe('2026-09-25T20:00');
+		expect(now.temp).toBe(hour20.temp);
+		expect(now.feels).toBe(hour20.feels);
+		// Порядок колонок не порушується: 15:00 → зараз (20:00) → 21:00
+		expect(slots.map((s) => s.hour)).toEqual([0, 3, 6, 9, 12, 15, 20, 21]);
+	});
+
+	it('опади колонки «Зараз» рахуються від поточної години, минулі не підмішуються', () => {
+		const now = buildTableSlots(hours(), 17).find((s) => s.now)!;
+		// 16:00 з дощем уже минула: у колонці лише 17:00
+		expect(now.hour).toBe(17);
+		expect(now.precip).toBe(0);
+		expect(now.code).toBe(3);
+	});
+
+	it('без поточної години (інший день) колонки «Зараз» немає', () => {
+		expect(buildTableSlots(hours()).some((s) => s.now)).toBe(false);
+	});
+});
+
+describe('findCurrentHourIndex — явна година', () => {
+	it('бере передану годину, а не системний час', () => {
+		const weather = makeForecast({ start: '2026-09-25' });
+		const idx = findCurrentHourIndex(weather, { date: '2026-09-26', hour: 7 });
+		expect(weather.hourly.time[idx]).toBe('2026-09-26T07:00');
 	});
 });
