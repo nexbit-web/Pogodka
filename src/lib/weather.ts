@@ -4,8 +4,10 @@ import type { CurrentWeather, DayHour, ForecastDay, OpenMeteoWeather, WeeklyDay 
 export { KYIV_TZ };
 
 /** Індекс години в масиві hourly, що відповідає поточній годині у Києві. */
-export function findCurrentHourIndex(weather: OpenMeteoWeather): number {
-	const { date, hour } = kyivNow();
+export function findCurrentHourIndex(
+	weather: OpenMeteoWeather,
+	{ date, hour }: { date: string; hour: number } = kyivNow()
+): number {
 	// Час Open-Meteo вже київський: «2026-09-25T14:00»
 	return weather.hourly.time.indexOf(`${date}T${String(hour).padStart(2, '0')}:00`);
 }
@@ -59,7 +61,7 @@ const WEATHER_TEXT: Record<number, string> = {
 	0: 'Ясно',
 	1: 'Майже ясно',
 	2: 'Частково хмарно',
-	3: 'Пасмурно',
+	3: 'Похмуро',
 	45: 'Туман',
 	48: 'Інеєвий туман',
 	51: 'Легка мряка',
@@ -213,6 +215,50 @@ export function buildForecastDays(weather: OpenMeteoWeather): ForecastDay[] {
 		uvMax: d.uv_index_max?.[i],
 		hours: byDate.get(date) ?? []
 	}));
+}
+
+/** Колонка погодинної таблиці */
+export interface TableSlot extends DayHour {
+	/** Колонка «Зараз»: дані поточної години, ті самі, що й у шапці */
+	now: boolean;
+}
+
+/**
+ * Колонки погодинної таблиці: кожні 3 години. Колонка відповідає проміжку [h, h+3),
+ * тож нічого між ними не губиться: опади за проміжок сумуються, ймовірність і пориви —
+ * найбільші, а якщо в проміжку пройшов дощ чи сніг, іконка показує саме його.
+ * Сьогодні проміжок із поточною годиною показує саме її — ті самі числа, що й у шапці,
+ * а опади рахує від неї до кінця проміжку.
+ */
+export function buildTableSlots(hours: DayHour[], currentHour?: number): TableSlot[] {
+	const byHour = new Map(hours.map((h) => [h.hour, h]));
+
+	return hours
+		.filter((h) => h.hour % 3 === 0)
+		.map((start) => {
+			const end = start.hour + 3;
+			const isNow =
+				currentHour !== undefined &&
+				currentHour >= start.hour &&
+				currentHour < end &&
+				byHour.has(currentHour);
+			const from = isNow ? currentHour : start.hour;
+			const base = isNow ? byHour.get(currentHour)! : start;
+			const period = hours.filter((h) => h.hour >= from && h.hour < end);
+
+			const probs = period.flatMap((h) => (h.precipProb === undefined ? [] : [h.precipProb]));
+			// Коди опадів ідуть за зростанням сили: 51 мряка … 65 сильний дощ … 99 гроза з градом
+			const wetCodes = period.filter((h) => h.precip > 0 && h.code >= 51).map((h) => h.code);
+
+			return {
+				...base,
+				code: wetCodes.length ? Math.max(base.code, ...wetCodes) : base.code,
+				precip: Math.round(period.reduce((sum, h) => sum + h.precip, 0) * 10) / 10,
+				precipProb: probs.length ? Math.max(...probs) : undefined,
+				gusts: Math.max(...period.map((h) => h.gusts)),
+				now: isNow
+			};
+		});
 }
 
 /** гПа → мм рт. ст. (так тиск звично показують в Україні) */

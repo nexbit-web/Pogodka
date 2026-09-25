@@ -10,8 +10,15 @@ const { prisma, redis } = vi.hoisted(() => ({
 vi.mock('$lib/server/prisma', () => ({ default: prisma }));
 vi.mock('$lib/server/upstash', () => ({ redisGet: redis.get, redisSet: redis.set }));
 
-const { buildOpenMeteoUrl, findCity, getCityWeather, getForecast, isValidForecast, pickBestCity } =
-	await import('$lib/server/weather');
+const {
+	buildOpenMeteoUrl,
+	findCity,
+	isFresh,
+	getCityWeather,
+	getForecast,
+	isValidForecast,
+	pickBestCity
+} = await import('$lib/server/weather');
 
 const city = (id: number, slug: string, nameUa: string, region: string, extra = {}) => ({
 	id,
@@ -324,5 +331,23 @@ describe('getCityWeather', () => {
 		database([]);
 		await expectHttpError(getCityWeather('Атлантида'), 404);
 		expect(fetchMock).not.toHaveBeenCalled();
+	});
+});
+
+describe('isFresh — свіжість кешу прогнозу', () => {
+	// Вересень: Київ = UTC+3
+	const at = (iso: string) => new Date(iso).getTime();
+
+	it('до 2 годин того самого дня — свіжий', () => {
+		expect(isFresh(at('2026-09-25T10:00:00Z'), at('2026-09-25T11:30:00Z'))).toBe(true);
+	});
+
+	it('старший за 2 години — застарілий', () => {
+		expect(isFresh(at('2026-09-25T08:00:00Z'), at('2026-09-25T10:30:00Z'))).toBe(false);
+	});
+
+	it('отриманий до півночі за Києвом — після півночі застарілий, навіть через 40 хвилин', () => {
+		// 23:40 25-го → 00:20 26-го за Києвом
+		expect(isFresh(at('2026-09-25T20:40:00Z'), at('2026-09-25T21:20:00Z'))).toBe(false);
 	});
 });

@@ -192,3 +192,40 @@ describe('DayForecast — таблиця дня', () => {
 		expect(rows).toEqual([true, false, true, false]);
 	});
 });
+
+describe('DayForecast — узгодженість із шапкою', () => {
+	// Рядок таблиці за підписом: клітинки в порядку колонок
+	const cellsOf = (label: string) => {
+		const row = screen
+			.getAllByRole('row')
+			.find((r) => r.querySelector('th[scope="row"]')?.textContent?.trim() === label)!;
+		return Array.from(row.querySelectorAll('td')).map((td) => td.textContent?.trim());
+	};
+
+	it('«Зараз» показує поточну годину (20:00), а не початок проміжку (18:00)', () => {
+		const weather = makeForecast({
+			hour: (d, hr) =>
+				d === 0 && hr === 18 ? { feels: 16 } : d === 0 && hr === 20 ? { feels: 13 } : {}
+		});
+		render(DayForecast, { weather, now: { date: today, hour: 20 } });
+
+		const headers = screen
+			.getAllByRole('columnheader')
+			.map((th) => th.textContent?.trim())
+			.filter((t) => t && /^\d{1,2}:00$|^Зараз$/.test(t));
+		expect(headers).toEqual(['0:00', '3:00', '6:00', '9:00', '12:00', '15:00', 'Зараз', '21:00']);
+		expect(cellsOf('Відчувається як')[6]).toBe('+13°');
+	});
+
+	it('дні до сьогодні (прогноз отримано до півночі) не показуються', () => {
+		const yesterday = DateTime.fromISO(today).minus({ days: 1 }).toISODate()!;
+		render(DayForecast, {
+			weather: makeForecast({ start: yesterday, days: 8 }),
+			now: { date: today, hour: 1 }
+		});
+
+		const tabs = screen.getAllByRole('tab');
+		expect(tabs).toHaveLength(7);
+		expect(tabs[0]).toHaveTextContent('Сьогодні');
+	});
+});

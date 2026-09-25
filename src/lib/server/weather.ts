@@ -4,11 +4,19 @@ import { redisGet, redisSet } from './upstash';
 import { importance } from './cityRank';
 import { assignPaths, parseRegionalPath } from './cityUrl';
 import { KYIV, isKyivQuery } from './regions';
+import { kyivNow } from '$lib/date';
 import type { OpenMeteoWeather, WeatherApiResponse } from '$lib/types';
 
 // Кеш живе 50 годин як запас на випадок збою Open-Meteo, але оновлюється, щойно старший за 2 години
 const CACHE_TTL = 50 * 60 * 60;
 const FRESH_MS = 2 * 60 * 60 * 1000;
+
+/**
+ * Кеш свіжий, якщо йому менше 2 годин і він отриманий сьогодні (за Києвом).
+ * Прогноз, узятий до півночі, починається з учорашнього дня — після півночі його оновлюємо.
+ */
+export const isFresh = (fetchedAt: number, now = Date.now()) =>
+	now - fetchedAt < FRESH_MS && kyivNow(new Date(fetchedAt)).date === kyivNow(new Date(now)).date;
 
 const CITY_SELECT = {
 	id: true,
@@ -213,7 +221,7 @@ export async function getForecast(city: CityRecord): Promise<WeatherApiResponse>
 	}
 
 	let weather: OpenMeteoWeather;
-	if (cached && Date.now() - cached.fetchedAt < FRESH_MS) {
+	if (cached && isFresh(cached.fetchedAt)) {
 		weather = cached.weather;
 	} else {
 		try {
