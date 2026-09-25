@@ -40,11 +40,12 @@
 
 	/* Кольори погодних умов */
 	--color-w-sun: var(--w-sun);
+	--color-w-moon: var(--w-moon);
 	--color-w-cloud: var(--w-cloud);
-	--color-w-rain: var(--w-rain);
-	--color-w-snow: var(--w-snow);
-	--color-w-storm: var(--w-storm);
-	--color-w-fog: var(--w-fog);
+
+	/* Вихідні дні — червоним, як звикли в календарях */
+	--color-weekend: var(--weekend);
+	--color-footer: var(--footer);
 
 	--radius-sm: calc(var(--radius) - 4px);
 	--radius-md: calc(var(--radius) - 2px);
@@ -95,55 +96,67 @@
 
 	/* Погодні умови */
 	--w-sun: #f5a623;
+	--w-moon: #5856d6;
 	--w-cloud: #86868b;
-	--w-rain: #0a84ff;
-	--w-snow: #3ab8e0;
-	--w-storm: #a259e6;
-	--w-fog: #98989d;
+
+	--weekend: #d70015;
+
+	/* Футер — сірий, як на apple.com */
+	--footer: #f5f5f7;
 }
 
 /* ============================================================
-   Темна тема — справжній чорний, як в Apple
+   Темна тема — палітра темного режиму Apple (iOS / macOS):
+   не чорна прірва, а графітові шари. Кожна поверхня, що «ближче»
+   до користувача, трохи світліша: фон → заливка → спливне меню.
    ============================================================ */
 .dark {
-	--background: #000000;
+	/* systemBackground (elevated) — основний фон сторінки */
+	--background: #1c1c1e;
 	--foreground: #f5f5f7;
 
-	--fill: #1d1d1f;
+	/* secondarySystemFill — вибраний день, колонка «зараз», поля */
+	--fill: #2c2c2e;
+	/* Футер — утоплений, темніший за сторінку, як сірий футер у світлій темі */
+	--footer: #151516;
 
-	--card: #1d1d1f;
+	--card: #2c2c2e;
 	--card-foreground: #f5f5f7;
-	--popover: #1d1d1f;
+	--popover: #2c2c2e;
 	--popover-foreground: #f5f5f7;
 
-	--primary: #2997ff;
+	/* systemBlue */
+	--primary: #0a84ff;
 	--primary-foreground: #ffffff;
 
-	--secondary: #1d1d1f;
+	--secondary: #2c2c2e;
 	--secondary-foreground: #f5f5f7;
 
-	--muted: #1d1d1f;
-	--muted-foreground: #a1a1a6;
-	--text-tertiary: #86868b;
+	/* secondaryLabel і tertiaryLabel */
+	--muted: #2c2c2e;
+	--muted-foreground: #98989d;
+	--text-tertiary: #78787e;
 
-	--accent: #2c2c2e;
+	--accent: #3a3a3c;
 	--accent-foreground: #f5f5f7;
 
+	/* systemRed */
 	--destructive: #ff453a;
 
-	--separator: #424245;
-	--border: #424245;
-	--input: #424245;
-	--ring: #2997ff;
+	/* opaqueSeparator */
+	--separator: #3a3a3c;
+	--border: #3a3a3c;
+	--input: #48484a;
+	--ring: #0a84ff;
 
-	--nav-bg: rgba(0, 0, 0, 0.72);
+	--nav-bg: rgba(28, 28, 30, 0.72);
 
-	--w-sun: #ffb340;
+	/* systemOrange, systemIndigo, systemGray */
+	--w-sun: #ff9f0a;
+	--w-moon: #7d7aff;
 	--w-cloud: #98989d;
-	--w-rain: #4aa8ff;
-	--w-snow: #64d2ff;
-	--w-storm: #bf5af2;
-	--w-fog: #aeaeb2;
+
+	--weekend: #ff453a;
 }
 
 @layer base {

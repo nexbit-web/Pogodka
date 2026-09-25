@@ -1,18 +1,13 @@
-import { DateTime } from 'luxon';
-import type { CurrentWeather, OpenMeteoWeather, WeeklyDay } from './types';
+import { KYIV_TZ, kyivNow } from './date';
+import type { CurrentWeather, DayHour, ForecastDay, OpenMeteoWeather, WeeklyDay } from './types';
 
-export const KYIV_TZ = 'Europe/Kyiv';
+export { KYIV_TZ };
 
 /** Індекс години в масиві hourly, що відповідає поточній годині у Києві. */
 export function findCurrentHourIndex(weather: OpenMeteoWeather): number {
-	const kievNow = DateTime.now().setZone(KYIV_TZ);
-	const today = kievNow.toISODate()!;
-	const currentHour = kievNow.hour;
-
-	return weather.hourly.time.findIndex((time) => {
-		const hour = DateTime.fromISO(time, { zone: KYIV_TZ }).hour;
-		return time.startsWith(today) && hour === currentHour;
-	});
+	const { date, hour } = kyivNow();
+	// Час Open-Meteo вже київський: «2026-09-25T14:00»
+	return weather.hourly.time.indexOf(`${date}T${String(hour).padStart(2, '0')}:00`);
 }
 
 export function getCurrentWeather(weather: OpenMeteoWeather, hourIndex: number): CurrentWeather {
@@ -93,8 +88,16 @@ export function getWeatherText(code: number): string {
 	return WEATHER_TEXT[code] || 'Невідомо';
 }
 
-/** id символу в /icons.svg за кодом Open-Meteo. */
-export function getWeatherIconId(code: number): string {
+// Іконки, в яких є сонце: вночі замість нього малюємо місяць
+const NIGHT_ICONS = new Set(['clear', 'partly-cloudy', 'drizzle']);
+
+/** id символу в /icons.svg за кодом Open-Meteo. Вночі — версія з місяцем. */
+export function getWeatherIconId(code: number, night = false): string {
+	const id = dayIconId(code);
+	return night && NIGHT_ICONS.has(id) ? `${id}-night` : id;
+}
+
+function dayIconId(code: number): string {
 	// 0 — повністю ясне небо
 	if (code === 0) return 'clear';
 	// 1,2 — малохмарно / змінна хмарність
@@ -118,28 +121,20 @@ export function getWeatherIconId(code: number): string {
 	return 'unknown';
 }
 
-/** CSS-змінна з кольором іконки для конкретних погодних умов. */
-export function getConditionTint(code: number): string {
-	const id = getWeatherIconId(code);
-
-	switch (id) {
+/**
+ * Колір іконки. Палітра навмисно стримана: кольорові лише ясне небо (сонце або місяць)
+ * і дощ (primary), решта — спокійний сірий.
+ */
+export function getConditionTint(code: number, night = false): string {
+	switch (getWeatherIconId(code, night)) {
 		case 'clear':
 			return 'var(--w-sun)';
-		case 'partly-cloudy':
-			return 'var(--w-sun)';
-		case 'cloudy':
-			return 'var(--w-cloud)';
-		case 'fog':
-			return 'var(--w-fog)';
+		case 'clear-night':
+			return 'var(--w-moon)';
 		case 'drizzle':
+		case 'drizzle-night':
 		case 'rain':
-			return 'var(--w-rain)';
-		case 'snow':
-		case 'snowfall':
-			return 'var(--w-snow)';
-		case 'thunderstorm':
-		case 'thunderstorm-hail':
-			return 'var(--w-storm)';
+			return 'var(--primary)';
 		default:
 			return 'var(--w-cloud)';
 	}
@@ -177,4 +172,75 @@ export function getTempColor(temp: number): string {
 	}
 
 	return `rgb(${last[1].join(' ')})`;
+}
+
+/** Дні прогнозу з погодинними даними, згруповані за датою (час Open-Meteo вже київський). */
+export function buildForecastDays(weather: OpenMeteoWeather): ForecastDay[] {
+	const h = weather.hourly;
+	const d = weather.daily;
+	const byDate = new Map<string, DayHour[]>();
+
+	h.time.forEach((time, i) => {
+		const date = time.slice(0, 10);
+		const hour: DayHour = {
+			time,
+			hour: Number(time.slice(11, 13)),
+			temp: h.temperature_2m[i] ?? 0,
+			feels: h.apparent_temperature[i] ?? 0,
+			code: h.weathercode[i] ?? 0,
+			precip: h.precipitation?.[i] ?? 0,
+			precipProb: h.precipitation_probability?.[i],
+			wind: h.windspeed_10m?.[i] ?? 0,
+			gusts: h.windgusts_10m?.[i] ?? 0,
+			windDir: h.winddirection_10m?.[i] ?? 0,
+			humidity: h.relativehumidity_2m?.[i] ?? 0,
+			pressure: h.pressure_msl?.[i] ?? 0
+		};
+		const list = byDate.get(date) ?? [];
+		list.push(hour);
+		byDate.set(date, list);
+	});
+
+	return d.time.map((date, i) => ({
+		date,
+		code: d.weathercode[i] ?? 0,
+		min: d.temperature_2m_min[i] ?? 0,
+		max: d.temperature_2m_max[i] ?? 0,
+		precipSum: d.precipitation_sum?.[i] ?? 0,
+		precipProbMax: d.precipitation_probability_max?.[i],
+		sunrise: d.sunrise?.[i],
+		sunset: d.sunset?.[i],
+		uvMax: d.uv_index_max?.[i],
+		hours: byDate.get(date) ?? []
+	}));
+}
+
+/** гПа → мм рт. ст. (так тиск звично показують в Україні) */
+export const hpaToMmHg = (hpa: number) => Math.round(hpa * 0.750062);
+
+/** Напрямок вітру словами: звідки дме */
+export function windDirectionText(deg: number) {
+	const directions = ['Пн', 'ПнСх', 'Сх', 'ПдСх', 'Пд', 'ПдЗх', 'Зх', 'ПнЗх'];
+	return directions[Math.round(deg / 45) % 8];
+}
+
+/** Оцінка УФ-індексу за шкалою ВООЗ */
+export function uvText(uv: number) {
+	if (uv < 3) return 'низький';
+	if (uv < 6) return 'помірний';
+	if (uv < 8) return 'високий';
+	if (uv < 11) return 'дуже високий';
+	return 'екстремальний';
+}
+
+/**
+ * Чи ця година темна: до сходу або після заходу сонця.
+ * Час Open-Meteo в одному форматі (YYYY-MM-DDTHH:mm, Київ), тож рядки порівнюються напряму.
+ */
+export function isNightHour(time: string, sunrise?: string, sunset?: string): boolean {
+	if (!sunrise || !sunset) {
+		const hour = Number(time.slice(11, 13));
+		return hour < 6 || hour >= 21;
+	}
+	return time < sunrise || time >= sunset;
 }

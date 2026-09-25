@@ -25,16 +25,19 @@
 
 	// Геометрія шару, px від його верхнього краю
 	const H_EXPANDED = 204; // повна висота розгорнутої шапки
-	const H_COLLAPSED = 91; // місто + рядок + лінія + 6 px до контенту
+	const H_COLLAPSED = 91; // місто + рядок + повітря до контенту
 	const CITY_BOTTOM = 48; // низ назви міста
 	const LINE_BOTTOM = 84; // низ рядка «18° | Пасмурно»
-	const DIVIDER_GAP = 7; // лінія (1 px) + порожнеча (6 px) до контенту
+	// Мʼякий край під згорнутою шапкою: контент під ним розмивається і тане
+	const EDGE_H = 18;
 	// Висота навігації сайту (h-14): тут стоїть шар до першого виміру
 	const HEADER_H = 56;
 
 	// Назва міста: базовий кегль і мінімальний масштаб для довгих назв
 	const CITY_SIZE = 30;
 	const CITY_MIN_SCALE = 0.68;
+	// На телефоні у згорнутій шапці назва менша: 30 → 24 px
+	const CITY_COLLAPSED_SCALE_MOBILE = 0.8;
 
 	// Рядки розгорнутого блоку: позиція і висота — для зникання під назвою міста
 	const ROWS = {
@@ -52,6 +55,15 @@
 	let visible = $state(H_EXPANDED);
 	let shift = $state(0);
 	let cityScale = $state(1);
+	let mobile = $state(false);
+
+	$effect(() => {
+		const query = window.matchMedia('(max-width: 639px)');
+		const sync = () => (mobile = query.matches);
+		sync();
+		query.addEventListener('change', sync);
+		return () => query.removeEventListener('change', sync);
+	});
 
 	$effect(() => {
 		const spacer = spacerEl;
@@ -147,7 +159,12 @@
 	// Проявляється, поки розгорнуті рядки ще гаснуть: по висоті вони не перетинаються,
 	// а перекриття в часі прибирає «провал», коли в шапці лишається саме місто
 	const lineOpacity = $derived(smooth(0.55, 0.9, progress));
-	const dividerOpacity = $derived(smooth(0.7, 1, progress));
+
+	// Згортаючись, назва міста на телефоні плавно зменшується
+	const collapseScale = $derived(
+		mobile ? 1 - (1 - CITY_COLLAPSED_SCALE_MOBILE) * smooth(0, 1, progress) : 1
+	);
+	const edgeOpacity = $derived(smooth(0.7, 1, progress));
 
 	const mask = $derived(
 		`linear-gradient(to bottom, transparent ${clipTop}px, #000 ${clipTop + fadeBand}px)`
@@ -167,7 +184,8 @@
 		<h1
 			bind:this={cityEl}
 			class="absolute inset-x-4 top-[10px] overflow-hidden text-center leading-[38px] font-semibold tracking-[-0.02em] whitespace-nowrap sm:inset-x-6"
-			style="font-size: {CITY_SIZE * cityScale}px"
+			style="font-size: {CITY_SIZE *
+				cityScale}px; transform: scale({collapseScale}); transform-origin: 50% 70%"
 			title={city}
 		>
 			<span bind:this={cityTextEl} class="inline-block">{city}</span>
@@ -175,7 +193,7 @@
 
 		<!-- Згорнутий рядок: 18° | Пасмурно -->
 		<p
-			class="absolute inset-x-4 top-[50px] flex items-center justify-center gap-2 text-[17px] leading-[24px] font-medium sm:inset-x-6"
+			class="absolute inset-x-4 top-[50px] flex items-center justify-center gap-2 text-[15px] leading-[24px] font-medium sm:inset-x-6 sm:text-[17px]"
 			style="opacity: {lineOpacity}; transform: translateY({(1 - lineOpacity) * 6}px)"
 			aria-hidden="true"
 		>
@@ -210,10 +228,25 @@
 			</div>
 		</div>
 	</div>
-
-	<!-- Лінія: завжди рівно за 6 px над контентом -->
-	<div
-		class="absolute inset-x-0 top-0 border-t border-separator"
-		style="transform: translateY({visible - DIVIDER_GAP}px); opacity: {dividerOpacity}"
-	></div>
 </div>
+
+<!--
+	Мʼякий край замість лінії: смуга одразу під шапкою розмиває контент, що заходить під неї,
+	і переходить у фон. Окремий шар, бо clip-path шапки обрізав би все нижче її краю.
+-->
+<div
+	class="soft-edge pointer-events-none fixed inset-x-0 top-0 z-30"
+	style="height: {EDGE_H}px; transform: translateY({layerY + visible}px); opacity: {edgeOpacity}"
+	aria-hidden="true"
+></div>
+
+<style>
+	.soft-edge {
+		background: linear-gradient(to bottom, var(--background), transparent);
+		backdrop-filter: blur(4px);
+		-webkit-backdrop-filter: blur(4px);
+		mask-image: linear-gradient(to bottom, #000, transparent);
+		-webkit-mask-image: linear-gradient(to bottom, #000, transparent);
+		will-change: transform;
+	}
+</style>

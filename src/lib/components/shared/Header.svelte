@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { cn } from '$lib/utils';
 	import SettingsMenu from './SettingsMenu.svelte';
+	import MobileMenu from './MobileMenu.svelte';
 	import Search from '@lucide/svelte/icons/search';
 	import X from '@lucide/svelte/icons/x';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
@@ -20,21 +21,17 @@
 	// Підсвічений рядок у випадайці (для стрілок на клавіатурі)
 	let activeIndex = $state(-1);
 
-	// Популярні міста підвантажуємо один раз
-	$effect(() => {
-		let cancelled = false;
+	// Популярні міста вантажимо при першому фокусі на пошуку, а не з кожною сторінкою
+	let popularRequested = false;
 
+	function loadPopular() {
+		if (popularRequested) return;
+		popularRequested = true;
 		fetch('/api/cities/search?q=')
 			.then((r) => r.json())
-			.then((data: CitySearchResult[]) => {
-				if (!cancelled) popularCities = data;
-			})
-			.catch(() => {});
-
-		return () => {
-			cancelled = true;
-		};
-	});
+			.then((data: CitySearchResult[]) => (popularCities = data))
+			.catch(() => (popularRequested = false));
+	}
 
 	// Пошук із дебаунсом 400 мс
 	$effect(() => {
@@ -131,22 +128,28 @@
 <!-- Шапка не липка: прокручується разом зі сторінкою -->
 <header class={cn('relative z-50 bg-background', className)}>
 	<div
-		class="mx-auto grid h-14 max-w-[980px] grid-cols-[auto_1fr_auto] items-center gap-3 px-4 sm:px-6 md:grid-cols-[1fr_minmax(0,26rem)_1fr] md:gap-6"
+		class="mx-auto grid h-14 max-w-[980px] grid-cols-[auto_1fr] items-center gap-2 px-4 sm:grid-cols-[auto_1fr_auto] sm:gap-3 sm:px-6 md:grid-cols-[1fr_minmax(0,30rem)_1fr] md:gap-6"
 	>
-		<!-- Логотип і назва — одним кольором -->
+		<!-- Логотип і назва — одним кольором. На телефоні вони переїжджають у бокове меню -->
 		<a
 			href={resolve('/')}
-			class="flex items-center gap-2 justify-self-start text-foreground transition-opacity hover:opacity-70"
+			class="flex items-center gap-2 justify-self-start text-foreground transition-opacity hover:opacity-70 max-sm:hidden"
 			aria-label="Pogodka — на головну"
 		>
 			<svg class="h-6 w-auto shrink-0" viewBox="0 0 574 408" aria-hidden="true">
-				<use href="/icons.svg?v=10#favicon"></use>
+				<use href="/icons.svg?v=11#favicon"></use>
 			</svg>
-			<span class="text-[20px] font-semibold tracking-[-0.02em] max-[380px]:hidden">Pogodka</span>
+			<span class="text-[20px] font-semibold tracking-[-0.02em]">Pogodka</span>
 		</a>
 
-		<!-- Пошук: поле з хрестиком і приєднана кнопка -->
-		<div class="relative w-full">
+		<!-- Телефон: кнопка бокового меню ліворуч від пошуку -->
+		<div class="sm:hidden">
+			<MobileMenu />
+		</div>
+
+		<!-- Пошук: поле з хрестиком і приєднана кнопка.
+		     На телефоні випадайка на всю ширину шапки, а не лише під полем -->
+		<div class="w-full sm:relative">
 			<!-- Поле й кнопка — одна група: при фокусі обводка primary охоплює обидва -->
 			<form
 				role="search"
@@ -163,14 +166,17 @@
 						type="search"
 						autocomplete="off"
 						placeholder="Пошук міста"
-						onfocus={() => (focused = true)}
+						onfocus={() => {
+							focused = true;
+							loadPopular();
+						}}
 						onkeydown={onKeydown}
 						role="combobox"
 						aria-expanded={focused}
 						aria-controls="search-results"
 						aria-autocomplete="list"
 						aria-activedescendant={activeIndex >= 0 ? `city-option-${activeIndex}` : undefined}
-						class="h-9 w-full border-0 bg-background pr-8 pl-3 text-[15px] outline-none placeholder:text-tertiary focus:outline-none focus-visible:outline-none"
+						class="h-9 w-full border-0 bg-background pr-8 pl-3 text-[16px] outline-none placeholder:text-tertiary focus:outline-none focus-visible:outline-none sm:text-[15px]"
 					/>
 
 					{#if query.length > 0}
@@ -188,7 +194,7 @@
 				<button
 					type="submit"
 					aria-label="Знайти"
-					class="flex h-9 w-11 shrink-0 cursor-pointer items-center justify-center border-l border-separator bg-fill outline-none focus-visible:outline-none text-muted-foreground transition-colors hover:bg-[color-mix(in_oklab,var(--fill),var(--foreground)_6%)] hover:text-foreground"
+					class="flex h-9 w-14 shrink-0 cursor-pointer items-center justify-center border-l border-separator bg-fill text-muted-foreground transition-colors outline-none hover:bg-[color-mix(in_oklab,var(--fill),var(--foreground)_6%)] hover:text-foreground focus-visible:outline-none"
 				>
 					<Search size={17} />
 				</button>
@@ -200,7 +206,7 @@
 					id="search-results"
 					role="listbox"
 					aria-label="Результати пошуку міст"
-					class="absolute inset-x-0 top-[calc(100%+4px)] z-50 overflow-hidden rounded-md border border-separator bg-popover shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
+					class="absolute inset-x-4 top-[52px] z-50 overflow-hidden rounded-md border border-separator bg-popover shadow-[0_8px_24px_rgba(0,0,0,0.12)] sm:inset-x-0 sm:top-[calc(100%+4px)]"
 				>
 					{#if loading}
 						<p class="flex items-center gap-2 px-3 py-3 text-[15px] text-muted-foreground">
@@ -240,8 +246,8 @@
 			{/if}
 		</div>
 
-		<!-- Налаштування -->
-		<div class="justify-self-end">
+		<!-- Налаштування — на планшеті й компʼютері; на телефоні вони в боковому меню -->
+		<div class="justify-self-end max-sm:hidden">
 			<SettingsMenu />
 		</div>
 	</div>

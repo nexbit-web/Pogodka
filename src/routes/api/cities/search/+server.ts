@@ -1,5 +1,6 @@
 import { json } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
+import { rankSearchResults } from '$lib/server/cityRank';
 import type { CitySearchResult } from '$lib/types';
 import type { RequestHandler } from './$types';
 
@@ -32,7 +33,8 @@ let popularCitiesCache: CitySearchResult[] | null = null;
 let popularCacheTime = 0;
 
 export const GET: RequestHandler = async ({ url }) => {
-	const query = url.searchParams.get('q')?.trim();
+	// Довжина обмежена: назв довших за 64 символи немає, а довгий рядок — зайве навантаження на БД
+	const query = url.searchParams.get('q')?.trim().slice(0, 64);
 
 	// Без запиту — повертаємо популярні міста
 	if (!query || query.length < 2) {
@@ -43,10 +45,15 @@ export const GET: RequestHandler = async ({ url }) => {
 				where: { slug: { in: POPULAR_SLUGS } },
 				select: CITY_FIELDS
 			});
-			// Сортуємо в потрібному порядку
-			cities.sort((a, b) => POPULAR_SLUGS.indexOf(a.slug) - POPULAR_SLUGS.indexOf(b.slug));
-
-			popularCitiesCache = cities;
+			// Слаги в базі не унікальні (сім «zaporizhzhia»): лишаємо по одному місту
+			// на слаг — обласний центр — і сортуємо в заданому порядку
+			popularCitiesCache = POPULAR_SLUGS.flatMap((slug) =>
+				rankSearchResults(
+					cities.filter((c) => c.slug === slug),
+					'',
+					1
+				)
+			);
 			popularCacheTime = now;
 		}
 
@@ -66,11 +73,12 @@ export const GET: RequestHandler = async ({ url }) => {
 			]
 		},
 		select: CITY_FIELDS,
-		take: 20,
-		orderBy: { nameEn: 'asc' }
+		// Беремо із запасом: «Оде» має понад 20 збігів, а Одеса мусить потрапити в підказки
+		take: 200,
+		orderBy: { id: 'asc' }
 	});
 
-	return json(cities, {
+	return json(rankSearchResults(cities, query), {
 		headers: {
 			// Короткий кеш для пошуку
 			'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'

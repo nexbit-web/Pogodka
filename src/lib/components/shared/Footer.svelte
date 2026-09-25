@@ -12,7 +12,7 @@
 	let { breadcrumb, region }: Props = $props();
 </script>
 
-<footer class="mt-20 bg-fill" itemscope itemtype="https://schema.org/WPFooter">
+<footer class="mt-12 bg-footer sm:mt-20" itemscope itemtype="https://schema.org/WPFooter">
 	<div class="mx-auto max-w-[980px] px-4 sm:px-6">
 		<!-- Ланцюжок навігації: іконка проєкту → розділ → поточна сторінка -->
 		<nav class="py-5" aria-label="Навігаційний ланцюжок">
@@ -24,7 +24,7 @@
 						aria-label="Pogodka — на головну"
 					>
 						<svg class="h-4 w-auto" viewBox="0 0 574 408" aria-hidden="true">
-							<use href="/icons.svg?v=10#favicon"></use>
+							<use href="/icons.svg?v=11#favicon"></use>
 						</svg>
 					</a>
 				</li>
@@ -98,21 +98,24 @@
 					<span itemprop="name">Pogodka.org</span>. Усі права захищено.
 				</p>
 
-				<nav class="flex items-center gap-x-3" aria-label="Правова інформація">
+				<nav
+					class="flex flex-wrap items-center gap-x-4 gap-y-1 whitespace-nowrap sm:gap-x-3"
+					aria-label="Правова інформація"
+				>
 					<a
 						href={resolve('/privacypolicy')}
 						class="transition-colors hover:text-foreground hover:underline"
 					>
 						Політика конфіденційності
 					</a>
-					<span class="text-separator" aria-hidden="true">|</span>
+					<span class="text-separator max-sm:hidden" aria-hidden="true">|</span>
 					<a
 						href={resolve('/agreement')}
 						class="transition-colors hover:text-foreground hover:underline"
 					>
 						Умови використання
 					</a>
-					<span class="text-separator" aria-hidden="true">|</span>
+					<span class="text-separator max-sm:hidden" aria-hidden="true">|</span>
 					<a
 						href={resolve('/support')}
 						class="transition-colors hover:text-foreground hover:underline"

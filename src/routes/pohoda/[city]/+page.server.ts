@@ -38,7 +38,7 @@ export const load: PageServerLoad = async ({ params }) => {
 			windSpeed: {
 				'@type': 'QuantitativeValue',
 				value: currentWeather.wind,
-				unitCode: 'KMH',
+				unitCode: 'MTS',
 				name: 'Швидкість вітру'
 			},
 			humidity: {

@@ -1,17 +1,15 @@
 <script lang="ts">
 	import Container from './Container.svelte';
 	import WeatherHeadline from './WeatherHeadline.svelte';
-	import HourlyWeather from './HourlyWeather.svelte';
-	import WeeklyForecast from './WeeklyForecast.svelte';
-	import WeatherDetails from './WeatherDetails.svelte';
-	import { buildWeeklyDays, findCurrentHourIndex, getCurrentWeather } from '$lib/weather';
+	import DayForecast from './DayForecast.svelte';
+	import PartnerBanner from './PartnerBanner.svelte';
+	import { findCurrentHourIndex, getCurrentWeather } from '$lib/weather';
 	import type { WeatherApiResponse } from '$lib/types';
 
 	let { data }: { data: WeatherApiResponse } = $props();
 
 	const weather = $derived(data.weather);
 	const current = $derived(getCurrentWeather(weather, findCurrentHourIndex(weather)));
-	const weeklyDays = $derived(buildWeeklyDays(weather));
 </script>
 
 <Container>
@@ -22,16 +20,10 @@
 		isFelt={current.feels}
 	/>
 
-	<!-- Секції розділені повітрям і волосяною лінією, без рамок -->
-	<div class="py-10">
-		<HourlyWeather days={weather} />
+	<!-- Увесь прогноз — в одному місці: стрічка днів і деталі вибраного дня -->
+	<div class="pt-4 pb-10 sm:py-5">
+		<DayForecast {weather} />
 	</div>
 
-	<div class="border-t border-separator py-10">
-		<WeeklyForecast days={weeklyDays} currentTemp={current.temp} />
-	</div>
-
-	<div class="border-t border-separator py-10">
-		<WeatherDetails {current} />
-	</div>
+	<PartnerBanner />
 </Container>

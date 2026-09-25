@@ -5,7 +5,7 @@ import type { RequestHandler } from './$types';
 // Публічний ендпоінт погоди. Сторінки використовують getCityWeather напряму,
 // цей роут лишається для зовнішніх споживачів.
 export const GET: RequestHandler = async ({ url }) => {
-	const cityName = url.searchParams.get('city');
+	const cityName = url.searchParams.get('city')?.trim().slice(0, 100);
 
 	if (!cityName) {
 		return json({ error: 'Не вказано місто' }, { status: 400 });

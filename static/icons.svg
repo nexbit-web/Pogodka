@@ -24,6 +24,27 @@
 <path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/>
 <path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>
 </symbol>
+<!-- ясна ніч: місяць і зорі -->
+<symbol id="clear-night" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M10.5 5a6.5 6.5 0 0 0 8.5 8.5A7.5 7.5 0 1 1 10.5 5Z" fill="currentColor"/>
+<path d="M18 2.5v3"/>
+<path d="M16.5 4h3"/>
+<path d="M21.5 8.5h.01"/>
+</symbol>
+<!-- мінлива хмарність вночі -->
+<symbol id="partly-cloudy-night" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M18.376 14.512a6 6 0 0 0 3.461-4.127c.148-.625-.659-.97-1.248-.714a4 4 0 0 1-5.259-5.26c.255-.589-.09-1.395-.716-1.248a6 6 0 0 0-4.594 5.36"/>
+<path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>
+<path d="M4.5 3v2"/>
+<path d="M3.5 4h2"/>
+</symbol>
+<!-- мряка вночі -->
+<symbol id="drizzle-night" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<path d="M18.376 14.512a6 6 0 0 0 3.461-4.127c.148-.625-.659-.97-1.248-.714a4 4 0 0 1-5.259-5.26c.255-.589-.09-1.395-.716-1.248a6 6 0 0 0-4.594 5.36"/>
+<path d="M3 20a5 5 0 1 1 8.9-4H13a3 3 0 0 1 2 5.24"/>
+<path d="M11 20v2"/>
+<path d="M7 19v2"/>
+</symbol>
 <!-- хмарно -->
 <symbol id="cloudy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>

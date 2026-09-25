@@ -7,7 +7,7 @@ node_modules
 .wrangler
 /.svelte-kit
 /build
-
+cities.json
 # OS
 .DS_Store
 Thumbs.db
@@ -21,3 +21,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Звіти покриття тестами
+coverage

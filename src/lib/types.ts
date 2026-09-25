@@ -24,6 +24,8 @@ export interface OpenMeteoWeather {
 		pressure_msl: number[];
 		surface_pressure?: number[];
 		wind_speed_10m?: number[];
+		// Можуть бути відсутні у старому кеші
+		precipitation_probability?: number[];
 	};
 	daily: {
 		time: string[];
@@ -31,6 +33,10 @@ export interface OpenMeteoWeather {
 		temperature_2m_min: number[];
 		precipitation_sum: number[];
 		weathercode: number[];
+		precipitation_probability_max?: number[];
+		sunrise?: string[];
+		sunset?: string[];
+		uv_index_max?: number[];
 	};
 }
 
@@ -66,4 +72,34 @@ export interface CitySearchResult {
 	region: string;
 	latitude: number;
 	longitude: number;
+}
+
+/** Одна точка погодинного прогнозу всередині дня */
+export interface DayHour {
+	time: string;
+	hour: number;
+	temp: number;
+	feels: number;
+	code: number;
+	precip: number;
+	precipProb?: number;
+	wind: number;
+	gusts: number;
+	windDir: number;
+	humidity: number;
+	pressure: number;
+}
+
+/** День прогнозу з підсумками та погодинними даними */
+export interface ForecastDay {
+	date: string;
+	code: number;
+	min: number;
+	max: number;
+	precipSum: number;
+	precipProbMax?: number;
+	sunrise?: string;
+	sunset?: string;
+	uvMax?: number;
+	hours: DayHour[];
 }
