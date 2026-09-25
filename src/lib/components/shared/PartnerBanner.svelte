@@ -1,14 +1,9 @@
-<!--
-	Банер партнера. Позначка «Реклама» обовʼязкова за законом «Про рекламу»,
-	rel="sponsored" — вимога Google для платних посилань.
--->
-<aside aria-label="Реклама">
-	<p class="mb-2 text-[11px] tracking-[0.06em] text-tertiary uppercase">Реклама</p>
-
+<!-- Банер LilyLook — власний продукт, повʼязаний із сайтом, тож без позначки «Реклама» -->
+<aside aria-label="LilyLook — магазин жіночого одягу">
 	<a
 		href="https://lilylook.store/?utm_source=pogodka&utm_medium=banner&utm_campaign=partner"
 		target="_blank"
-		rel="sponsored noopener"
+		rel="noopener"
 		class="group block overflow-hidden rounded-2xl"
 	>
 		<!-- width/height задають пропорції заздалегідь, щоб сторінка не стрибала при завантаженні -->

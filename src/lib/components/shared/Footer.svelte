@@ -51,7 +51,8 @@
 				</li>
 
 				<!-- Область → місто: від загального до конкретного, як у ланцюжках Apple -->
-				{#each [region, breadcrumb].filter(Boolean) as crumb, idx (idx)}
+				<!-- Для Києва область і місто збігаються — показуємо один раз -->
+				{#each [...new Set([region, breadcrumb].filter(Boolean))] as crumb, idx (idx)}
 					<li aria-hidden="true" class="flex items-center">
 						<svg
 							class="h-2.5 w-2.5 text-tertiary"

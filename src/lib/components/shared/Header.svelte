@@ -87,7 +87,7 @@
 	}
 
 	function cityHref(city: CitySearchResult) {
-		return resolve('/pohoda/[city]', { city: city.slug });
+		return resolve('/pohoda/[city]', { city: city.path ?? city.slug });
 	}
 
 	// Enter або кнопка пошуку — відкриваємо підсвічене місто, інакше перше в списку

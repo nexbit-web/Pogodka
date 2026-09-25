@@ -4,6 +4,8 @@ export interface WeatherApiResponse {
 	kraina: string;
 	latitude: number;
 	longitude: number;
+	/** Канонічна адреса: /pohoda/{path} */
+	path: string;
 	// Сира відповідь Open-Meteo (hourly / daily масиви)
 	weather: OpenMeteoWeather;
 }
@@ -66,6 +68,8 @@ export interface WeeklyDay {
 export interface CitySearchResult {
 	id: number;
 	slug: string;
+	/** Канонічна адреса сторінки; у однойменних населених пунктів — з областю */
+	path: string;
 	nameUa: string;
 	nameRu: string;
 	nameEn: string;

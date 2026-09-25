@@ -188,7 +188,10 @@
 				cityScale}px; transform: scale({collapseScale}); transform-origin: 50% 70%"
 			title={city}
 		>
-			<span bind:this={cityTextEl} class="inline-block">{city}</span>
+			<!-- Для пошуковиків і скрінрідерів заголовок — «Погода Харків» -->
+			<span class="sr-only">Погода&nbsp;</span><span bind:this={cityTextEl} class="inline-block"
+				>{city}</span
+			>
 		</h1>
 
 		<!-- Згорнутий рядок: 18° | Пасмурно -->

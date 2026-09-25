@@ -35,7 +35,7 @@
 	import { clock, dayOfMonth, isWeekend, kyivNow, monthName, weekdayName } from '$lib/date';
 	import type { OpenMeteoWeather } from '$lib/types';
 
-	let { weather }: { weather: OpenMeteoWeather } = $props();
+	let { weather, city = '' }: { weather: OpenMeteoWeather; city?: string } = $props();
 
 	const days = $derived(buildForecastDays(weather));
 	let selected = $state(0);
@@ -84,7 +84,8 @@
 		id="forecast-title"
 		class="text-[24px] leading-tight font-semibold tracking-[-0.02em] sm:text-[28px]"
 	>
-		Прогноз на 7 днів. <span class="text-tertiary">Оберіть день.</span>
+		{city ? `Погода ${city} на 7 днів.` : 'Прогноз на 7 днів.'}
+		<span class="text-tertiary">Оберіть день.</span>
 	</h2>
 
 	<!-- Стрічка днів: день тижня, число, місяць, іконка, мін/макс -->

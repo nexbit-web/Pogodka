@@ -49,14 +49,17 @@ describe('Footer', () => {
 });
 
 describe('PartnerBanner', () => {
-	it('позначений як реклама і веде на магазин партнера', () => {
+	it('веде на магазин LilyLook у новій вкладці, без позначки «Реклама»', () => {
 		render(PartnerBanner);
 
-		expect(screen.getByRole('complementary', { name: 'Реклама' })).toHaveTextContent('Реклама');
+		// Власний продукт — без позначки «Реклама»
+		expect(screen.getByRole('complementary', { name: /LilyLook/ })).not.toHaveTextContent(
+			'Реклама'
+		);
 		const link = screen.getByRole('link');
 		expect(new URL(link.getAttribute('href')!).origin).toBe('https://lilylook.store');
 		expect(link).toHaveAttribute('target', '_blank');
-		expect(link.getAttribute('rel')).toContain('sponsored');
+		expect(link.getAttribute('rel')).not.toContain('sponsored');
 		expect(link.getAttribute('rel')).toContain('noopener');
 	});
 

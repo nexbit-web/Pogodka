@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { error } from '@sveltejs/kit';
+import { error, isRedirect } from '@sveltejs/kit';
 import { makeApiResponse } from '../fixtures/forecast';
 
 const { prisma, weather, support } = vi.hoisted(() => ({
@@ -20,6 +20,17 @@ const event = (init: { url?: string; params?: Record<string, string>; request?: 
 		params: init.params ?? {},
 		request: init.request
 	}) as never;
+
+const row = (id: number, slug: string, nameUa: string, region: string) => ({
+	id,
+	slug,
+	nameUa,
+	nameRu: nameUa,
+	nameEn: slug,
+	region,
+	latitude: 50,
+	longitude: 30
+});
 
 beforeEach(() => {
 	vi.resetModules();
@@ -62,46 +73,32 @@ describe('GET /api/pogoda', () => {
 		weather.getCityWeather.mockImplementation(() => error(404, 'Місто не знайдено'));
 		await expect(
 			(await load())(event({ url: 'https://x/api/pogoda?city=zzz' }))
-		).rejects.toMatchObject({
-			status: 404
-		});
+		).rejects.toMatchObject({ status: 404 });
 	});
 });
 
 describe('GET /api/cities/search', () => {
 	const load = async () => (await import('../../src/routes/api/cities/search/+server')).GET;
-	const cities = [
-		{ id: 1, slug: 'lviv', nameUa: 'Львів', region: 'Львівська область' },
-		{ id: 2, slug: 'kyiv', nameUa: 'Київ', region: 'Київська область' },
-		{ id: 3, slug: 'kharkiv', nameUa: 'Харків', region: 'Харківська область' }
-	];
 
-	it('без запиту — популярні міста в заданому порядку, з кешем CDN', async () => {
-		prisma.city.findMany.mockResolvedValue([...cities]);
+	it('без запиту — популярні міста: столиця першою, по одному на слаг, з кешем CDN', async () => {
+		prisma.city.findMany.mockResolvedValue([
+			row(12405, 'kyiv', 'Київ', 'Миколаївська область'),
+			row(2732, 'lviv', 'Львів', 'Дніпропетровська область'),
+			row(11272, 'lviv', 'Львів', 'Львівська область'),
+			row(19753, 'kharkiv', 'Харків', 'Харківська область')
+		]);
 
 		const res = await (await load())(event({ url: 'https://x/api/cities/search?q=' }));
 		const body = await res.json();
 
-		expect(body.map((c: { slug: string }) => c.slug)).toEqual(['kyiv', 'kharkiv', 'lviv']);
+		// Столиця (id 0), а не село Київ у Миколаївській області
+		expect(body.map((c: { id: number }) => c.id)).toEqual([0, 19753, 11272]);
+		expect(body.every((c: { path: string; slug: string }) => c.path === c.slug)).toBe(true);
 		expect(res.headers.get('Cache-Control')).toContain('s-maxage=3600');
 	});
 
-	it('з однакових слагів лишає по одному місту — обласний центр', async () => {
-		prisma.city.findMany.mockResolvedValue([
-			{ id: 2732, slug: 'lviv', nameUa: 'Львів', region: 'Дніпропетровська область' },
-			{ id: 11272, slug: 'lviv', nameUa: 'Львів', region: 'Львівська область' },
-			{ id: 12473, slug: 'lviv', nameUa: 'Львів', region: 'Миколаївська область' },
-			{ id: 19753, slug: 'kharkiv', nameUa: 'Харків', region: 'Харківська область' }
-		]);
-
-		const res = await (await load())(event({ url: 'https://x/api/cities/search' }));
-		const body = await res.json();
-
-		expect(body.map((c: { id: number }) => c.id)).toEqual([19753, 11272]);
-	});
-
 	it('популярні міста кешуються в памʼяті — база не смикається на кожен запит', async () => {
-		prisma.city.findMany.mockResolvedValue([...cities]);
+		prisma.city.findMany.mockResolvedValue([]);
 		const GET = await load();
 
 		await GET(event({ url: 'https://x/api/cities/search' }));
@@ -111,31 +108,40 @@ describe('GET /api/cities/search', () => {
 		expect(prisma.city.findMany).toHaveBeenCalledTimes(1);
 	});
 
-	it('шукає за початком будь-якої назви', async () => {
-		prisma.city.findMany.mockResolvedValue([cities[0]]);
+	it('шукає за початком будь-якої назви і дає однойменним адресу з областю', async () => {
+		prisma.city.findMany.mockResolvedValue([
+			row(2732, 'lviv', 'Львів', 'Дніпропетровська область'),
+			row(11272, 'lviv', 'Львів', 'Львівська область')
+		]);
 
-		const res = await (
-			await load()
-		)(event({ url: 'https://x/api/cities/search?q=%D0%9B%D1%8C%D0%B2' }));
+		const res = await (await load())(event({ url: 'https://x/api/cities/search?q=Льв' }));
+		const body = await res.json();
 
-		expect(await res.json()).toEqual([cities[0]]);
+		expect(body.map((c: { id: number; path: string }) => [c.id, c.path])).toEqual([
+			[11272, 'lviv'],
+			[2732, 'lviv-dnipropetrovska']
+		]);
 		const args = prisma.city.findMany.mock.calls[0][0];
 		expect(args.take).toBe(200);
 		expect(args.where.OR[0]).toEqual({ nameUa: { startsWith: 'Льв', mode: 'insensitive' } });
 		expect(res.headers.get('Cache-Control')).toContain('s-maxage=60');
 	});
 
+	it('на «Киї» першою підказує столицю', async () => {
+		prisma.city.findMany.mockResolvedValue([row(12405, 'kyiv', 'Київ', 'Миколаївська область')]);
+
+		const res = await (await load())(event({ url: 'https://x/api/cities/search?q=Киї' }));
+		const body = await res.json();
+
+		expect(body[0]).toMatchObject({ id: 0, path: 'kyiv' });
+		expect(body[1]).toMatchObject({ id: 12405, path: 'kyiv-mykolaivska' });
+	});
+
 	it('Одеса йде першою серед збігів «Оде», а видача обмежена 20 містами', async () => {
-		const many = Array.from({ length: 30 }, (_, i) => ({
-			id: i + 1,
-			slug: `ode-${i}`,
-			nameUa: `Одерадівка${i}`,
-			region: 'Тернопільська область'
-		}));
-		prisma.city.findMany.mockResolvedValue([
-			...many,
-			{ id: 99, slug: 'odesa', nameUa: 'Одеса', region: 'Одеська область' }
-		]);
+		const many = Array.from({ length: 30 }, (_, i) =>
+			row(i + 1, `ode-${i}`, `Одерадівка${i}`, 'Тернопільська область')
+		);
+		prisma.city.findMany.mockResolvedValue([...many, row(99, 'odesa', 'Одеса', 'Одеська область')]);
 
 		const res = await (await load())(event({ url: 'https://x/api/cities/search?q=Оде' }));
 		const body = await res.json();
@@ -193,32 +199,63 @@ describe('POST /api/support', () => {
 	});
 });
 
-describe('Sitemap', () => {
-	it('індекс ділить міста на файли по 5000', async () => {
-		prisma.city.count.mockResolvedValue(12001);
-		const { GET } = await import('../../src/routes/api/sitemap.xml/+server');
+describe('Карта сайту', () => {
+	// 12 001 населений пункт у базі + столиця + головна
+	const manyCities = () =>
+		Array.from({ length: 12001 }, (_, i) =>
+			row(i + 1, `city-${i + 1}`, `Місто${i + 1}`, 'Київська область')
+		);
+
+	it('/sitemap.xml — індекс файлів по 10 000 адрес, поза закритим /api/', async () => {
+		prisma.city.findMany.mockResolvedValue(manyCities());
+		const { GET } = await import('../../src/routes/sitemap.xml/+server');
 
 		const res = await GET(event({}));
 		const xml = await res.text();
 
-		expect(res.headers.get('Content-Type')).toBe('application/xml');
-		expect(xml.match(/<sitemap>/g)).toHaveLength(3);
-		expect(xml).toContain('https://www.pogodka.org/api/sitemap/3');
+		expect(res.headers.get('Content-Type')).toContain('application/xml');
+		expect(xml.match(/<sitemap>/g)).toHaveLength(2);
+		expect(xml).toContain('<loc>https://www.pogodka.org/sitemaps/2.xml</loc>');
+		expect(xml).not.toContain('/api/');
 	});
 
-	it('сторінка мапи містить URL міст', async () => {
-		prisma.city.findMany.mockResolvedValue([{ slug: 'lviv' }, { slug: 'kyiv' }]);
-		const { GET } = await import('../../src/routes/api/sitemap/[index]/+server');
+	it('перший файл: головна, столиця, далі населені пункти — без дублів', async () => {
+		prisma.city.findMany.mockResolvedValue([
+			row(2732, 'lviv', 'Львів', 'Дніпропетровська область'),
+			row(11272, 'lviv', 'Львів', 'Львівська область'),
+			row(12405, 'kyiv', 'Київ', 'Миколаївська область')
+		]);
+		const { GET } = await import('../../src/routes/sitemaps/[file]/+server');
 
-		const res = await GET(event({ params: { index: '2' } }));
-		const xml = await res.text();
+		const xml = await (await GET(event({ params: { file: '1.xml' } }))).text();
+		const locs = [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1]);
 
-		expect(xml).toContain('<loc>https://www.pogodka.org/pohoda/lviv</loc>');
-		expect(prisma.city.findMany.mock.calls[0][0]).toMatchObject({ skip: 5000, take: 5000 });
+		expect(locs).toEqual([
+			'https://www.pogodka.org',
+			'https://www.pogodka.org/pohoda/kyiv',
+			'https://www.pogodka.org/pohoda/lviv-dnipropetrovska',
+			'https://www.pogodka.org/pohoda/lviv',
+			'https://www.pogodka.org/pohoda/kyiv-mykolaivska'
+		]);
+		expect(new Set(locs).size).toBe(locs.length);
 	});
 
-	it.each(['0', '-1', 'abc', '1.5'])('невідома сторінка «%s» — 404', async (index) => {
-		const { GET } = await import('../../src/routes/api/sitemap/[index]/+server');
-		await expect(GET(event({ params: { index } }))).rejects.toMatchObject({ status: 404 });
+	it.each(['0.xml', '3.xml', 'abc', '1', '-1.xml'])('невідомий файл «%s» — 404', async (file) => {
+		prisma.city.findMany.mockResolvedValue(manyCities());
+		const { GET } = await import('../../src/routes/sitemaps/[file]/+server');
+		await expect(GET(event({ params: { file } }))).rejects.toMatchObject({ status: 404 });
+	});
+
+	it('старі адреси /api/sitemap… переадресовують на /sitemap.xml', async () => {
+		const index = await import('../../src/routes/api/sitemap.xml/+server');
+		const page = await import('../../src/routes/api/sitemap/[index]/+server');
+
+		for (const handler of [index.GET, page.GET]) {
+			const err = await Promise.resolve()
+				.then(() => handler(event({ params: { index: '1' } })))
+				.catch((e: unknown) => e);
+			expect(isRedirect(err)).toBe(true);
+			expect(err).toMatchObject({ status: 301, location: '/sitemap.xml' });
+		}
 	});
 });

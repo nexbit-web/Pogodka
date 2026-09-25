@@ -4,7 +4,6 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 
-		<!-- Колір системного UI під тему сторінки -->
 		<!-- Колір смуги браузера; при перемиканні теми його оновлює mode-watcher -->
 		<meta name="theme-color" content="#ffffff" />
 
@@ -26,11 +25,9 @@
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap"
 		/>
 
-		<meta name="category" content="weather" />
-		<meta
-			name="robots"
-			content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
-		/>
+		<!-- robots, canonical і соцмережі — у компоненті Seo кожної сторінки -->
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<meta name="apple-mobile-web-app-title" content="Pogodka" />
 
 		%sveltekit.head%
 	</head>

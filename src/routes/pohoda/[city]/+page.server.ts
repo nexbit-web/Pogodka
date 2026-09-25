@@ -1,75 +1,79 @@
-import { DateTime } from 'luxon';
-import { findCity, getCityWeather } from '$lib/server/weather';
-import { buildWeeklyDays, findCurrentHourIndex, getCurrentWeather, KYIV_TZ } from '$lib/weather';
-import { SITE_URL } from '$lib/config';
+import { error, redirect } from '@sveltejs/kit';
+import { findCity, getForecast } from '$lib/server/weather';
+import { nearbyCities } from '$lib/server/cities';
+import { buildWeeklyDays, findCurrentHourIndex, getCurrentWeather } from '$lib/weather';
+import {
+	breadcrumbLd,
+	cityDescription,
+	cityPageLd,
+	cityTitle,
+	graph,
+	shortRegion,
+	type CitySeoInput
+} from '$lib/seo';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params }) => {
-	const cityName = decodeURIComponent(params.city);
+// Сторінку кешує CDN: 5 хвилин свіжа, ще пів години віддається, поки оновлюється у фоні.
+// Швидка відповідь сервера — пряма вимога Core Web Vitals і краулінгового бюджету.
+const CACHE = 'public, max-age=0, s-maxage=300, stale-while-revalidate=1800';
 
-	// getCityWeather сам кине 404, якщо міста немає в БД
-	const [weather, cityRecord] = await Promise.all([getCityWeather(cityName), findCity(cityName)]);
+export const load: PageServerLoad = async ({ params, setHeaders }) => {
+	const city = await findCity(params.city);
+	if (!city) error(404, 'Населений пункт не знайдено');
 
-	const titleCity = cityRecord?.nameUa ?? cityName;
-	const slug = cityRecord?.slug ?? cityName;
+	// Одна сторінка — одна адреса: /pohoda/Lviv і /pohoda/Львів ведуть на /pohoda/lviv
+	if (params.city !== city.path) redirect(301, `/pohoda/${encodeURIComponent(city.path)}`);
 
-	// JSON-LD для пошукових систем
-	const kievNow = DateTime.now().setZone(KYIV_TZ);
-	const currentWeather = getCurrentWeather(weather.weather, findCurrentHourIndex(weather.weather));
-	const weeklyDays = buildWeeklyDays(weather.weather);
+	const [weather, nearby] = await Promise.all([
+		getForecast(city),
+		// Блок «Погода поруч» — не критичний: без нього сторінка все одно має відкритися
+		nearbyCities(city).catch((err) => {
+			console.error(`[nearby] Не вдалося знайти сусідів для "${city.path}":`, err);
+			return [];
+		})
+	]);
 
-	const jsonLd = {
-		'@context': 'https://schema.org',
-		'@type': 'City',
-		name: weather.misto,
-		url: `${SITE_URL}/pohoda/${slug}`,
+	setHeaders({ 'cache-control': CACHE });
 
-		// Поточна погода
-		weather: {
-			'@type': 'WeatherForecast',
-			datePosted: kievNow.toISO(),
-			description: `Поточний прогноз погоди в місті ${weather.misto}`,
-			temperature: {
-				'@type': 'QuantitativeValue',
-				value: currentWeather.temp,
-				unitCode: 'CEL',
-				name: 'Температура'
-			},
-			windSpeed: {
-				'@type': 'QuantitativeValue',
-				value: currentWeather.wind,
-				unitCode: 'MTS',
-				name: 'Швидкість вітру'
-			},
-			humidity: {
-				'@type': 'QuantitativeValue',
-				value: currentWeather.humidity,
-				unitCode: 'P1',
-				name: 'Вологість'
-			},
-			feelsLike: {
-				'@type': 'QuantitativeValue',
-				value: currentWeather.feels,
-				unitCode: 'CEL',
-				name: 'Відчувається як'
-			}
-		},
+	const current = getCurrentWeather(weather.weather, findCurrentHourIndex(weather.weather));
+	const tomorrow = buildWeeklyDays(weather.weather)[1];
 
-		// Прогноз на 7 днів
-		dailyForecast: weeklyDays.map((day) => ({
-			'@type': 'WeatherForecast',
-			datePosted: day.date,
-			description: `Прогноз погоди на ${day.date} в місті ${weather.misto}`,
-			temperature: {
-				'@type': 'QuantitativeValue',
-				minValue: day.day.mintemp_c,
-				maxValue: day.day.maxtemp_c,
-				unitCode: 'CEL',
-				name: 'Температура (мін/макс)'
-			},
-			weatherCode: day.day.code
-		}))
+	const seoInput: CitySeoInput = {
+		name: city.nameUa,
+		region: city.region,
+		path: city.path,
+		slug: city.slug,
+		now: { temp: current.temp, feels: current.feels, code: current.code },
+		tomorrow: tomorrow && { min: tomorrow.day.mintemp_c, max: tomorrow.day.maxtemp_c }
 	};
+	const title = cityTitle(seoInput);
+	const description = cityDescription(seoInput);
 
-	return { weather, titleCity, slug, jsonLd };
+	const jsonLd = graph(
+		breadcrumbLd([
+			{ name: 'Прогноз погоди', path: '/' },
+			{ name: `Погода ${city.nameUa}`, path: `/pohoda/${city.path}` }
+		]),
+		cityPageLd({
+			name: city.nameUa,
+			region: city.region,
+			path: city.path,
+			title,
+			description,
+			latitude: city.latitude,
+			longitude: city.longitude,
+			updated: new Date().toISOString()
+		})
+	);
+
+	return {
+		weather,
+		city: { name: city.nameUa, region: city.region, path: city.path },
+		nearby: nearby.map((c) => ({
+			name: c.nameUa,
+			path: c.path,
+			note: c.region === city.region ? `${c.distance} км` : shortRegion(c.region)
+		})),
+		seo: { title, description, jsonLd }
+	};
 };

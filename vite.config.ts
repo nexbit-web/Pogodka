@@ -13,7 +13,9 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter()
+			adapter: adapter(),
+			// Посилання від кореня (/pohoda/lviv), а не відносні (./pohoda/lviv): однакові на кожній сторінці
+			paths: { relative: false }
 		})
 	],
 

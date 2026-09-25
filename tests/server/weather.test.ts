@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { isHttpError } from '@sveltejs/kit';
-import { makeApiResponse, makeForecast } from '../fixtures/forecast';
+import { makeForecast } from '../fixtures/forecast';
 
 const { prisma, redis } = vi.hoisted(() => ({
 	prisma: { city: { findMany: vi.fn() } },
@@ -10,7 +10,7 @@ const { prisma, redis } = vi.hoisted(() => ({
 vi.mock('$lib/server/prisma', () => ({ default: prisma }));
 vi.mock('$lib/server/upstash', () => ({ redisGet: redis.get, redisSet: redis.set }));
 
-const { buildOpenMeteoUrl, findCity, getCityWeather, isValidForecast, pickBestCity } =
+const { buildOpenMeteoUrl, findCity, getCityWeather, getForecast, isValidForecast, pickBestCity } =
 	await import('$lib/server/weather');
 
 const city = (id: number, slug: string, nameUa: string, region: string, extra = {}) => ({
@@ -32,6 +32,20 @@ const LVIV_DUPLICATES = [
 	city(11272, 'lviv', 'Львів', 'Львівська область'),
 	city(12473, 'lviv', 'Львів', 'Миколаївська область')
 ];
+
+/** База: перший запит — пошук кандидатів, наступні — група однойменних за слагом */
+function database(rows: ReturnType<typeof city>[]) {
+	prisma.city.findMany.mockImplementation(({ where }: { where: Record<string, unknown> }) => {
+		if (typeof where.slug === 'string')
+			return Promise.resolve(rows.filter((r) => r.slug === where.slug));
+		const q = String(
+			((where.OR as Record<string, { equals: string }>[])[0].slug as { equals: string }).equals
+		).toLowerCase();
+		return Promise.resolve(
+			rows.filter((r) => [r.slug, r.nameUa, r.nameEn, r.nameRu].some((n) => n.toLowerCase() === q))
+		);
+	});
+}
 
 const fetchMock = vi.fn();
 
@@ -61,13 +75,13 @@ describe('pickBestCity', () => {
 	});
 
 	it.each([
-		['Одеса', 'Одеська область'],
-		['Суми', 'Сумська область'],
+		['Луцьк', 'Волинська область'],
+		['Ужгород', 'Закарпатська область'],
+		['Кропивницький', 'Кіровоградська область'],
 		['Рівне', 'Рівненська область'],
-		['Дніпро', 'Дніпропетровська область'],
-		['Запоріжжя', 'Запорізька область']
-	])('%s — центр області «%s»', (name, region) => {
-		const cities = [city(1, 'x', name, 'Волинська область'), city(2, 'x', name, region)];
+		['Дніпро', 'Дніпропетровська область']
+	])('%s — центр області «%s», навіть якщо назви не співзвучні', (name, region) => {
+		const cities = [city(1, 'x', name, 'Сумська область'), city(2, 'x', name, region)];
 		expect(pickBestCity(cities, name)?.region).toBe(region);
 	});
 
@@ -93,23 +107,61 @@ describe('pickBestCity', () => {
 });
 
 describe('findCity', () => {
-	it('шукає за всіма назвами без урахування регістру і прибирає зайві поля', async () => {
-		prisma.city.findMany.mockResolvedValue(LVIV_DUPLICATES);
-
-		const found = await findCity('  Lviv ');
-
-		expect(found).toEqual({
+	it('обласний центр отримує коротку адресу', async () => {
+		database(LVIV_DUPLICATES);
+		expect(await findCity('lviv')).toEqual({
 			id: 11272,
 			slug: 'lviv',
 			nameUa: 'Львів',
 			region: 'Львівська область',
 			countryUa: 'Україна',
 			latitude: 49.8,
-			longitude: 24
+			longitude: 24,
+			path: 'lviv'
 		});
-		const { where } = prisma.city.findMany.mock.calls[0][0];
-		expect(where.OR).toHaveLength(4);
-		expect(where.OR[0]).toEqual({ slug: { equals: 'Lviv', mode: 'insensitive' } });
+	});
+
+	it('знаходить за назвою будь-якою мовою і віддає канонічну адресу', async () => {
+		database(LVIV_DUPLICATES);
+		expect((await findCity('  Львів '))?.path).toBe('lviv');
+		expect((await findCity('LVIV'))?.path).toBe('lviv');
+	});
+
+	it('однойменне село — за адресою з областю', async () => {
+		database(LVIV_DUPLICATES);
+		const found = await findCity('lviv-mykolaivska');
+		expect(found).toMatchObject({
+			id: 12473,
+			region: 'Миколаївська область',
+			path: 'lviv-mykolaivska'
+		});
+	});
+
+	it('кілька однойменних в одній області — з номером', async () => {
+		database([
+			city(5, 'ivanivka', 'Іванівка', 'Одеська область'),
+			city(7, 'ivanivka', 'Іванівка', 'Сумська область'),
+			city(9, 'ivanivka', 'Іванівка', 'Сумська область')
+		]);
+		expect((await findCity('ivanivka-sumska'))?.id).toBe(7);
+		expect((await findCity('ivanivka-sumska-2'))?.id).toBe(9);
+		expect(await findCity('ivanivka-sumska-3')).toBeNull();
+	});
+
+	it('Київ — столиця, без запиту до бази, а не село в Миколаївській області', async () => {
+		for (const name of ['kyiv', 'Київ', 'Kyiv', 'Киев']) {
+			const found = await findCity(name);
+			expect(found).toMatchObject({ nameUa: 'Київ', path: 'kyiv', latitude: 50.4501 });
+		}
+		expect(prisma.city.findMany).not.toHaveBeenCalled();
+	});
+
+	it('село Київ у Миколаївській області доступне за адресою з областю', async () => {
+		database([city(12405, 'kyiv', 'Київ', 'Миколаївська область')]);
+		expect(await findCity('kyiv-mykolaivska')).toMatchObject({
+			id: 12405,
+			path: 'kyiv-mykolaivska'
+		});
 	});
 
 	it('на порожній запит не ходить у базу', async () => {
@@ -117,9 +169,10 @@ describe('findCity', () => {
 		expect(prisma.city.findMany).not.toHaveBeenCalled();
 	});
 
-	it('повертає null, якщо міста немає', async () => {
-		prisma.city.findMany.mockResolvedValue([]);
+	it('невідоме місто — null', async () => {
+		database([]);
 		expect(await findCity('Атлантида')).toBeNull();
+		expect(await findCity('atlantyda-lvivska')).toBeNull();
 	});
 });
 
@@ -180,79 +233,96 @@ describe('isValidForecast', () => {
 	});
 });
 
-describe('getCityWeather', () => {
-	it('віддає дані з кешу без запитів до бази й Open-Meteo', async () => {
-		const cached = makeApiResponse();
-		redis.get.mockResolvedValue(JSON.stringify(cached));
+describe('getForecast', () => {
+	const LVIV = {
+		id: 11272,
+		slug: 'lviv',
+		nameUa: 'Львів',
+		region: 'Львівська область',
+		countryUa: 'Україна',
+		latitude: 49.8,
+		longitude: 24,
+		path: 'lviv'
+	};
+	const cacheOf = (ageMs: number, weather = makeForecast()) =>
+		JSON.stringify({ weather, fetchedAt: Date.now() - ageMs });
 
-		expect(await getCityWeather('Kharkiv')).toEqual(cached);
-		expect(redis.get).toHaveBeenCalledWith('v2:kharkiv');
-		expect(prisma.city.findMany).not.toHaveBeenCalled();
+	it('свіжий кеш (до 2 годин) — без запиту до Open-Meteo', async () => {
+		redis.get.mockResolvedValue(cacheOf(30 * 60 * 1000));
+
+		const data = await getForecast(LVIV);
+
+		expect(data).toMatchObject({ misto: 'Львів', oblast: 'Львівська область', path: 'lviv' });
+		expect(redis.get).toHaveBeenCalledWith('v3:lviv');
 		expect(fetchMock).not.toHaveBeenCalled();
 	});
 
-	it('без кешу — бере місто з бази, погоду з Open-Meteo і кешує на 50 годин', async () => {
+	it('без кешу — бере Open-Meteo і кешує з часом отримання', async () => {
 		const forecast = makeForecast();
-		prisma.city.findMany.mockResolvedValue(LVIV_DUPLICATES);
 		fetchMock.mockResolvedValue(new Response(JSON.stringify(forecast)));
 
-		const data = await getCityWeather('lviv');
+		const data = await getForecast(LVIV);
 
-		expect(data).toEqual({
-			misto: 'Львів',
-			oblast: 'Львівська область',
-			kraina: 'Україна',
-			latitude: 49.8,
-			longitude: 24,
-			weather: forecast
-		});
-		expect(redis.set).toHaveBeenCalledWith('v2:lviv', JSON.stringify(data), 50 * 60 * 60);
+		expect(data.weather).toEqual(forecast);
+		const [key, value, ttl] = redis.set.mock.calls[0];
+		expect(key).toBe('v3:lviv');
+		expect(JSON.parse(value).fetchedAt).toBeGreaterThan(Date.now() - 5000);
+		expect(ttl).toBe(50 * 60 * 60);
 		expect(fetchMock.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
+	});
+
+	it('застарілий кеш оновлюється', async () => {
+		redis.get.mockResolvedValue(cacheOf(3 * 60 * 60 * 1000));
+		fetchMock.mockResolvedValue(new Response(JSON.stringify(makeForecast())));
+
+		await getForecast(LVIV);
+
+		expect(fetchMock).toHaveBeenCalledTimes(1);
+		expect(redis.set).toHaveBeenCalledTimes(1);
+	});
+
+	it('Open-Meteo недоступний — показує застарілий кеш замість помилки', async () => {
+		const old = makeForecast({ start: '2026-01-01' });
+		redis.get.mockResolvedValue(cacheOf(10 * 60 * 60 * 1000, old));
+		fetchMock.mockResolvedValue(new Response('Too many requests', { status: 429 }));
+
+		const data = await getForecast(LVIV);
+
+		expect(data.weather.daily.time[0]).toBe('2026-01-01');
+		expect(redis.set).not.toHaveBeenCalled();
 	});
 
 	it('пошкоджений кеш ігнорує і бере свіжі дані', async () => {
 		redis.get.mockResolvedValue('{not json');
-		prisma.city.findMany.mockResolvedValue(LVIV_DUPLICATES);
 		fetchMock.mockResolvedValue(new Response(JSON.stringify(makeForecast())));
 
-		await expect(getCityWeather('lviv')).resolves.toMatchObject({ misto: 'Львів' });
+		await expect(getForecast(LVIV)).resolves.toMatchObject({ misto: 'Львів' });
 	});
 
-	it('кеш із неповними даними теж ігнорує', async () => {
-		redis.get.mockResolvedValue(JSON.stringify(makeApiResponse(makeForecast({ days: 0 }))));
-		prisma.city.findMany.mockResolvedValue(LVIV_DUPLICATES);
-		fetchMock.mockResolvedValue(new Response(JSON.stringify(makeForecast())));
-
-		const data = await getCityWeather('lviv');
-		expect(data.weather.daily.time).toHaveLength(7);
-	});
-
-	it('невідоме місто — 404', async () => {
-		prisma.city.findMany.mockResolvedValue([]);
-		await expectHttpError(getCityWeather('Атлантида'), 404);
-		expect(fetchMock).not.toHaveBeenCalled();
-	});
-
-	it('Open-Meteo відповів помилкою — 502 і нічого не кешуємо', async () => {
-		prisma.city.findMany.mockResolvedValue(LVIV_DUPLICATES);
-		fetchMock.mockResolvedValue(new Response('Too many requests', { status: 429 }));
-
-		await expectHttpError(getCityWeather('lviv'), 502);
-		expect(redis.set).not.toHaveBeenCalled();
-	});
-
-	it('Open-Meteo недоступний або завис — 502, а не 500', async () => {
-		prisma.city.findMany.mockResolvedValue(LVIV_DUPLICATES);
+	it('без кешу й без Open-Meteo — 502, а не 500', async () => {
 		fetchMock.mockRejectedValue(new DOMException('The operation timed out', 'TimeoutError'));
-
-		await expectHttpError(getCityWeather('lviv'), 502);
+		await expectHttpError(getForecast(LVIV), 502);
 	});
 
-	it('неповна відповідь Open-Meteo — 502 і не потрапляє в кеш на 50 годин', async () => {
-		prisma.city.findMany.mockResolvedValue(LVIV_DUPLICATES);
+	it('неповна відповідь Open-Meteo — 502 і не потрапляє в кеш', async () => {
 		fetchMock.mockResolvedValue(new Response(JSON.stringify({ error: true, reason: 'boom' })));
 
-		await expectHttpError(getCityWeather('lviv'), 502);
+		await expectHttpError(getForecast(LVIV), 502);
 		expect(redis.set).not.toHaveBeenCalled();
+	});
+});
+
+describe('getCityWeather', () => {
+	it('знаходить місто і віддає його прогноз', async () => {
+		database(LVIV_DUPLICATES);
+		fetchMock.mockResolvedValue(new Response(JSON.stringify(makeForecast())));
+
+		await expect(getCityWeather('Lviv')).resolves.toMatchObject({ misto: 'Львів', path: 'lviv' });
+	});
+
+	it('невідоме місто — 404 без запиту до Open-Meteo', async () => {
+		database([]);
+		await expectHttpError(getCityWeather('Атлантида'), 404);
+		expect(fetchMock).not.toHaveBeenCalled();
 	});
 });

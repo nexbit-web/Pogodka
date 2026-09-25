@@ -1,6 +1,8 @@
 import { json } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
 import { rankSearchResults } from '$lib/server/cityRank';
+import { attachPaths } from '$lib/server/cities';
+import { KYIV, kyivMatchesPrefix } from '$lib/server/regions';
 import type { CitySearchResult } from '$lib/types';
 import type { RequestHandler } from './$types';
 
@@ -14,6 +16,19 @@ const CITY_FIELDS = {
 	latitude: true,
 	longitude: true
 } as const;
+
+type City = Omit<CitySearchResult, 'path'>;
+
+const CAPITAL: City = {
+	id: KYIV.id,
+	slug: KYIV.slug,
+	nameUa: KYIV.nameUa,
+	nameRu: KYIV.nameRu,
+	nameEn: KYIV.nameEn,
+	region: KYIV.region,
+	latitude: KYIV.latitude,
+	longitude: KYIV.longitude
+};
 
 const POPULAR_SLUGS = [
 	'kyiv',
@@ -36,24 +51,27 @@ export const GET: RequestHandler = async ({ url }) => {
 	// Довжина обмежена: назв довших за 64 символи немає, а довгий рядок — зайве навантаження на БД
 	const query = url.searchParams.get('q')?.trim().slice(0, 64);
 
-	// Без запиту — повертаємо популярні міста
+	// Без запиту — популярні міста
 	if (!query || query.length < 2) {
 		const now = Date.now();
 
 		if (!popularCitiesCache || now - popularCacheTime > 3_600_000) {
-			const cities = await prisma.city.findMany({
+			const rows: City[] = await prisma.city.findMany({
 				where: { slug: { in: POPULAR_SLUGS } },
 				select: CITY_FIELDS
 			});
-			// Слаги в базі не унікальні (сім «zaporizhzhia»): лишаємо по одному місту
-			// на слаг — обласний центр — і сортуємо в заданому порядку
-			popularCitiesCache = POPULAR_SLUGS.flatMap((slug) =>
+			const cities = [CAPITAL, ...rows];
+
+			// Слаги в базі не унікальні (сім «zaporizhzhia», село «kyiv»): лишаємо по одному
+			// місту на слаг — столицю чи обласний центр — і сортуємо в заданому порядку
+			const picked = POPULAR_SLUGS.flatMap((slug) =>
 				rankSearchResults(
 					cities.filter((c) => c.slug === slug),
 					'',
 					1
 				)
 			);
+			popularCitiesCache = picked.map((city) => ({ ...city, path: city.slug }));
 			popularCacheTime = now;
 		}
 
@@ -64,7 +82,7 @@ export const GET: RequestHandler = async ({ url }) => {
 		});
 	}
 
-	const cities = await prisma.city.findMany({
+	const rows: City[] = await prisma.city.findMany({
 		where: {
 			OR: [
 				{ nameUa: { startsWith: query, mode: 'insensitive' } },
@@ -78,7 +96,10 @@ export const GET: RequestHandler = async ({ url }) => {
 		orderBy: { id: 'asc' }
 	});
 
-	return json(rankSearchResults(cities, query), {
+	const candidates = kyivMatchesPrefix(query) ? [CAPITAL, ...rows] : rows;
+	const cities = await attachPaths(rankSearchResults(candidates, query));
+
+	return json(cities, {
 		headers: {
 			// Короткий кеш для пошуку
 			'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'

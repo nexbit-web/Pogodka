@@ -141,6 +141,7 @@ export function makeApiResponse(
 		kraina: 'Україна',
 		latitude: 49.99,
 		longitude: 36.23,
+		path: 'kharkiv',
 		weather,
 		...overrides
 	};

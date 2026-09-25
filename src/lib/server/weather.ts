@@ -1,15 +1,20 @@
 import { error } from '@sveltejs/kit';
 import prisma from './prisma';
 import { redisGet, redisSet } from './upstash';
-import { isRegionCentre } from './cityRank';
+import { importance } from './cityRank';
+import { assignPaths, parseRegionalPath } from './cityUrl';
+import { KYIV, isKyivQuery } from './regions';
 import type { OpenMeteoWeather, WeatherApiResponse } from '$lib/types';
 
-// TTL кешу погоди — 50 годин
-const TTL = 50 * 60 * 60;
+// Кеш живе 50 годин як запас на випадок збою Open-Meteo, але оновлюється, щойно старший за 2 години
+const CACHE_TTL = 50 * 60 * 60;
+const FRESH_MS = 2 * 60 * 60 * 1000;
 
 const CITY_SELECT = {
 	id: true,
 	nameUa: true,
+	nameEn: true,
+	nameRu: true,
 	region: true,
 	countryUa: true,
 	latitude: true,
@@ -25,22 +30,24 @@ export interface CityRecord {
 	latitude: number;
 	longitude: number;
 	slug: string;
+	/** Канонічна адреса сторінки: /pohoda/{path} */
+	path: string;
 }
 
+type Candidate = Omit<CityRecord, 'path'> & { nameEn?: string; nameRu?: string };
+
 /*
-	Назви й слаги в базі не унікальні: «Львів» є у трьох областях, «Іванівка» — у двадцяти двох.
+	Назви й слаги в базі не унікальні: «Львів» є у трьох областях, «Рівне» — у чотирнадцяти.
 	Щоб один і той самий запит завжди давав той самий, найочікуваніший результат:
 	1. точний збіг слагу, потім української, англійської, російської назви;
-	2. серед рівних — місто, чия назва збігається з назвою області (Львів → Львівська,
-	   Одеса → Одеська): це обласні центри, які й шукають найчастіше;
+	2. серед рівних — столиця, потім обласний центр;
 	3. далі — найменший id, щоб порядок був стабільним.
+	Той самий порядок визначає, кому дістається коротка адреса (див. cityUrl.ts).
 */
-export function pickBestCity<
-	T extends Omit<CityRecord, 'countryUa' | 'latitude' | 'longitude'> & {
-		nameEn?: string;
-		nameRu?: string;
-	}
->(cities: T[], query: string): T | null {
+export function pickBestCity<T extends Omit<Candidate, 'countryUa' | 'latitude' | 'longitude'>>(
+	cities: T[],
+	query: string
+): T | null {
 	const q = query.trim().toLowerCase();
 
 	const matchRank = (c: T) => {
@@ -51,22 +58,44 @@ export function pickBestCity<
 		return 4;
 	};
 
-	return (
-		[...cities].sort(
-			(a, b) =>
-				matchRank(a) - matchRank(b) ||
-				Number(isRegionCentre(b)) - Number(isRegionCentre(a)) ||
-				a.id - b.id
-		)[0] ?? null
-	);
+	return [...cities].sort((a, b) => matchRank(a) - matchRank(b) || importance(a, b))[0] ?? null;
 }
 
-/** Пошук міста за будь-якою з назв або слагом. */
-export async function findCity(cityName: string): Promise<CityRecord | null> {
-	const name = cityName.trim();
+/** Усі населені пункти з цим слагом (разом зі столицею, якщо слаг «kyiv») */
+async function slugGroup(slug: string): Promise<Candidate[]> {
+	const rows = await prisma.city.findMany({
+		where: { slug },
+		select: CITY_SELECT,
+		orderBy: { id: 'asc' }
+	});
+	return slug === KYIV.slug ? [{ ...KYIV }, ...rows] : rows;
+}
+
+function withPath(city: Candidate, group: Candidate[]): CityRecord {
+	return {
+		id: city.id,
+		nameUa: city.nameUa,
+		region: city.region,
+		countryUa: city.countryUa,
+		latitude: city.latitude,
+		longitude: city.longitude,
+		slug: city.slug,
+		path: assignPaths(group).get(city.id) ?? city.slug
+	};
+}
+
+/**
+ * Пошук населеного пункту за адресою сторінки, слагом або будь-якою з назв.
+ * Повертає і канонічну адресу — сторінка переадресує на неї всі інші варіанти.
+ */
+export async function findCity(query: string): Promise<CityRecord | null> {
+	const name = query.trim();
 	if (!name) return null;
 
-	const candidates = await prisma.city.findMany({
+	// Столиця — без запиту до бази
+	if (isKyivQuery(name)) return { ...KYIV, path: KYIV.slug };
+
+	const candidates: Candidate[] = await prisma.city.findMany({
 		where: {
 			OR: [
 				{ slug: { equals: name, mode: 'insensitive' } },
@@ -75,23 +104,22 @@ export async function findCity(cityName: string): Promise<CityRecord | null> {
 				{ nameRu: { equals: name, mode: 'insensitive' } }
 			]
 		},
-		select: { ...CITY_SELECT, nameEn: true, nameRu: true },
+		select: CITY_SELECT,
 		orderBy: { id: 'asc' },
 		take: 50
 	});
 
 	const best = pickBestCity(candidates, name);
-	if (!best) return null;
+	if (best) return withPath(best, await slugGroup(best.slug));
 
-	return {
-		id: best.id,
-		nameUa: best.nameUa,
-		region: best.region,
-		countryUa: best.countryUa,
-		latitude: best.latitude,
-		longitude: best.longitude,
-		slug: best.slug
-	};
+	// Адреса з областю: /pohoda/lviv-mykolaivska, /pohoda/ivanivka-sumska-2
+	const regional = parseRegionalPath(name);
+	if (!regional) return null;
+
+	const group = await slugGroup(regional.slug);
+	const paths = assignPaths(group);
+	const match = group.find((city) => paths.get(city.id) === name.toLowerCase());
+	return match ? withPath(match, group) : null;
 }
 
 // Open-Meteo зазвичай відповідає за 100–300 мс; довше 8 с — вважаємо недоступним
@@ -145,59 +173,73 @@ export function buildOpenMeteoUrl(latitude: number, longitude: number) {
 	);
 }
 
+interface CachedForecast {
+	weather: OpenMeteoWeather;
+	fetchedAt: number;
+}
+
+async function fetchForecast(city: CityRecord): Promise<OpenMeteoWeather> {
+	const res = await fetch(buildOpenMeteoUrl(city.latitude, city.longitude), {
+		cache: 'no-store',
+		signal: AbortSignal.timeout(OPEN_METEO_TIMEOUT_MS)
+	});
+	if (!res.ok) throw new Error(`Open-Meteo повернув ${res.status}`);
+
+	const weather: unknown = await res.json();
+	if (!isValidForecast(weather)) throw new Error('Неповна відповідь Open-Meteo');
+	return weather;
+}
+
 /**
- * Погода для міста: спершу Redis, потім БД + Open-Meteo.
- * Викликається напряму з load-функцій та з /api/pogoda — без HTTP-запиту до себе.
+ * Прогноз для вже знайденого населеного пункту.
+ * Свіжий кеш (до 2 год) віддається одразу. Старіший — оновлюється, а якщо Open-Meteo
+ * саме зараз недоступний, показуємо збережений прогноз замість помилки:
+ * для людей і пошукових роботів це краще, ніж сторінка 502.
  */
-export async function getCityWeather(cityName: string): Promise<WeatherApiResponse> {
-	// Префікс версії: після зміни набору полів старий кеш не підмішується
-	const key = `v2:${cityName.toLowerCase().trim()}`;
+export async function getForecast(city: CityRecord): Promise<WeatherApiResponse> {
+	// Префікс версії: після зміни набору полів чи адрес старий кеш не підмішується
+	const key = `v3:${city.path}`;
 
-	const cached = await redisGet(key);
-	if (cached) {
+	let cached: CachedForecast | null = null;
+	const raw = await redisGet(key);
+	if (raw) {
 		try {
-			const parsed = JSON.parse(cached) as WeatherApiResponse;
-			if (isValidForecast(parsed?.weather)) return parsed;
+			const parsed = JSON.parse(raw) as CachedForecast;
+			if (isValidForecast(parsed?.weather)) cached = parsed;
 		} catch {
-			// Пошкоджений кеш — просто йдемо далі за свіжими даними
+			// Пошкоджений кеш — просто йдемо за свіжими даними
 		}
-		console.warn(`[Redis] Пошкоджений кеш для ключа "${key}", беремо свіжі дані`);
+		if (!cached) console.warn(`[Redis] Пошкоджений кеш для ключа "${key}", беремо свіжі дані`);
 	}
 
-	const city = await findCity(cityName);
-	if (!city) {
-		error(404, 'Місто не знайдено');
+	let weather: OpenMeteoWeather;
+	if (cached && Date.now() - cached.fetchedAt < FRESH_MS) {
+		weather = cached.weather;
+	} else {
+		try {
+			weather = await fetchForecast(city);
+			await redisSet(key, JSON.stringify({ weather, fetchedAt: Date.now() }), CACHE_TTL);
+		} catch (err) {
+			console.error(`[Open-Meteo] Не вдалося оновити погоду для "${city.path}":`, err);
+			if (!cached) error(502, 'Не вийшло отримати дані погоди');
+			weather = cached.weather;
+		}
 	}
 
-	let weather: unknown;
-	try {
-		const res = await fetch(buildOpenMeteoUrl(city.latitude, city.longitude), {
-			cache: 'no-store',
-			signal: AbortSignal.timeout(OPEN_METEO_TIMEOUT_MS)
-		});
-		if (!res.ok) throw new Error(`Open-Meteo повернув ${res.status}`);
-		weather = await res.json();
-	} catch (err) {
-		console.error(`[Open-Meteo] Не вдалося отримати погоду для "${city.slug}":`, err);
-		error(502, 'Не вийшло отримати дані погоди');
-	}
-
-	// Некоректну відповідь не показуємо і, головне, не кладемо в кеш на 50 годин
-	if (!isValidForecast(weather)) {
-		console.error(`[Open-Meteo] Неповна відповідь для "${city.slug}"`);
-		error(502, 'Не вийшло отримати дані погоди');
-	}
-
-	const data: WeatherApiResponse = {
+	return {
 		misto: city.nameUa,
 		oblast: city.region,
 		kraina: city.countryUa,
 		latitude: city.latitude,
 		longitude: city.longitude,
+		path: city.path,
 		weather
 	};
+}
 
-	await redisSet(key, JSON.stringify(data), TTL);
-
-	return data;
+/** Погода за назвою чи адресою — для /api/pogoda. Невідоме місто — 404. */
+export async function getCityWeather(cityName: string): Promise<WeatherApiResponse> {
+	const city = await findCity(cityName);
+	if (!city) error(404, 'Місто не знайдено');
+	return getForecast(city);
 }
