@@ -38,6 +38,13 @@ describe('Footer', () => {
 			'/agreement'
 		);
 		expect(screen.getByRole('link', { name: 'Техпідтримка' })).toHaveAttribute('href', '/support');
+		expect(screen.getByRole('link', { name: 'Про нас' })).toHaveAttribute('href', '/about');
+
+		// CC BY 4.0: джерело метеоданих має бути вказане
+		expect(screen.getByRole('link', { name: 'Open-Meteo.com' })).toHaveAttribute(
+			'href',
+			'https://open-meteo.com/'
+		);
 
 		const youtube = screen.getByRole('link', { name: 'YouTube' });
 		expect(youtube).toHaveAttribute('target', '_blank');

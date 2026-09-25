@@ -72,6 +72,7 @@
 	const isCurrent = (href: string) => page.url.pathname === href;
 
 	const LINKS = [
+		{ href: resolve('/about'), label: 'Про нас' },
 		{ href: resolve('/support'), label: 'Техпідтримка' },
 		{ href: resolve('/privacypolicy'), label: 'Політика конфіденційності' },
 		{ href: resolve('/agreement'), label: 'Умови використання' }

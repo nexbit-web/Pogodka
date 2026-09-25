@@ -219,7 +219,7 @@ describe('Карта сайту', () => {
 		expect(xml).not.toContain('/api/');
 	});
 
-	it('перший файл: головна, столиця, далі населені пункти — без дублів', async () => {
+	it('перший файл: головна, «Про нас», столиця, далі населені пункти — без дублів', async () => {
 		prisma.city.findMany.mockResolvedValue([
 			row(2732, 'lviv', 'Львів', 'Дніпропетровська область'),
 			row(11272, 'lviv', 'Львів', 'Львівська область'),
@@ -232,6 +232,7 @@ describe('Карта сайту', () => {
 
 		expect(locs).toEqual([
 			'https://www.pogodka.org',
+			'https://www.pogodka.org/about',
 			'https://www.pogodka.org/pohoda/kyiv',
 			'https://www.pogodka.org/pohoda/lviv-dnipropetrovska',
 			'https://www.pogodka.org/pohoda/lviv',

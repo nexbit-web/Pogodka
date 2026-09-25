@@ -87,6 +87,13 @@
 					rel="noopener noreferrer me"
 					class="text-primary hover:underline"
 					itemprop="sameAs">YouTube</a
+				>. Дані прогнозу:
+				<!-- Ліцензія CC BY 4.0 вимагає вказувати джерело -->
+				<a
+					href="https://open-meteo.com/"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-primary hover:underline">Open-Meteo.com</a
 				>.
 			</p>
 
@@ -103,6 +110,13 @@
 					class="flex flex-wrap items-center gap-x-4 gap-y-1 whitespace-nowrap sm:gap-x-3"
 					aria-label="Правова інформація"
 				>
+					<a
+						href={resolve('/about')}
+						class="transition-colors hover:text-foreground hover:underline"
+					>
+						Про нас
+					</a>
+					<span class="text-separator max-sm:hidden" aria-hidden="true">|</span>
 					<a
 						href={resolve('/privacypolicy')}
 						class="transition-colors hover:text-foreground hover:underline"

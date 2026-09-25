@@ -10,12 +10,15 @@ import { allCityPaths } from './cities';
 export const URLS_PER_FILE = 10_000;
 
 // Сторінки поза містами: лише ті, що мають потрапляти в пошук
-const STATIC_PAGES = [{ path: '/', priority: '1.0' }];
+const STATIC_PAGES = [
+	{ path: '/', priority: '1.0', changefreq: 'hourly' as const },
+	{ path: '/about', priority: '0.5', changefreq: 'monthly' as const }
+];
 
 export interface SitemapEntry {
 	loc: string;
 	priority: string;
-	changefreq: 'hourly' | 'daily';
+	changefreq: 'hourly' | 'daily' | 'monthly';
 }
 
 export async function sitemapEntries(): Promise<SitemapEntry[]> {
@@ -24,7 +27,7 @@ export async function sitemapEntries(): Promise<SitemapEntry[]> {
 		...STATIC_PAGES.map((p) => ({
 			loc: `${SITE_URL}${p.path === '/' ? '' : p.path}`,
 			priority: p.priority,
-			changefreq: 'hourly' as const
+			changefreq: p.changefreq
 		})),
 		...cities.map((path, i) => ({
 			loc: `${SITE_URL}/pohoda/${encodeURIComponent(path)}`,

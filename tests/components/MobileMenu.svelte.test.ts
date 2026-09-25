@@ -70,6 +70,7 @@ describe('MobileMenu', () => {
 			'href',
 			'/support'
 		);
+		expect(within(dialog).getByRole('link', { name: 'Про нас' })).toHaveAttribute('href', '/about');
 		expect(within(dialog).queryByText('Популярні міста')).not.toBeInTheDocument();
 		expect(fetchMock).not.toHaveBeenCalled();
 		expect(trigger).toHaveAttribute('aria-expanded', 'true');

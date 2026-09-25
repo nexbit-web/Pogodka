@@ -29,6 +29,20 @@
 		<link rel="manifest" href="/manifest.webmanifest" />
 		<meta name="apple-mobile-web-app-title" content="Pogodka" />
 
+		<!--
+			Google AdSense: мета-тег підтверджує право на сайт, скрипт показує рекламу.
+			Той самий ідентифікатор видавця — у static/ads.txt, їх перевіряє тест.
+			Скрипт асинхронний і не затримує показ сторінки. Вікно згоди для ЄЕЗ,
+			Великої Британії та Швейцарії підвантажує він же, коли в кабінеті AdSense
+			увімкнено повідомлення «Privacy & messaging → European regulations».
+		-->
+		<meta name="google-adsense-account" content="ca-pub-4358580854566630" />
+		<script
+			async
+			src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4358580854566630"
+			crossorigin="anonymous"
+		></script>
+
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
