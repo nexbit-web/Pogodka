@@ -1,0 +1,7 @@
+# Pogodka — прогноз погоди для кожного населеного пункту України
+User-agent: *
+Allow: /
+# Службові JSON-ендпоінти не потрібні в пошуку
+Disallow: /api/
+
+Sitemap: https://www.pogodka.org/sitemap.xml

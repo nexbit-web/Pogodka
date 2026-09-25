@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="uk">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<!-- Колір смуги браузера; при перемиканні теми його оновлює mode-watcher -->
+		<meta name="theme-color" content="#ffffff" />
+
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+		<link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="icon" href="/icon-192x192.png" sizes="192x192" type="image/png" />
+		<link rel="icon" href="/icon-512x512.png" sizes="512x512" type="image/png" />
+
+		<!--
+			На macOS/iOS підхоплюється системний SF Pro і Inter не завантажується.
+			Для Windows/Android тягнемо Inter — найближчий за рисунком до SF.
+		-->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			rel="stylesheet"
+			href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap"
+		/>
+
+		<!-- robots, canonical і соцмережі — у компоненті Seo кожної сторінки -->
+		<link rel="manifest" href="/manifest.webmanifest" />
+		<meta name="apple-mobile-web-app-title" content="Pogodka" />
+
+		<!--
+			Google AdSense: мета-тег підтверджує право на сайт, скрипт показує рекламу.
+			Той самий ідентифікатор видавця — у static/ads.txt, їх перевіряє тест.
+			Скрипт асинхронний і не затримує показ сторінки. Вікно згоди для ЄЕЗ,
+			Великої Британії та Швейцарії підвантажує він же, коли в кабінеті AdSense
+			увімкнено повідомлення «Privacy & messaging → European regulations».
+		-->
+		<meta name="google-adsense-account" content="ca-pub-4358580854566630" />
+		<script
+			async
+			src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4358580854566630"
+			crossorigin="anonymous"
+		></script>
+
+		%sveltekit.head%
+	</head>
+	<body data-sveltekit-preload-data="hover">
+		<div style="display: contents">%sveltekit.body%</div>
+	</body>
+</html>
