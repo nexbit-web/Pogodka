@@ -25,6 +25,26 @@
 			href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap"
 		/>
 
+		<!--
+			Свій населений пункт одразу: прямий вхід на головну відкриває останній переглянутий.
+			Виконується до показу сторінки, тож Київ не блимає. Переходи всередині сайту
+			(зокрема клік по логотипу) і пошукові роботи без сховища сюди не потрапляють.
+		-->
+		<script>
+			try {
+				var lastCity = localStorage.getItem('pogodka-city');
+				if (
+					location.pathname === '/' &&
+					lastCity &&
+					lastCity !== 'kyiv' &&
+					/^[a-z0-9-]+$/.test(lastCity) &&
+					document.referrer.indexOf(location.origin) !== 0
+				) {
+					location.replace('/pohoda/' + lastCity);
+				}
+			} catch (e) {}
+		</script>
+
 		<!-- robots, canonical і соцмережі — у компоненті Seo кожної сторінки -->
 		<link rel="manifest" href="/manifest.webmanifest" />
 		<meta name="apple-mobile-web-app-title" content="Pogodka" />

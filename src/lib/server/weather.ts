@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import prisma from './prisma';
 import { redisGet, redisSet } from './upstash';
+import { getAirQuality } from './air';
 import { importance } from './cityRank';
 import { assignPaths, parseRegionalPath } from './cityUrl';
 import { KYIV, isKyivQuery } from './regions';
@@ -208,6 +209,9 @@ export async function getForecast(city: CityRecord): Promise<WeatherApiResponse>
 	// Префікс версії: після зміни набору полів чи адрес старий кеш не підмішується
 	const key = `v3:${city.path}`;
 
+	// Якість повітря — паралельно з прогнозом, тож сторінка від неї не повільнішає
+	const airPromise = getAirQuality(city);
+
 	let cached: CachedForecast | null = null;
 	const raw = await redisGet(key);
 	if (raw) {
@@ -241,7 +245,8 @@ export async function getForecast(city: CityRecord): Promise<WeatherApiResponse>
 		latitude: city.latitude,
 		longitude: city.longitude,
 		path: city.path,
-		weather
+		weather,
+		air: await airPromise
 	};
 }
 

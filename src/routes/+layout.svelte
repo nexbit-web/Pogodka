@@ -12,6 +12,25 @@
 	$effect(() => {
 		import('$lib/components/ui/sonner').then((m) => (Toaster = m.Toaster));
 	});
+
+	// Плашка «Погода там, де ви зараз» — лише при першому візиті і лише там, де геолокація можлива.
+	// Її код вантажиться окремо і тільки тим, кому її покажуть; зʼявляється через 1,5 с після сторінки
+	let GeoPrompt = $state<typeof import('$lib/components/shared/GeoPrompt.svelte').default | null>(
+		null
+	);
+	$effect(() => {
+		let cancelled = false;
+		const timer = setTimeout(async () => {
+			const { shouldOfferGeolocation } = await import('$lib/geolocate');
+			if (cancelled || !(await shouldOfferGeolocation())) return;
+			const m = await import('$lib/components/shared/GeoPrompt.svelte');
+			if (!cancelled) GeoPrompt = m.default;
+		}, 1500);
+		return () => {
+			cancelled = true;
+			clearTimeout(timer);
+		};
+	});
 </script>
 
 <!--
@@ -26,6 +45,9 @@
 />
 {#if Toaster}
 	<Toaster position="top-center" />
+{/if}
+{#if GeoPrompt}
+	<GeoPrompt />
 {/if}
 <TopLoader />
 

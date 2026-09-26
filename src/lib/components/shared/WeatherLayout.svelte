@@ -3,7 +3,7 @@
 	import WeatherHeadline from './WeatherHeadline.svelte';
 	import DayForecast from './DayForecast.svelte';
 	import PartnerBanner from './PartnerBanner.svelte';
-	import { findCurrentHourIndex, getCurrentWeather } from '$lib/weather';
+	import { findCurrentHourIndex, getCurrentWeather, precipOutlook } from '$lib/weather';
 	import { kyivNow } from '$lib/date';
 	import { untrack, type Snippet } from 'svelte';
 	import type { WeatherApiResponse } from '$lib/types';
@@ -29,7 +29,9 @@
 		return () => clearInterval(timer);
 	});
 
-	const current = $derived(getCurrentWeather(weather, findCurrentHourIndex(weather, now)));
+	const hourIndex = $derived(findCurrentHourIndex(weather, now));
+	const current = $derived(getCurrentWeather(weather, hourIndex));
+	const outlook = $derived(precipOutlook(weather, hourIndex));
 </script>
 
 <Container>
@@ -38,11 +40,12 @@
 		temperature={current.temp}
 		weather={current.code}
 		isFelt={current.feels}
+		{outlook}
 	/>
 
 	<!-- Увесь прогноз — в одному місці: стрічка днів і деталі вибраного дня -->
 	<div class="pt-4 pb-10 sm:py-5">
-		<DayForecast {weather} {now} city={data.misto} />
+		<DayForecast {weather} {now} air={data.air} />
 	</div>
 
 	<!-- Посилання на інші населені пункти: сусідні або обласні центри -->

@@ -3,9 +3,15 @@
 	import CityLinks from '$lib/components/shared/CityLinks.svelte';
 	import Footer from '$lib/components/shared/Footer.svelte';
 	import Seo from '$lib/components/shared/Seo.svelte';
+	import { rememberCity } from '$lib/cityHistory';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
+
+	// Історія для пошуку; з останнім переглянутим відкриється головна наступного разу (див. app.html)
+	$effect(() => {
+		rememberCity({ path: data.city.path, name: data.city.name, region: data.city.region });
+	});
 </script>
 
 <Seo

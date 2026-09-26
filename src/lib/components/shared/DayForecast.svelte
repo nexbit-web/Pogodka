@@ -7,19 +7,12 @@
 
 	// Частини доби, як на Синоптику: по дві тригодинні колонки
 	const DAY_PARTS = ['ніч', 'ранок', 'день', 'вечір'];
-
-	// Шкала УФ-індексу, як у «Погоді» на iPhone: від безпечного зеленого до фіолетового
-	const UV_GRADIENT =
-		'linear-gradient(90deg, #34c759, #ffcc00 30%, #ff9500 55%, #ff3b30 75%, #af52de)';
 </script>
 
 <script lang="ts">
 	import { fade } from 'svelte/transition';
+	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import ArrowUp from '@lucide/svelte/icons/arrow-up';
-	import Sunrise from '@lucide/svelte/icons/sunrise';
-	import Sunset from '@lucide/svelte/icons/sunset';
-	import Hourglass from '@lucide/svelte/icons/hourglass';
-	import Sun from '@lucide/svelte/icons/sun';
 	import TempCurve from './TempCurve.svelte';
 	import {
 		buildForecastDays,
@@ -30,19 +23,23 @@
 		getWeatherText,
 		hpaToMmHg,
 		uvText,
-		windDirectionText
+		windDirectionText,
+		dayAqi,
+		dayPollen
 	} from '$lib/weather';
-	import { daylight, describeDay, signed } from '$lib/dayInsights';
+	import { dayWarnings, daylight, describeDay, signed } from '$lib/dayInsights';
+	import { typograph } from '$lib/typography';
 	import { clock, dayOfMonth, isWeekend, kyivNow, monthName, weekdayName } from '$lib/date';
-	import type { OpenMeteoWeather } from '$lib/types';
+	import type { AirQualityData, OpenMeteoWeather } from '$lib/types';
 
 	let {
 		weather,
-		city = '',
-		now = kyivNow()
+		now = kyivNow(),
+		air = null
 	}: {
 		weather: OpenMeteoWeather;
-		city?: string;
+		/** Якість повітря й пилок; null — даних немає */
+		air?: AirQualityData | null;
 		/** Поточні дата й година в Києві — спільні з шапкою сторінки */
 		now?: { date: string; hour: number };
 	} = $props();
@@ -60,7 +57,6 @@
 
 	const day = $derived(days[selected]);
 	const isToday = $derived(day?.date === todayIso);
-	const weekend = $derived(day ? isWeekend(day.date) : false);
 
 	// Таблиця як на Синоптику: кожні 3 години, колонка «Зараз» — поточна година
 	const slots = $derived(day ? buildTableSlots(day.hours, isToday ? now.hour : undefined) : []);
@@ -69,10 +65,44 @@
 	const nightOf = (slot: (typeof slots)[number]) =>
 		isNightHour(slot.time, day?.sunrise, day?.sunset);
 	const currentIndex = $derived(slots.findIndex((s) => s.now));
-	const hasProbability = $derived(slots.some((s) => s.precipProb !== undefined));
+
+	// Рядки, що нічого не кажуть про цей день, не показуємо: нулі й прочерки на весь день —
+	// шум, а «відчувається як» без різниці з температурою — повтор (як і в шапці)
+	const showFeelsRow = $derived(slots.some((s) => Math.round(s.feels) !== Math.round(s.temp)));
+	const showProbRow = $derived(slots.some((s) => (s.precipProb ?? 0) > 0));
+	const showPrecipRow = $derived(slots.some((s) => s.precip > 0));
+
+	// Смуги через рядок і заокруглений низ колонки «зараз» — за тими рядками, що є насправді
+	const rowKeys = $derived(
+		[
+			showFeelsRow && 'feels',
+			'pressure',
+			'humidity',
+			'wind',
+			showProbRow && 'prob',
+			showPrecipRow && 'precip'
+		].filter((key): key is string => Boolean(key))
+	);
+	const striped = (key: string) => rowKeys.indexOf(key) % 2 === 0;
+	const isLast = (key: string) => rowKeys.at(-1) === key;
+
+	// Небезпечна погода — окремими рядками над описом, лише коли вона справді очікується
+	const warnings = $derived(day ? dayWarnings(day, isToday ? now.hour : 0) : []);
+
+	// Повітря: сьогодні — поточна година, інші дні — найгірша; пилок — лише помітний
+	const aqi = $derived(
+		air && day
+			? dayAqi(
+					air,
+					day.date,
+					isToday ? `${day.date}T${String(now.hour).padStart(2, '0')}:00` : undefined
+				)
+			: null
+	);
+	const pollen = $derived(air && day ? dayPollen(air, day.date) : null);
 
 	const insights = $derived(
-		day ? describeDay(day, isToday ? now.hour : 0, days[selected - 1]) : null
+		day ? describeDay(day, isToday ? now.hour : 0, days[selected - 1], { aqi, pollen }) : null
 	);
 
 	// Колонка «зараз» підсвічена ледь помітним primary, як виділення у Finder
@@ -90,26 +120,30 @@
 </script>
 
 <section aria-labelledby="forecast-title">
-	<!-- Двотонний заголовок, як на apple.com: твердження чорним, пояснення сірим -->
-	<h2
-		id="forecast-title"
-		class="text-[24px] leading-tight font-semibold tracking-[-0.02em] sm:text-[28px]"
-	>
-		{city ? `Погода ${city} на 7 днів.` : 'Прогноз на 7 днів.'}
-		<span class="text-tertiary">Оберіть день.</span>
+	<!--
+		Тиха мітка замість гучного заголовка: місто вже є в шапці над блоком,
+		а що картки можна вибирати, видно й без підказки. Для пошуковиків це й далі h2.
+	-->
+	<h2 id="forecast-title" class="text-[13px] font-medium text-muted-foreground sm:text-[14px]">
+		Прогноз на 7 днів
 	</h2>
 
-	<!-- Стрічка днів: день тижня, число, місяць, іконка, мін/макс -->
+	<!--
+		Стрічка днів — як вибір конфігурації на apple.com: день тижня, число, іконка, макс./мін.
+		Нічого, що не допомагає вибрати день: місяць є в заголовку панелі нижче,
+		а вибір позначає лише колір рамки — текст при цьому не змінюється і не стрибає.
+		Субота й неділя підписані червоним, як у календарі.
+		Відступи по 6px навколо — щоб контур фокусу не обрізався прокруткою.
+	-->
 	<div
 		role="tablist"
 		aria-label="Дні прогнозу"
 		tabindex="-1"
 		onkeydown={onTabsKeydown}
-		class="scroll-x -mx-4 mt-5 grid scroll-px-4 auto-cols-[4.75rem] grid-flow-col gap-2 px-4 sm:mx-0 sm:auto-cols-[minmax(6.5rem,1fr)] sm:px-0"
+		class="scroll-x -mx-4 mt-1.5 grid snap-x scroll-px-4 auto-cols-[4.75rem] grid-flow-col gap-2 px-4 py-1.5 sm:-mx-1.5 sm:auto-cols-fr sm:gap-3 sm:px-1.5"
 	>
 		{#each days as d, idx (d.date)}
 			{@const active = idx === selected}
-			{@const red = isWeekend(d.date)}
 			<button
 				id={`day-tab-${idx}`}
 				role="tab"
@@ -117,11 +151,13 @@
 				aria-controls="day-panel"
 				tabindex={active ? 0 : -1}
 				onclick={() => (selected = idx)}
-				class="day-tab flex cursor-pointer flex-col items-center rounded-2xl px-1 pt-3 pb-3.5 sm:px-2"
+				class="day-tab flex cursor-pointer snap-start flex-col items-center rounded-lg px-1 pt-3.5 pb-4 sm:pt-4 sm:pb-5"
 				class:day-tab-active={active}
 			>
 				<span
-					class="text-[13px] {active ? 'font-semibold' : 'font-medium'} {red ? 'text-weekend' : ''}"
+					class="text-[13px] leading-none font-medium sm:text-[14px] {isWeekend(d.date)
+						? 'text-weekend'
+						: 'text-muted-foreground'}"
 				>
 					{#if d.date === todayIso}
 						Сьогодні
@@ -131,16 +167,13 @@
 					{/if}
 				</span>
 				<span
-					class="mt-0.5 text-[24px] leading-tight font-semibold tabular-nums sm:text-[28px] {red
-						? 'text-weekend'
-						: ''}"
+					class="mt-2 text-[26px] leading-none font-semibold tracking-[-0.01em] tabular-nums sm:text-[30px]"
 				>
-					{dayOfMonth(d.date)}
+					{dayOfMonth(d.date)}<span class="sr-only">&nbsp;{monthName(d.date)}</span>
 				</span>
-				<span class="text-[12px] text-tertiary">{monthName(d.date)}</span>
 
 				<svg
-					class="my-2 size-8 sm:size-9"
+					class="my-3 size-7 sm:size-8"
 					style="color: {getConditionTint(d.code)}"
 					viewBox="0 0 24 24"
 					role="img"
@@ -149,16 +182,14 @@
 					<use href={`/icons.svg?v=11#${getWeatherIconId(d.code)}`}></use>
 				</svg>
 
-				<!-- Телефон: макс. над мін., без підписів — так вужче -->
-				<span class="flex flex-col items-center leading-tight tabular-nums sm:hidden">
-					<span class="text-[15px] font-semibold">{signed(d.max)}</span>
-					<span class="text-[13px] text-muted-foreground">{signed(d.min)}</span>
-				</span>
-				<span class="grid grid-cols-2 gap-x-3 text-center max-sm:hidden">
-					<span class="text-[10px] text-tertiary">мін.</span>
-					<span class="text-[10px] text-tertiary">макс.</span>
-					<span class="text-[15px] text-muted-foreground tabular-nums">{signed(d.min)}</span>
-					<span class="text-[15px] font-semibold tabular-nums">{signed(d.max)}</span>
+				<!-- Макс. і мін., як у «Погоді» на iPhone: вища — чорним, нижча — сірим -->
+				<span
+					class="flex flex-col items-center gap-0.5 text-[15px] leading-tight tabular-nums sm:flex-row sm:gap-1.5 sm:text-[17px]"
+				>
+					<span class="font-semibold"><span class="sr-only">макс. </span>{signed(d.max)}</span>
+					<span class="text-muted-foreground"
+						><span class="sr-only">мін. </span>{signed(d.min)}</span
+					>
 				</span>
 			</button>
 		{/each}
@@ -175,53 +206,37 @@
 				in:fade={{ duration: 180 }}
 			>
 				<!-- «Пʼятниця, 25 вересня. Свіжий день зі змінною хмарністю.» -->
+				<!--
+					Типографіка за шкалою apple.com: заголовок 19/24 px — на компʼютері вміщується в один рядок,
+					на телефоні дата й характер дня стоять двома рівними рядками, а не рвуться посеред фрази.
+					Текст 17 px з інтерліньяжем 1,47, рядок до ~70 знаків — око легко переходить на наступний.
+					text-wrap: pretty не лишає одне слово в кінці абзацу.
+					Нерозривні пробіли не дають відірвати «з» від «1:00» чи «0,9» від «мм».
+				-->
 				<h3
-					class="max-w-[46rem] text-[22px] leading-[1.2] font-semibold tracking-[-0.02em] sm:text-[26px]"
+					class="text-[19px] leading-[1.26] font-semibold tracking-[-0.01em] text-pretty sm:text-[24px] sm:leading-[1.17]"
 				>
-					<span class={weekend ? 'text-weekend' : ''}>
-						{isToday ? 'Сьогодні' : cap(weekdayName(day.date))}</span
-					>, {dayOfMonth(day.date)}
-					{monthName(day.date)}. <span class="text-tertiary">{insights.title}.</span>
+					{isToday ? 'Сьогодні' : cap(weekdayName(day.date))},&nbsp;{dayOfMonth(
+						day.date
+					)}&nbsp;{monthName(day.date)}.
+					<span class="text-tertiary max-sm:block">{typograph(insights.title)}.</span>
 				</h3>
-				<p class="mt-3 max-w-[46rem] text-[17px] leading-relaxed">{insights.text}</p>
-
-				<!-- Сонце й ультрафіолет — мʼяка картка, як Trade In на apple.com -->
-				{#if (day.sunrise && day.sunset) || day.uvMax !== undefined}
-					<dl
-						class="mt-6 grid grid-cols-2 gap-px overflow-hidden rounded-[18px] bg-separator sm:grid-cols-4"
-					>
-						{#if day.sunrise && day.sunset}
-							{@render stat(Sunrise, 'Схід сонця', clock(day.sunrise), 'var(--w-sun)')}
-							{@render stat(Sunset, 'Захід сонця', clock(day.sunset), 'var(--w-sun)')}
-							{@render stat(Hourglass, 'Світловий день', daylight(day.sunrise, day.sunset))}
-						{/if}
-						{#if day.uvMax !== undefined}
-							<div class="bg-fill px-4 py-3.5 sm:px-5 sm:py-4">
-								<dt class="flex items-center gap-1.5 text-[13px] text-muted-foreground">
-									<Sun class="size-4" style="color: var(--w-sun)" aria-hidden="true" />
-									УФ-індекс
-								</dt>
-								<dd class="mt-1 flex items-baseline gap-1.5">
-									<span class="text-[22px] leading-tight font-semibold tabular-nums">
-										{Math.round(day.uvMax)}
-									</span>
-									<span class="text-[13px] text-muted-foreground">{uvText(day.uvMax)}</span>
-								</dd>
-								<!-- Шкала з позначкою рівня -->
-								<div
-									class="relative mt-2.5 h-1 rounded-full"
-									style="background: {UV_GRADIENT}"
+				{#if warnings.length > 0}
+					<ul class="mt-4 flex flex-col gap-2">
+						{#each warnings as warning (warning)}
+							<li class="flex items-start gap-2 text-[17px] leading-[1.47] font-semibold">
+								<TriangleAlert
+									class="mt-[3px] size-[18px] shrink-0 text-warning"
 									aria-hidden="true"
-								>
-									<span
-										class="absolute top-1/2 size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-fill bg-foreground"
-										style="left: {Math.min(Math.max(day.uvMax / 11, 0), 1) * 100}%"
-									></span>
-								</div>
-							</div>
-						{/if}
-					</dl>
+								/>
+								{typograph(warning)}
+							</li>
+						{/each}
+					</ul>
 				{/if}
+				<p class="mt-3 max-w-[40rem] text-[17px] leading-[1.47] text-pretty">
+					{typograph(insights.text)}
+				</p>
 
 				<!-- Погодинна таблиця в стилі Finder: смуги замість ліній -->
 				<div class="scroll-x -mx-4 mt-8 px-4 sm:mx-0 sm:px-0">
@@ -314,22 +329,32 @@
 								{/each}
 							</tr>
 
+							{#if showFeelsRow}
+								{@render row(
+									'Відчувається як',
+									(s) => signed(s.feels),
+									striped('feels'),
+									'text-muted-foreground'
+								)}
+							{/if}
+							{@render row('Тиск, мм', (s) => String(hpaToMmHg(s.pressure)), striped('pressure'))}
 							{@render row(
-								'Відчувається як',
-								(s) => signed(s.feels),
-								true,
-								'text-muted-foreground'
+								'Вологість, %',
+								(s) => String(Math.round(s.humidity)),
+								striped('humidity')
 							)}
-							{@render row('Тиск, мм', (s) => String(hpaToMmHg(s.pressure)), false)}
-							{@render row('Вологість, %', (s) => String(Math.round(s.humidity)), true)}
 
-							{@render caption('Вітер, м/с', false)}
-							<tr>
+							{@render caption('Вітер, м/с', striped('wind'))}
+							<tr class={striped('wind') ? 'stripe' : ''}>
 								<th scope="row" class={labelClass}>
 									<span class="max-sm:sr-only">Вітер, м/с</span>
 								</th>
 								{#each slots as slot, idx (slot.time)}
-									<td class="{cellClass} {nowCell(idx)}">
+									<td
+										class="{cellClass} {nowCell(idx)} {isLast('wind') && idx === currentIndex
+											? 'rounded-b-[10px]'
+											: ''}"
+									>
 										<span
 											class="inline-flex items-center gap-0.5 sm:gap-1"
 											title={`${windDirectionText(slot.windDir)}, пориви до ${Math.round(slot.gusts)} м/с`}
@@ -347,45 +372,66 @@
 								{/each}
 							</tr>
 
-							{#if hasProbability}
+							{#if showProbRow}
 								{@render row(
 									'Ймовірність опадів, %',
 									(s) => (s.precipProb === undefined ? '—' : String(s.precipProb)),
-									true,
+									striped('prob'),
 									'',
-									(s) => (s.precipProb ?? 0) >= 30
+									(s) => (s.precipProb ?? 0) >= 30,
+									isLast('prob')
 								)}
 							{/if}
 
-							{@render row(
-								'Опади, мм',
-								(s) => (s.precip > 0 ? s.precip.toFixed(1) : '—'),
-								!hasProbability,
-								'',
-								(s) => s.precip > 0,
-								true
-							)}
+							{#if showPrecipRow}
+								{@render row(
+									'Опади, мм',
+									(s) => (s.precip > 0 ? s.precip.toFixed(1) : '—'),
+									striped('precip'),
+									'',
+									(s) => s.precip > 0,
+									true
+								)}
+							{/if}
 						</tbody>
 					</table>
 				</div>
+
+				<!--
+					Сонце й ультрафіолет — мʼяка картка, як Trade In на apple.com.
+					Лише підпис і значення: іконки повторювали б підписи, а кольорова шкала — слово «помірний».
+					Час — без нуля попереду, як у таблиці вище: 6:48.
+					Стоїть під таблицею: опис — зверху, години — посередині, сонце — наостанок.
+					Повітря й пилок — в описі дня, окремих клітинок для них немає.
+				-->
+				{#if (day.sunrise && day.sunset) || day.uvMax !== undefined}
+					<dl
+						class="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[18px] bg-separator sm:grid-cols-4"
+					>
+						{#if day.sunrise && day.sunset}
+							{@render stat('Схід сонця', clock(day.sunrise, false))}
+							{@render stat('Захід сонця', clock(day.sunset, false))}
+							{@render stat('Світловий день', daylight(day.sunrise, day.sunset))}
+						{/if}
+						{#if day.uvMax !== undefined}
+							{@render stat('УФ-індекс', String(Math.round(day.uvMax)), uvText(day.uvMax))}
+						{/if}
+					</dl>
+				{/if}
 			</div>
 		{/key}
 	{/if}
 </section>
 
 <!-- Показник у картці сонця: іконка й підпис сірим, значення крупно -->
-{#snippet stat(Icon: typeof Sun, label: string, value: string, tint?: string)}
+{#snippet stat(label: string, value: string, note?: string)}
 	<div class="bg-fill px-4 py-3.5 sm:px-5 sm:py-4">
-		<dt class="flex items-center gap-1.5 text-[13px] text-muted-foreground">
-			<Icon
-				class="size-4 {tint ? '' : 'text-tertiary'}"
-				style={tint ? `color: ${tint}` : undefined}
-				aria-hidden="true"
-			/>
-			{label}
-		</dt>
-		<dd class="mt-1 text-[22px] leading-tight font-semibold whitespace-nowrap tabular-nums">
-			{value}
+		<dt class="text-[13px] text-muted-foreground">{label}</dt>
+		<dd class="mt-1 flex items-baseline gap-1.5 whitespace-nowrap">
+			<span class="text-[22px] leading-tight font-semibold tabular-nums">{value}</span>
+			{#if note}
+				<span class="text-[13px] text-muted-foreground">{note}</span>
+			{/if}
 		</dd>
 	</div>
 {/snippet}
@@ -436,22 +482,32 @@
 
 <style>
 	/*
-		Картки днів як вибір моделі на apple.com: тонка сіра рамка,
-		у вибраного — рамка кольору primary. Рамка намальована тінню всередину,
-		тож товщина змінюється без зсуву вмісту.
+		Картки днів — за зразком вибору конфігурації на apple.com:
+		радіус 12px, тонка рамка кольору роздільника, на наведенні — темніша,
+		у вибраного — така сама тонка, але кольору primary. Ні тіней, ні заливки.
+		Рамка намальована тінню всередину і не займає місця у розмітці.
 	*/
 	.day-tab {
-		box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--text-tertiary) 55%, var(--background));
-		transition: box-shadow 0.15s ease;
+		box-shadow: inset 0 0 0 1px var(--separator);
+		transition: box-shadow 0.2s ease;
+		-webkit-tap-highlight-color: transparent;
 	}
 
-	.day-tab:hover {
-		box-shadow: inset 0 0 0 1px var(--text-tertiary);
+	@media (hover: hover) {
+		.day-tab:hover {
+			box-shadow: inset 0 0 0 1px var(--text-tertiary);
+		}
 	}
 
 	.day-tab-active,
 	.day-tab-active:hover {
-		box-shadow: inset 0 0 0 2px var(--primary);
+		box-shadow: inset 0 0 0 1px var(--primary);
+	}
+
+	/* Фокус із клавіатури — окремим контуром із відступом, як на apple.com */
+	.day-tab:focus-visible {
+		outline: 2px solid var(--primary);
+		outline-offset: 3px;
 	}
 
 	/* Таблиця: смуги через рядок і мʼяко підсвічена колонка «зараз» */

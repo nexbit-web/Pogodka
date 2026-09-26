@@ -42,6 +42,7 @@
 	--color-w-sun: var(--w-sun);
 	--color-w-moon: var(--w-moon);
 	--color-w-cloud: var(--w-cloud);
+	--color-warning: var(--warning);
 
 	/* Вихідні дні — червоним, як звикли в календарях */
 	--color-weekend: var(--weekend);
@@ -98,6 +99,7 @@
 	--w-sun: #f5a623;
 	--w-moon: #5856d6;
 	--w-cloud: #86868b;
+	--warning: #ff9500;
 
 	--weekend: #d70015;
 
@@ -155,6 +157,7 @@
 	--w-sun: #ff9f0a;
 	--w-moon: #7d7aff;
 	--w-cloud: #98989d;
+	--warning: #ff9f0a;
 
 	--weekend: #ff453a;
 }

@@ -1,3 +1,4 @@
+import { representativeDayCode } from './weather';
 import type { DayHour, ForecastDay } from './types';
 
 /** Температура зі знаком, як звикли в Україні: +10°, −3°, 0° */
@@ -128,11 +129,19 @@ function skyStory(seed: string, hours: DayHour[]): string {
 
 	if (merged.length <= 1) return pick(`${seed}:steady`, SKY_STEADY[merged[0]?.sky ?? 'clear']);
 
+	const used = new Set<string>();
 	const phrases = merged.map((m, i) => {
 		const t = m.names.join(' та ');
 		// Сонце після хмар чи опадів — «розвидниться»
 		if (m.sky === 'clear' && i > 0) return `${t} розвидниться`;
-		return pick(`${seed}:part${i}`, SKY_PART[m.sky]).replace('{t}', t);
+		// Про сонце — лише вранці й удень: уночі та ввечері воно не світить
+		const sunny = m.names.includes('вранці') || m.names.includes('вдень');
+		const options = sunny ? SKY_PART[m.sky] : SKY_PART[m.sky].filter((o) => !o.includes('сонце'));
+		// Та сама фраза двічі в одному реченні звучить неохайно — беремо іншу
+		const fresh = options.filter((o) => !used.has(o));
+		const phrase = pick(`${seed}:part${i}`, fresh.length ? fresh : options);
+		used.add(phrase);
+		return phrase.replace('{t}', t);
 	});
 
 	const last = phrases.pop()!;
@@ -197,15 +206,74 @@ export interface DayStory {
  * Для сьогоднішнього дня враховує лише години, що ще попереду.
  * `prev` — попередній день, щоб порівняти температуру.
  */
-export function describeDay(day: ForecastDay, fromHour = 0, prev?: ForecastDay): DayStory {
+/** Повітря дня для опису: європейський індекс AQI і помітний пилок */
+export interface DayAir {
+	aqi: number | null;
+	pollen: { name: string; level: 'помірний' | 'високий' } | null;
+}
+
+// Пилок у родовому відмінку: «концентрація пилку амброзії»
+const POLLEN_OF: Record<string, string> = {
+	Амброзія: 'амброзії',
+	Береза: 'берези',
+	Вільха: 'вільхи',
+	Злаки: 'злакових трав',
+	Полин: 'полину'
+};
+
+/** Речення про повітря за шкалою EEA; для забрудненого — що з цим робити */
+function airStory(air: DayAir): string[] {
+	const sentences: string[] = [];
+	const { aqi, pollen } = air;
+
+	if (aqi !== null) {
+		if (aqi <= 20) sentences.push('Повітря чисте.');
+		else if (aqi <= 40) sentences.push('Якість повітря задовільна.');
+		else if (aqi <= 60)
+			sentences.push(
+				'Якість повітря помірна: людям із хворобами дихання краще не перенавантажуватися надворі.'
+			);
+		else if (aqi <= 80) sentences.push('Повітря забруднене: варто менше бувати надворі.');
+		else sentences.push('Повітря дуже забруднене: краще залишатися в приміщенні.');
+	}
+
+	if (pollen) {
+		const of = POLLEN_OF[pollen.name] ?? pollen.name.toLowerCase();
+		sentences.push(
+			pollen.level === 'високий'
+				? `Висока концентрація пилку ${of} — алергікам варто бути обережними.`
+				: `Помірна концентрація пилку ${of}.`
+		);
+	}
+	return sentences;
+}
+
+export function describeDay(
+	day: ForecastDay,
+	fromHour = 0,
+	prev?: ForecastDay,
+	air?: DayAir
+): DayStory {
 	const ahead = day.hours.filter((h) => h.hour >= fromHour);
 	const hours = ahead.length ? ahead : day.hours;
 	const seed = day.date;
 	const evening = fromHour >= 18;
 
-	// Заголовок
+	// Заголовок — за тим самим правилом, що й іконка дня в стрічці: для цілого дня
+	// це її ж код, для сьогодні — години, що попереду. Незначні опади день «дощовим» не роблять
 	const daytime = hours.filter((h) => h.hour >= 9 && h.hour <= 18);
-	const titleSky = dominantSky(daytime.length ? daytime : hours);
+	const titleSky = sky(
+		fromHour > 0
+			? representativeDayCode(
+					Math.max(...hours.map((h) => h.code)),
+					hours,
+					hours.reduce((sum, h) => sum + h.precip, 0),
+					Math.max(0, ...hours.map((h) => h.precipProb ?? 0)),
+					day.sunrise,
+					day.sunset
+				)
+			: day.code
+	);
 	const noun = evening ? 'вечір' : 'день';
 	const skyTitle = pick(`${seed}:title`, SKY_TITLE[titleSky]).replace('{d}', noun);
 	// «Сонячний вечір» звучить дивно — увечері просто ясно
@@ -220,6 +288,28 @@ export function describeDay(day: ForecastDay, fromHour = 0, prev?: ForecastDay):
 	if (fromHour >= 15) {
 		const low = Math.min(...hours.map((h) => h.temp));
 		sentences.push(`До ночі похолоднішає до ${signed(low)}.`);
+	} else if (fromHour > 0) {
+		// День уже почався: лише те, що попереду. «Прогріється» до того, що вже є,
+		// чи «уночі» про ніч, яка минула, — неправда
+		const now = Math.round(hours[0].temp);
+		const peak = Math.max(...hours.map((h) => h.temp));
+		const afterPeak = hours.slice(hours.findIndex((h) => h.temp === peak));
+		const low = Math.min(...afterPeak.map((h) => h.temp));
+		const cools = Math.round(low) < Math.round(peak);
+
+		if (Math.round(peak) > now) {
+			sentences.push(
+				cools
+					? `Удень потеплішає до ${signed(peak)}, а до ночі похолоднішає до ${signed(low)}.`
+					: `Удень потеплішає до ${signed(peak)}.`
+			);
+		} else {
+			sentences.push(
+				cools
+					? `Тепліше вже не буде: до ночі похолоднішає до ${signed(low)}.`
+					: `Температура до вечора майже не зміниться.`
+			);
+		}
 	} else {
 		sentences.push(
 			pick(`${seed}:temp`, [
@@ -254,10 +344,8 @@ export function describeDay(day: ForecastDay, fromHour = 0, prev?: ForecastDay):
 		sentences.push('Через вологість спека відчуватиметься сильніше.');
 	}
 
-	// Вітер
-	if (gusts >= 15) {
-		sentences.push(`Сильний вітер: пориви до ${Math.round(gusts)} м/с.`);
-	} else if (gusts >= 10) {
+	// Вітер. Сильний (від 15 м/с) — у попередженнях над текстом, тут не повторюємо
+	if (gusts >= 10 && gusts < 15) {
 		sentences.push(
 			pick(`${seed}:wind`, [
 				`Місцями поривчастий вітер, до ${Math.round(gusts)} м/с.`,
@@ -266,14 +354,15 @@ export function describeDay(day: ForecastDay, fromHour = 0, prev?: ForecastDay):
 		);
 	}
 
+	// Повітря й пилок — лише в описі, окремої клітинки для них немає
+	if (air) sentences.push(...airStory(air));
+
 	// Одна доречна деталь наостанок
 	const dry = !hours.some((h) => WET.includes(sky(h.code)));
 	const morningFog = hours.some((h) => h.hour >= 5 && h.hour <= 10 && sky(h.code) === 'fog');
 
 	if (morningFog && titleSky !== 'fog') {
 		sentences.push('Вранці через туман на дорогах можлива погана видимість.');
-	} else if (day.min <= 0 && day.max > 2 && fromHour < 9) {
-		sentences.push('Уночі та вранці можливі заморозки.');
 	} else if (dry && (day.uvMax ?? 0) >= 7 && titleSky === 'clear') {
 		sentences.push('Сонце активне, тож захист від ультрафіолету не завадить.');
 	} else if (
@@ -296,4 +385,40 @@ export function describeDay(day: ForecastDay, fromHour = 0, prev?: ForecastDay):
 export function daylight(sunrise: string, sunset: string): string {
 	const minutes = Math.round((Date.parse(sunset) - Date.parse(sunrise)) / 60000);
 	return `${Math.floor(minutes / 60)} год ${minutes % 60} хв`;
+}
+
+/**
+ * Попередження про небезпечну погоду — лише коли вона справді очікується:
+ * «Заморозки до −2°», «Сильний вітер: пориви до 17 м/с».
+ * Для сьогодні враховує лише години, що попереду.
+ */
+export function dayWarnings(day: ForecastDay, fromHour = 0): string[] {
+	const ahead = day.hours.filter((h) => h.hour >= fromHour);
+	const hours = ahead.length ? ahead : day.hours;
+	if (hours.length === 0) return [];
+
+	const temps = hours.map((h) => h.temp);
+	const low = fromHour > 0 ? Math.min(...temps) : day.min;
+	const high = fromHour > 0 ? Math.max(...temps) : day.max;
+	const gusts = Math.max(...hours.map((h) => h.gusts));
+	const precip = hours.reduce((sum, h) => sum + h.precip, 0);
+	const warnings: string[] = [];
+
+	if (low <= -15) warnings.push(`Сильний мороз до ${signed(low)}`);
+	else if (Math.round(low) <= 0) warnings.push(`Заморозки до ${signed(low)}`);
+
+	if (high >= 35) warnings.push(`Сильна спека до ${signed(high)}`);
+	else if (high >= 30) warnings.push(`Спека до ${signed(high)}`);
+
+	if (gusts >= 20) warnings.push(`Дуже сильний вітер: пориви до ${Math.round(gusts)} м/с`);
+	else if (gusts >= 15) warnings.push(`Сильний вітер: пориви до ${Math.round(gusts)} м/с`);
+
+	if (hours.some((h) => h.code >= 95)) warnings.push('Можлива гроза');
+
+	if (precip >= 20) {
+		const snow = hours.some((h) => sky(h.code) === 'snow');
+		warnings.push(`${snow ? 'Сильний снігопад' : 'Сильні опади'}: до ${Math.round(precip)} мм`);
+	}
+
+	return warnings;
 }

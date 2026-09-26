@@ -8,7 +8,7 @@ const SECURITY_HEADERS: Record<string, string> = {
 	'X-Content-Type-Options': 'nosniff',
 	'Referrer-Policy': 'strict-origin-when-cross-origin',
 	'X-Frame-Options': 'SAMEORIGIN',
-	'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+	'Permissions-Policy': 'camera=(), microphone=(), geolocation=(self), interest-cohort=()',
 	'Strict-Transport-Security': 'max-age=31536000'
 };
 

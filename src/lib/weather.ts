@@ -1,5 +1,12 @@
 import { KYIV_TZ, kyivNow } from './date';
-import type { CurrentWeather, DayHour, ForecastDay, OpenMeteoWeather, WeeklyDay } from './types';
+import type {
+	AirQualityData,
+	CurrentWeather,
+	DayHour,
+	ForecastDay,
+	OpenMeteoWeather,
+	WeeklyDay
+} from './types';
 
 export { KYIV_TZ };
 
@@ -176,6 +183,42 @@ export function getTempColor(temp: number): string {
 	return `rgb(${last[1].join(' ')})`;
 }
 
+// Осадки вважаються помітними від 0,5 мм за день або з імовірністю від 30%
+const NOTABLE_PRECIP_MM = 0.5;
+const NOTABLE_PRECIP_PROB = 30;
+
+/**
+ * Іконка дня — яким день був насправді, а не найгірша його година.
+ * Open-Meteo віддає за добу найсильнішу погоду: 0,1 мм дощу за одну годину
+ * перетворюють сухий день на «дощовий». Тому опади показуємо, лише якщо вони помітні,
+ * а інакше — типовий стан неба світлового дня.
+ */
+export function representativeDayCode(
+	apiCode: number,
+	hours: DayHour[],
+	precipSum: number,
+	precipProbMax?: number,
+	sunrise?: string,
+	sunset?: string
+): number {
+	const notable = precipSum >= NOTABLE_PRECIP_MM || (precipProbMax ?? 0) >= NOTABLE_PRECIP_PROB;
+	if (apiCode >= 51 && notable) return apiCode;
+
+	if (hours.length === 0) return apiCode >= 51 ? 3 : apiCode;
+	// Світлова частина дня; для вечора, коли вона вже минула, — усі години
+	const light = hours.filter((h) => !isNightHour(h.time, sunrise, sunset));
+	const daytime = light.length ? light : hours;
+
+	// Туман — лише якщо тримався хоча б пів світлового дня
+	const fog = daytime.filter((h) => h.code === 45 || h.code === 48);
+	if (fog.length * 2 >= daytime.length) return fog[0].code;
+
+	// Інакше — медіана хмарності (0 ясно … 3 похмуро): «середина» дня, а не його частина.
+	// Туман і години з незначними опадами рахуються як похмурі
+	const sky = daytime.map((h) => (h.code <= 3 ? h.code : 3)).sort((x, y) => x - y);
+	return sky[Math.floor(sky.length / 2)];
+}
+
 /** Дні прогнозу з погодинними даними, згруповані за датою (час Open-Meteo вже київський). */
 export function buildForecastDays(weather: OpenMeteoWeather): ForecastDay[] {
 	const h = weather.hourly;
@@ -203,18 +246,78 @@ export function buildForecastDays(weather: OpenMeteoWeather): ForecastDay[] {
 		byDate.set(date, list);
 	});
 
-	return d.time.map((date, i) => ({
-		date,
-		code: d.weathercode[i] ?? 0,
-		min: d.temperature_2m_min[i] ?? 0,
-		max: d.temperature_2m_max[i] ?? 0,
-		precipSum: d.precipitation_sum?.[i] ?? 0,
-		precipProbMax: d.precipitation_probability_max?.[i],
-		sunrise: d.sunrise?.[i],
-		sunset: d.sunset?.[i],
-		uvMax: d.uv_index_max?.[i],
-		hours: byDate.get(date) ?? []
-	}));
+	return d.time.map((date, i) => {
+		const hours = byDate.get(date) ?? [];
+		const precipSum = d.precipitation_sum?.[i] ?? 0;
+		const precipProbMax = d.precipitation_probability_max?.[i];
+		const sunrise = d.sunrise?.[i];
+		const sunset = d.sunset?.[i];
+
+		return {
+			date,
+			code: representativeDayCode(
+				d.weathercode[i] ?? 0,
+				hours,
+				precipSum,
+				precipProbMax,
+				sunrise,
+				sunset
+			),
+			min: d.temperature_2m_min[i] ?? 0,
+			max: d.temperature_2m_max[i] ?? 0,
+			precipSum,
+			precipProbMax,
+			sunrise,
+			sunset,
+			uvMax: d.uv_index_max?.[i],
+			hours
+		};
+	});
+}
+
+// Назва опадів за кодом погоди — для рядка «Дощ почнеться близько 15:00»
+function precipWord(code: number): string {
+	if (code >= 95) return 'Гроза';
+	if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'Сніг';
+	if (code >= 51 && code <= 57) return 'Мряка';
+	return 'Дощ';
+}
+
+/**
+ * Найближчі опади на кілька годин уперед — щоб одразу знати, чи брати парасольку:
+ * «Дощ почнеться близько 15:00», «Дощ закінчиться близько 17:00».
+ * null — у найближчі години сухо, і рядка не буде.
+ *
+ * Опади Open-Meteo — сума за годину, що закінчується в указаний час:
+ * значення о 16:00 означає дощ з 15:00 до 16:00. Тому поточна година — наступний запис,
+ * а початок опадів — година перед першим мокрим записом.
+ */
+export function precipOutlook(
+	weather: OpenMeteoWeather,
+	hourIndex: number,
+	horizon = 6
+): string | null {
+	const { time, precipitation, weathercode } = weather.hourly;
+	if (hourIndex < 0 || !precipitation) return null;
+
+	const wet = (i: number) => (precipitation[i] ?? 0) > 0 && (weathercode[i] ?? 0) >= 51;
+	// «15:00» без нуля попереду, як у таблиці
+	const at = (i: number) => time[i]?.slice(11, 16).replace(/^0/, '');
+	const now = hourIndex + 1;
+	const last = Math.min(hourIndex + horizon, time.length - 1);
+
+	if (wet(now)) {
+		const word = precipWord(weathercode[now]);
+		for (let i = now + 1; i <= last; i++) {
+			if (!wet(i)) return `${word} закінчиться близько ${at(i - 1)}`;
+		}
+		return `${word} триватиме ще кілька годин`;
+	}
+
+	for (let i = now + 1; i <= last; i++) {
+		if (wet(i)) return `${precipWord(weathercode[i])} почнеться близько ${at(i - 1)}`;
+	}
+	return null;
 }
 
 /** Колонка погодинної таблиці */
@@ -259,6 +362,65 @@ export function buildTableSlots(hours: DayHour[], currentHour?: number): TableSl
 				now: isNow
 			};
 		});
+}
+
+// ——— Якість повітря й пилок ———
+
+/** Європейський індекс якості повітря словами (шкала EEA) */
+export function aqiText(aqi: number): string {
+	if (aqi <= 20) return 'добра';
+	if (aqi <= 40) return 'задовільна';
+	if (aqi <= 60) return 'помірна';
+	if (aqi <= 80) return 'погана';
+	if (aqi <= 100) return 'дуже погана';
+	return 'надзвичайно погана';
+}
+
+const hoursOf = (air: AirQualityData, date: string) =>
+	air.time.flatMap((t, i) => (t.startsWith(date) ? [i] : []));
+
+/**
+ * Індекс якості повітря для дня: сьогодні — поточна година, інші дні — найгірша година.
+ * null — даних на цей день немає (прогноз якості повітря лише на 5 днів).
+ */
+export function dayAqi(air: AirQualityData, date: string, currentTime?: string): number | null {
+	if (currentTime) {
+		const value = air.european_aqi[air.time.indexOf(currentTime)];
+		if (value != null) return Math.round(value);
+	}
+	const values = hoursOf(air, date).flatMap((i) => air.european_aqi[i] ?? []);
+	return values.length ? Math.round(Math.max(...values)) : null;
+}
+
+// Пилок: назва і пороги «помірний» / «високий», зерен/м³. Пороги обережні —
+// показуємо лише помітний пилок, щоб не лякати дрібницями
+const POLLEN = [
+	{ key: 'ragweed_pollen', name: 'Амброзія', moderate: 10, high: 50 },
+	{ key: 'birch_pollen', name: 'Береза', moderate: 10, high: 100 },
+	{ key: 'alder_pollen', name: 'Вільха', moderate: 10, high: 100 },
+	{ key: 'grass_pollen', name: 'Злаки', moderate: 10, high: 50 },
+	{ key: 'mugwort_pollen', name: 'Полин', moderate: 10, high: 50 }
+] as const;
+
+/** Найпомітніший пилок дня або null, якщо жодного не багато */
+export function dayPollen(
+	air: AirQualityData,
+	date: string
+): { name: string; level: 'помірний' | 'високий' } | null {
+	const hours = hoursOf(air, date);
+	let best: { name: string; level: 'помірний' | 'високий'; ratio: number } | null = null;
+
+	for (const p of POLLEN) {
+		const values = hours.flatMap((i) => air[p.key][i] ?? []);
+		const max = values.length ? Math.max(...values) : 0;
+		if (max < p.moderate) continue;
+		// Порівнюємо відносно порогу: 60 зерен амброзії важать більше, ніж 60 берези
+		const ratio = max / p.high;
+		if (!best || ratio > best.ratio) {
+			best = { name: p.name, level: max >= p.high ? 'високий' : 'помірний', ratio };
+		}
+	}
+	return best && { name: best.name, level: best.level };
 }
 
 /** гПа → мм рт. ст. (так тиск звично показують в Україні) */
