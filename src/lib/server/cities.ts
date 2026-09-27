@@ -14,10 +14,11 @@ interface Base {
 	region: string;
 }
 
-const capital = (): Base & { latitude: number; longitude: number } => ({
+const capital = (): Base & { nameRu: string; latitude: number; longitude: number } => ({
 	id: KYIV.id,
 	slug: KYIV.slug,
 	nameUa: KYIV.nameUa,
+	nameRu: KYIV.nameRu,
 	region: KYIV.region,
 	latitude: KYIV.latitude,
 	longitude: KYIV.longitude
@@ -41,6 +42,7 @@ export async function attachPaths<T extends Base>(cities: T[]): Promise<(T & { p
 export interface NearbyCity {
 	id: number;
 	nameUa: string;
+	nameRu?: string;
 	region: string;
 	path: string;
 	/** Відстань, км */
@@ -76,7 +78,15 @@ export async function nearbyCities(
 			longitude: { gte: city.longitude - dLon, lte: city.longitude + dLon },
 			NOT: { id: city.id }
 		},
-		select: { id: true, slug: true, nameUa: true, region: true, latitude: true, longitude: true },
+		select: {
+			id: true,
+			slug: true,
+			nameUa: true,
+			nameRu: true,
+			region: true,
+			latitude: true,
+			longitude: true
+		},
 		take: 300
 	});
 
@@ -100,6 +110,7 @@ export async function nearbyCities(
 	return withPaths.map((c) => ({
 		id: c.id,
 		nameUa: c.nameUa,
+		nameRu: c.nameRu ?? undefined,
 		region: c.region,
 		path: c.path,
 		distance: Math.round(c.distance)

@@ -3,6 +3,9 @@
 	Спільне для рядка в пошуку і плашки при першому візиті. Координати не зберігаються.
 */
 
+import { messagesFor } from './i18n/messages';
+import type { Lang } from './i18n';
+
 const PROMPT_KEY = 'pogodka-geo-prompt';
 
 /** Помилка з текстом, який можна показати людині як є */
@@ -27,23 +30,24 @@ const position = () =>
 	);
 
 /** Адреса сторінки найближчого населеного пункту (path для /pohoda/{path}) */
-export async function locateNearestCity(): Promise<string> {
+export async function locateNearestCity(lang: Lang = 'uk'): Promise<string> {
+	const t = messagesFor(lang);
 	let coords: GeolocationCoordinates;
 	try {
 		coords = (await position()).coords;
 	} catch (err) {
 		if ((err as GeolocationPositionError).code === 1) {
-			throw new GeoError('Доступ до геолокації вимкнено в налаштуваннях браузера', true);
+			throw new GeoError(t.geoDenied, true);
 		}
-		throw new GeoError('Не вдалося визначити місцезнаходження. Спробуйте ще раз');
+		throw new GeoError(t.geoRetry);
 	}
 
 	const res = await fetch(
 		`/api/cities/nearest?lat=${coords.latitude.toFixed(4)}&lon=${coords.longitude.toFixed(4)}`
 	).catch(() => null);
 
-	if (res?.status === 404) throw new GeoError('Поруч немає населених пунктів України');
-	if (!res?.ok) throw new GeoError('Не вдалося визначити населений пункт. Спробуйте ще раз');
+	if (res?.status === 404) throw new GeoError(t.geoNone);
+	if (!res?.ok) throw new GeoError(t.geoCityFailed);
 	return ((await res.json()) as { path: string }).path;
 }
 

@@ -1,4 +1,6 @@
-import { representativeDayCode } from './weather';
+import { representativeDayCode, type PollenLevel, type PollenPlant } from './weather';
+import type { Lang } from './i18n';
+import { ruPack } from './i18n/pack';
 import type { DayHour, ForecastDay } from './types';
 
 /** Температура зі знаком, як звикли в Україні: +10°, −3°, 0° */
@@ -25,12 +27,207 @@ function sky(code: number): Sky {
 const WET: Sky[] = ['storm', 'snow', 'rain', 'drizzle'];
 
 // Частини доби в тому ж порядку, що й у таблиці
-const PARTS = [
-	{ name: 'вночі', from: 0, to: 6 },
-	{ name: 'вранці', from: 6, to: 12 },
-	{ name: 'вдень', from: 12, to: 18 },
-	{ name: 'ввечері', from: 18, to: 24 }
+type Part = 'night' | 'morning' | 'day' | 'evening';
+const PARTS: { key: Part; from: number; to: number }[] = [
+	{ key: 'night', from: 0, to: 6 },
+	{ key: 'morning', from: 6, to: 12 },
+	{ key: 'day', from: 12, to: 18 },
+	{ key: 'evening', from: 18, to: 24 }
 ];
+
+/*
+	Розмовник: усі фрази опису дня однією мовою. Логіка нижче спільна,
+	тож українська й російська версії описують день однаково, різняться лише слова.
+*/
+export interface Phrasebook {
+	parts: Record<Part, string>;
+	/** «вранці та вдень» */
+	and: string;
+	/** Слово «сонце» — щоб не казати про сонце вночі й увечері */
+	sun: string;
+	day: string;
+	evening: string;
+	clearEvening: string;
+	warmth: (max: number) => string[];
+	skyTitle: Record<Sky, string[]>;
+	skySteady: Record<Sky, string[]>;
+	skyPart: Record<Sky, string[]>;
+	clearing: string;
+	maybeRain: string[];
+	dry: string[];
+	precip: {
+		storm: (sum: number) => string;
+		snow: (sum: number) => string;
+		drizzle: string;
+		rain: (sum: number) => string;
+	};
+	allDay: string;
+	around: (h: number) => string;
+	between: (from: number, to: number) => string;
+	expected: string;
+	slippery: string;
+	umbrella: string[];
+	air: string[];
+	pollenOf: Record<PollenPlant, string>;
+	pollen: (level: PollenLevel, of: string) => string;
+	coolsTonight: (low: string) => string;
+	warmsCools: (peak: string, low: string) => string;
+	warms: (peak: string) => string;
+	peakPassed: (low: string) => string;
+	steadyTemp: string;
+	fullDay: (min: string, max: string) => string[];
+	vsYesterday: (diff: number) => string;
+	windChill: string;
+	dampChill: string;
+	muggy: string;
+	gusty: (g: number) => string[];
+	fog: string;
+	uv: string;
+	mood: string[];
+	daylight: (h: number, m: number) => string;
+	warnings: {
+		frostSevere: (t: string) => string;
+		frost: (t: string) => string;
+		heatSevere: (t: string) => string;
+		heat: (t: string) => string;
+		windSevere: (g: number) => string;
+		wind: (g: number) => string;
+		storm: string;
+		snowfall: (mm: number) => string;
+		downpour: (mm: number) => string;
+	};
+}
+
+const UK: Phrasebook = {
+	parts: { night: 'вночі', morning: 'вранці', day: 'вдень', evening: 'ввечері' },
+	and: ' та ',
+	sun: 'сонце',
+	day: 'день',
+	evening: 'вечір',
+	clearEvening: 'ясний',
+	// Характер дня за денним максимумом
+	warmth: (max) => {
+		if (max >= 30) return ['спекотний', 'по-справжньому спекотний'];
+		if (max >= 24) return ['теплий', 'по-літньому теплий'];
+		if (max >= 17) return ['мʼякий', 'приємно теплий'];
+		if (max >= 11) return ['свіжий', 'прохолодний'];
+		if (max >= 4) return ['прохолодний', 'зябкий'];
+		if (max >= 0) return ['холодний'];
+		return ['морозний'];
+	},
+	// Заголовок: «Теплий день із проясненнями». {d} — «день» або «вечір»
+	skyTitle: {
+		clear: ['сонячний {d}', 'ясний {d}'],
+		cloudy: ['{d} із проясненнями', '{d} зі змінною хмарністю'],
+		overcast: ['похмурий {d}', 'сірий {d}'],
+		fog: ['туманний {d}'],
+		drizzle: ['{d} із мрякою'],
+		rain: ['дощовий {d}', '{d} із дощем'],
+		snow: ['сніжний {d}', '{d} зі снігопадом'],
+		storm: ['грозовий {d}', '{d} із грозами']
+	},
+	// Коли стан неба не змінюється за весь час
+	skySteady: {
+		clear: ['Небо чисте, жодної хмаринки.', 'Сонце світитиме без перерви.'],
+		cloudy: [
+			'Сонце то ховатиметься за хмари, то визиратиме знову.',
+			'Хмари йтимуть небом, але сонце раз у раз проглядатиме.'
+		],
+		overcast: ['Хмари не розійдуться до самого вечора.', 'Небо суцільно затягнуте хмарами.'],
+		fog: ['Туман триматиметься довго.', 'Над містом стоятиме густий туман.'],
+		drizzle: ['Сіятиме дрібна мряка.', 'У повітрі висітиме мряка.'],
+		rain: ['Дощитиме майже без перерви.', 'Дощ ітиме з короткими перервами.'],
+		snow: ['Сніг падатиме майже без перерви.', 'Сніжитиме з короткими перервами.'],
+		storm: ['Погода неспокійна: можливі грози.', 'Раз у раз налітатимуть грози.']
+	},
+	// Фраза для частини доби; {t} — «вранці», «вдень»…
+	skyPart: {
+		clear: ['{t} ясно', '{t} світитиме сонце'],
+		cloudy: ['{t} мінлива хмарність', '{t} сонце чергуватиметься з хмарами'],
+		overcast: ['{t} небо затягнуть хмари', '{t} похмуро'],
+		fog: ['{t} ляже туман', '{t} туман'],
+		drizzle: ['{t} мрячитиме', '{t} сіятиме мряка'],
+		rain: ['{t} пройде дощ', '{t} дощитиме'],
+		snow: ['{t} піде сніг', '{t} сніжитиме'],
+		storm: ['{t} можлива гроза', '{t} налетить гроза']
+	},
+	clearing: '{t} розвидниться',
+	maybeRain: [
+		'Короткий дощ не виключений, але, найімовірніше, обійдеться.',
+		'Невелика ймовірність дощу є, проте, найпевніше, буде сухо.'
+	],
+	dry: ['Опадів не передбачається.', 'Обійдеться без опадів.', 'День мине сухо.'],
+	precip: {
+		storm: (sum) => (sum >= 5 ? 'Гроза зі зливою' : 'Гроза'),
+		snow: (sum) => (sum < 1 ? 'Невеликий сніг' : sum < 5 ? 'Сніг' : 'Сильний снігопад'),
+		drizzle: 'Мряка',
+		rain: (sum) =>
+			sum < 1 ? 'Невеликий дощ' : sum < 5 ? 'Дощ' : sum < 15 ? 'Сильний дощ' : 'Злива'
+	},
+	allDay: 'з перервами протягом дня',
+	around: (h) => `близько ${h}:00`,
+	between: (from, to) => `приблизно з ${from}:00 до ${to}:00`,
+	expected: 'очікується',
+	slippery: 'Дороги можуть бути слизькими.',
+	umbrella: ['Парасолька знадобиться.', 'Варто взяти парасольку.'],
+	// Повітря за шкалою EEA; для забрудненого — що з цим робити
+	air: [
+		'Повітря чисте.',
+		'Якість повітря задовільна.',
+		'Якість повітря помірна: людям із хворобами дихання краще не перенавантажуватися надворі.',
+		'Повітря забруднене: варто менше бувати надворі.',
+		'Повітря дуже забруднене: краще залишатися в приміщенні.'
+	],
+	// Родовий відмінок: «концентрація пилку амброзії»
+	pollenOf: {
+		ragweed: 'амброзії',
+		birch: 'берези',
+		alder: 'вільхи',
+		grass: 'злакових трав',
+		mugwort: 'полину'
+	},
+	pollen: (level, of) =>
+		level === 'high'
+			? `Висока концентрація пилку ${of} — алергікам варто бути обережними.`
+			: `Помірна концентрація пилку ${of}.`,
+	coolsTonight: (low) => `До ночі похолоднішає до ${low}.`,
+	warmsCools: (peak, low) => `Удень потеплішає до ${peak}, а до ночі похолоднішає до ${low}.`,
+	warms: (peak) => `Удень потеплішає до ${peak}.`,
+	peakPassed: (low) => `Тепліше вже не буде: до ночі похолоднішає до ${low}.`,
+	steadyTemp: 'Температура до вечора майже не зміниться.',
+	fullDay: (min, max) => [
+		`Удень повітря прогріється до ${max}, уночі — ${min}.`,
+		`Температура — від ${min} уночі до ${max} удень.`,
+		`Максимум — ${max}, мінімум уночі — ${min}.`
+	],
+	vsYesterday: (diff) =>
+		`Це на ${Math.abs(diff)}° ${diff > 0 ? 'тепліше' : 'холодніше'}, ніж напередодні.`,
+	windChill: 'Через вітер надворі здаватиметься помітно холодніше.',
+	dampChill: 'Через вологість надворі здаватиметься холодніше, ніж на термометрі.',
+	muggy: 'Через вологість спека відчуватиметься сильніше.',
+	gusty: (g) => [
+		`Місцями поривчастий вітер, до ${g} м/с.`,
+		`Вітер часом посилюватиметься до ${g} м/с.`
+	],
+	fog: 'Вранці через туман на дорогах можлива погана видимість.',
+	uv: 'Сонце активне, тож захист від ультрафіолету не завадить.',
+	mood: ['Чудовий день для прогулянки.', 'Гарна нагода побути надворі.'],
+	daylight: (h, m) => `${h} год ${m} хв`,
+	warnings: {
+		frostSevere: (t) => `Сильний мороз до ${t}`,
+		frost: (t) => `Заморозки до ${t}`,
+		heatSevere: (t) => `Сильна спека до ${t}`,
+		heat: (t) => `Спека до ${t}`,
+		windSevere: (g) => `Дуже сильний вітер: пориви до ${g} м/с`,
+		wind: (g) => `Сильний вітер: пориви до ${g} м/с`,
+		storm: 'Можлива гроза',
+		snowfall: (mm) => `Сильний снігопад: до ${mm} мм`,
+		downpour: (mm) => `Сильні опади: до ${mm} мм`
+	}
+};
+
+// Російський розмовник — з окремого пакета, що вантажиться лише на /ru (див. i18n/pack.ts)
+const phrasebook = (lang: Lang): Phrasebook => (lang === 'ru' && ruPack()?.phrases) || UK;
 
 /*
 	Формулювання «випадкові», але детерміновані: зерно — дата і ключ фрази.
@@ -61,82 +258,32 @@ function dominantSky(hours: DayHour[]): Sky {
 	return [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? 'clear';
 }
 
-// Характер дня за денним максимумом
-function warmth(max: number): string[] {
-	if (max >= 30) return ['спекотний', 'по-справжньому спекотний'];
-	if (max >= 24) return ['теплий', 'по-літньому теплий'];
-	if (max >= 17) return ['мʼякий', 'приємно теплий'];
-	if (max >= 11) return ['свіжий', 'прохолодний'];
-	if (max >= 4) return ['прохолодний', 'зябкий'];
-	if (max >= 0) return ['холодний'];
-	return ['морозний'];
-}
-
-// Заголовок: «Теплий день із проясненнями». {d} — «день» або «вечір»
-const SKY_TITLE: Record<Sky, string[]> = {
-	clear: ['сонячний {d}', 'ясний {d}'],
-	cloudy: ['{d} із проясненнями', '{d} зі змінною хмарністю'],
-	overcast: ['похмурий {d}', 'сірий {d}'],
-	fog: ['туманний {d}'],
-	drizzle: ['{d} із мрякою'],
-	rain: ['дощовий {d}', '{d} із дощем'],
-	snow: ['сніжний {d}', '{d} зі снігопадом'],
-	storm: ['грозовий {d}', '{d} із грозами']
-};
-
-// Коли стан неба не змінюється за весь час
-const SKY_STEADY: Record<Sky, string[]> = {
-	clear: ['Небо чисте, жодної хмаринки.', 'Сонце світитиме без перерви.'],
-	cloudy: [
-		'Сонце то ховатиметься за хмари, то визиратиме знову.',
-		'Хмари йтимуть небом, але сонце раз у раз проглядатиме.'
-	],
-	overcast: ['Хмари не розійдуться до самого вечора.', 'Небо суцільно затягнуте хмарами.'],
-	fog: ['Туман триматиметься довго.', 'Над містом стоятиме густий туман.'],
-	drizzle: ['Сіятиме дрібна мряка.', 'У повітрі висітиме мряка.'],
-	rain: ['Дощитиме майже без перерви.', 'Дощ ітиме з короткими перервами.'],
-	snow: ['Сніг падатиме майже без перерви.', 'Сніжитиме з короткими перервами.'],
-	storm: ['Погода неспокійна: можливі грози.', 'Раз у раз налітатимуть грози.']
-};
-
-// Фраза для частини доби; {t} — «вранці», «вдень»…
-const SKY_PART: Record<Sky, string[]> = {
-	clear: ['{t} ясно', '{t} світитиме сонце'],
-	cloudy: ['{t} мінлива хмарність', '{t} сонце чергуватиметься з хмарами'],
-	overcast: ['{t} небо затягнуть хмари', '{t} похмуро'],
-	fog: ['{t} ляже туман', '{t} туман'],
-	drizzle: ['{t} мрячитиме', '{t} сіятиме мряка'],
-	rain: ['{t} пройде дощ', '{t} дощитиме'],
-	snow: ['{t} піде сніг', '{t} сніжитиме'],
-	storm: ['{t} можлива гроза', '{t} налетить гроза']
-};
-
 /** Хід погоди протягом дня: «Вранці похмуро, вдень розвидниться, а ввечері пройде дощ.» */
-function skyStory(seed: string, hours: DayHour[]): string {
-	const parts = PARTS.map((p) => ({
-		name: p.name,
-		hours: hours.filter((h) => h.hour >= p.from && h.hour < p.to)
+function skyStory(p: Phrasebook, seed: string, hours: DayHour[]): string {
+	const parts = PARTS.map((part) => ({
+		key: part.key,
+		hours: hours.filter((h) => h.hour >= part.from && h.hour < part.to)
 	}))
-		.filter((p) => p.hours.length > 0)
-		.map((p) => ({ name: p.name, sky: dominantSky(p.hours) }));
+		.filter((part) => part.hours.length > 0)
+		.map((part) => ({ key: part.key, sky: dominantSky(part.hours) }));
 
-	const merged: { names: string[]; sky: Sky }[] = [];
-	for (const p of parts) {
+	const merged: { keys: Part[]; sky: Sky }[] = [];
+	for (const part of parts) {
 		const last = merged.at(-1);
-		if (last && last.sky === p.sky) last.names.push(p.name);
-		else merged.push({ names: [p.name], sky: p.sky });
+		if (last && last.sky === part.sky) last.keys.push(part.key);
+		else merged.push({ keys: [part.key], sky: part.sky });
 	}
 
-	if (merged.length <= 1) return pick(`${seed}:steady`, SKY_STEADY[merged[0]?.sky ?? 'clear']);
+	if (merged.length <= 1) return pick(`${seed}:steady`, p.skySteady[merged[0]?.sky ?? 'clear']);
 
 	const used = new Set<string>();
 	const phrases = merged.map((m, i) => {
-		const t = m.names.join(' та ');
+		const t = m.keys.map((k) => p.parts[k]).join(p.and);
 		// Сонце після хмар чи опадів — «розвидниться»
-		if (m.sky === 'clear' && i > 0) return `${t} розвидниться`;
+		if (m.sky === 'clear' && i > 0) return p.clearing.replace('{t}', t);
 		// Про сонце — лише вранці й удень: уночі та ввечері воно не світить
-		const sunny = m.names.includes('вранці') || m.names.includes('вдень');
-		const options = sunny ? SKY_PART[m.sky] : SKY_PART[m.sky].filter((o) => !o.includes('сонце'));
+		const sunny = m.keys.includes('morning') || m.keys.includes('day');
+		const options = sunny ? p.skyPart[m.sky] : p.skyPart[m.sky].filter((o) => !o.includes(p.sun));
 		// Та сама фраза двічі в одному реченні звучить неохайно — беремо іншу
 		const fresh = options.filter((o) => !used.has(o));
 		const phrase = pick(`${seed}:part${i}`, fresh.length ? fresh : options);
@@ -149,47 +296,39 @@ function skyStory(seed: string, hours: DayHour[]): string {
 }
 
 /** Коли і скільки опадів: «Невеликий дощ очікується приблизно з 14:00 до 17:00.» */
-function precipStory(seed: string, day: ForecastDay, hours: DayHour[]): string {
+function precipStory(p: Phrasebook, seed: string, day: ForecastDay, hours: DayHour[]): string {
 	const wet = hours.filter((h) => h.precip >= 0.1 || WET.includes(sky(h.code)));
 
 	if (wet.length === 0) {
-		if ((day.precipProbMax ?? 0) >= 30) {
-			return pick(`${seed}:maybe`, [
-				'Короткий дощ не виключений, але, найімовірніше, обійдеться.',
-				'Невелика ймовірність дощу є, проте, найпевніше, буде сухо.'
-			]);
-		}
-		return pick(`${seed}:dry`, [
-			'Опадів не передбачається.',
-			'Обійдеться без опадів.',
-			'День мине сухо.'
-		]);
+		if ((day.precipProbMax ?? 0) >= 30) return pick(`${seed}:maybe`, p.maybeRain);
+		return pick(`${seed}:dry`, p.dry);
 	}
 
 	const sum = wet.reduce((s, h) => s + h.precip, 0);
 	const kinds = new Set(wet.map((h) => sky(h.code)));
 
+	const drizzleOnly =
+		!kinds.has('storm') && !kinds.has('snow') && !kinds.has('rain') && kinds.has('drizzle');
 	let subject: string;
-	if (kinds.has('storm')) subject = sum >= 5 ? 'Гроза зі зливою' : 'Гроза';
-	else if (kinds.has('snow'))
-		subject = sum < 1 ? 'Невеликий сніг' : sum < 5 ? 'Сніг' : 'Сильний снігопад';
-	else if (!kinds.has('rain') && kinds.has('drizzle')) subject = 'Мряка';
-	else subject = sum < 1 ? 'Невеликий дощ' : sum < 5 ? 'Дощ' : sum < 15 ? 'Сильний дощ' : 'Злива';
+	if (kinds.has('storm')) subject = p.precip.storm(sum);
+	else if (kinds.has('snow')) subject = p.precip.snow(sum);
+	else if (drizzleOnly) subject = p.precip.drizzle;
+	else subject = p.precip.rain(sum);
 
 	const from = wet[0].hour;
 	const to = wet.at(-1)!.hour + 1;
 	let when: string;
-	if (to - from >= 12) when = 'з перервами протягом дня';
-	else if (to - from <= 1) when = `близько ${from}:00`;
-	else when = `приблизно з ${from}:00 до ${to === 24 ? 0 : to}:00`;
+	if (to - from >= 12) when = p.allDay;
+	else if (to - from <= 1) when = p.around(from);
+	else when = p.between(from, to === 24 ? 0 : to);
 
-	const amount = sum >= 0.5 && subject !== 'Мряка' ? `, до ${mm(sum)} мм` : '';
-	let text = `${subject} очікується ${when}${amount}.`;
+	const amount = sum >= 0.5 && !drizzleOnly ? `, до ${mm(sum)} мм` : '';
+	let text = `${subject} ${p.expected} ${when}${amount}.`;
 
 	if (kinds.has('snow') && sum >= 1) {
-		text += ' Дороги можуть бути слизькими.';
+		text += ` ${p.slippery}`;
 	} else if (sum >= 0.5) {
-		text += ` ${pick(`${seed}:umbrella`, ['Парасолька знадобиться.', 'Варто взяти парасольку.'])}`;
+		text += ` ${pick(`${seed}:umbrella`, p.umbrella)}`;
 	}
 	return text;
 }
@@ -201,59 +340,38 @@ export interface DayStory {
 	text: string;
 }
 
+/** Повітря дня для опису: європейський індекс AQI і помітний пилок */
+export interface DayAir {
+	aqi: number | null;
+	pollen: { plant: PollenPlant; level: PollenLevel } | null;
+}
+
+/** Речення про повітря за шкалою EEA; для забрудненого — що з цим робити */
+function airStory(p: Phrasebook, air: DayAir): string[] {
+	const sentences: string[] = [];
+	const { aqi, pollen } = air;
+
+	if (aqi !== null) {
+		const level = aqi <= 20 ? 0 : aqi <= 40 ? 1 : aqi <= 60 ? 2 : aqi <= 80 ? 3 : 4;
+		sentences.push(p.air[level]);
+	}
+	if (pollen) sentences.push(p.pollen(pollen.level, p.pollenOf[pollen.plant]));
+	return sentences;
+}
+
 /**
  * Опис дня, як від ведучого прогнозу погоди.
  * Для сьогоднішнього дня враховує лише години, що ще попереду.
  * `prev` — попередній день, щоб порівняти температуру.
  */
-/** Повітря дня для опису: європейський індекс AQI і помітний пилок */
-export interface DayAir {
-	aqi: number | null;
-	pollen: { name: string; level: 'помірний' | 'високий' } | null;
-}
-
-// Пилок у родовому відмінку: «концентрація пилку амброзії»
-const POLLEN_OF: Record<string, string> = {
-	Амброзія: 'амброзії',
-	Береза: 'берези',
-	Вільха: 'вільхи',
-	Злаки: 'злакових трав',
-	Полин: 'полину'
-};
-
-/** Речення про повітря за шкалою EEA; для забрудненого — що з цим робити */
-function airStory(air: DayAir): string[] {
-	const sentences: string[] = [];
-	const { aqi, pollen } = air;
-
-	if (aqi !== null) {
-		if (aqi <= 20) sentences.push('Повітря чисте.');
-		else if (aqi <= 40) sentences.push('Якість повітря задовільна.');
-		else if (aqi <= 60)
-			sentences.push(
-				'Якість повітря помірна: людям із хворобами дихання краще не перенавантажуватися надворі.'
-			);
-		else if (aqi <= 80) sentences.push('Повітря забруднене: варто менше бувати надворі.');
-		else sentences.push('Повітря дуже забруднене: краще залишатися в приміщенні.');
-	}
-
-	if (pollen) {
-		const of = POLLEN_OF[pollen.name] ?? pollen.name.toLowerCase();
-		sentences.push(
-			pollen.level === 'високий'
-				? `Висока концентрація пилку ${of} — алергікам варто бути обережними.`
-				: `Помірна концентрація пилку ${of}.`
-		);
-	}
-	return sentences;
-}
-
 export function describeDay(
 	day: ForecastDay,
 	fromHour = 0,
 	prev?: ForecastDay,
-	air?: DayAir
+	air?: DayAir,
+	lang: Lang = 'uk'
 ): DayStory {
+	const p = phrasebook(lang);
 	const ahead = day.hours.filter((h) => h.hour >= fromHour);
 	const hours = ahead.length ? ahead : day.hours;
 	const seed = day.date;
@@ -274,20 +392,19 @@ export function describeDay(
 				)
 			: day.code
 	);
-	const noun = evening ? 'вечір' : 'день';
-	const skyTitle = pick(`${seed}:title`, SKY_TITLE[titleSky]).replace('{d}', noun);
+	const noun = evening ? p.evening : p.day;
+	const skyTitle = pick(`${seed}:title`, p.skyTitle[titleSky]).replace('{d}', noun);
 	// «Сонячний вечір» звучить дивно — увечері просто ясно
-	const skyPhrase = evening && titleSky === 'clear' ? `ясний ${noun}` : skyTitle;
+	const skyPhrase = evening && titleSky === 'clear' ? `${p.clearEvening} ${noun}` : skyTitle;
 	const title = cap(
-		`${pick(`${seed}:warmth`, warmth(evening ? Math.max(...hours.map((h) => h.temp)) : day.max))} ${skyPhrase}`
+		`${pick(`${seed}:warmth`, p.warmth(evening ? Math.max(...hours.map((h) => h.temp)) : day.max))} ${skyPhrase}`
 	);
 
-	const sentences: string[] = [skyStory(seed, hours), precipStory(seed, day, hours)];
+	const sentences: string[] = [skyStory(p, seed, hours), precipStory(p, seed, day, hours)];
 
 	// Температура
 	if (fromHour >= 15) {
-		const low = Math.min(...hours.map((h) => h.temp));
-		sentences.push(`До ночі похолоднішає до ${signed(low)}.`);
+		sentences.push(p.coolsTonight(signed(Math.min(...hours.map((h) => h.temp)))));
 	} else if (fromHour > 0) {
 		// День уже почався: лише те, що попереду. «Прогріється» до того, що вже є,
 		// чи «уночі» про ніч, яка минула, — неправда
@@ -298,35 +415,17 @@ export function describeDay(
 		const cools = Math.round(low) < Math.round(peak);
 
 		if (Math.round(peak) > now) {
-			sentences.push(
-				cools
-					? `Удень потеплішає до ${signed(peak)}, а до ночі похолоднішає до ${signed(low)}.`
-					: `Удень потеплішає до ${signed(peak)}.`
-			);
+			sentences.push(cools ? p.warmsCools(signed(peak), signed(low)) : p.warms(signed(peak)));
 		} else {
-			sentences.push(
-				cools
-					? `Тепліше вже не буде: до ночі похолоднішає до ${signed(low)}.`
-					: `Температура до вечора майже не зміниться.`
-			);
+			sentences.push(cools ? p.peakPassed(signed(low)) : p.steadyTemp);
 		}
 	} else {
-		sentences.push(
-			pick(`${seed}:temp`, [
-				`Удень повітря прогріється до ${signed(day.max)}, уночі — ${signed(day.min)}.`,
-				`Температура — від ${signed(day.min)} уночі до ${signed(day.max)} удень.`,
-				`Максимум — ${signed(day.max)}, мінімум уночі — ${signed(day.min)}.`
-			])
-		);
+		sentences.push(pick(`${seed}:temp`, p.fullDay(signed(day.min), signed(day.max))));
 	}
 
 	if (prev && fromHour === 0) {
 		const diff = Math.round(day.max - prev.max);
-		if (Math.abs(diff) >= 3) {
-			sentences.push(
-				`Це на ${Math.abs(diff)}° ${diff > 0 ? 'тепліше' : 'холодніше'}, ніж напередодні.`
-			);
-		}
+		if (Math.abs(diff) >= 3) sentences.push(p.vsYesterday(diff));
 	}
 
 	// Відчуття: вітер і вологість
@@ -335,36 +434,27 @@ export function describeDay(
 	const gusts = Math.max(0, ...hours.map((h) => h.gusts));
 
 	if (feelGap >= 4) {
-		sentences.push(
-			avg(sample.map((h) => h.wind)) >= 4
-				? 'Через вітер надворі здаватиметься помітно холодніше.'
-				: 'Через вологість надворі здаватиметься холодніше, ніж на термометрі.'
-		);
+		sentences.push(avg(sample.map((h) => h.wind)) >= 4 ? p.windChill : p.dampChill);
 	} else if (feelGap <= -3 && day.max >= 22) {
-		sentences.push('Через вологість спека відчуватиметься сильніше.');
+		sentences.push(p.muggy);
 	}
 
 	// Вітер. Сильний (від 15 м/с) — у попередженнях над текстом, тут не повторюємо
 	if (gusts >= 10 && gusts < 15) {
-		sentences.push(
-			pick(`${seed}:wind`, [
-				`Місцями поривчастий вітер, до ${Math.round(gusts)} м/с.`,
-				`Вітер часом посилюватиметься до ${Math.round(gusts)} м/с.`
-			])
-		);
+		sentences.push(pick(`${seed}:wind`, p.gusty(Math.round(gusts))));
 	}
 
 	// Повітря й пилок — лише в описі, окремої клітинки для них немає
-	if (air) sentences.push(...airStory(air));
+	if (air) sentences.push(...airStory(p, air));
 
 	// Одна доречна деталь наостанок
 	const dry = !hours.some((h) => WET.includes(sky(h.code)));
 	const morningFog = hours.some((h) => h.hour >= 5 && h.hour <= 10 && sky(h.code) === 'fog');
 
 	if (morningFog && titleSky !== 'fog') {
-		sentences.push('Вранці через туман на дорогах можлива погана видимість.');
+		sentences.push(p.fog);
 	} else if (dry && (day.uvMax ?? 0) >= 7 && titleSky === 'clear') {
-		sentences.push('Сонце активне, тож захист від ультрафіолету не завадить.');
+		sentences.push(p.uv);
 	} else if (
 		dry &&
 		!evening &&
@@ -373,18 +463,16 @@ export function describeDay(
 		gusts < 10 &&
 		['clear', 'cloudy'].includes(titleSky)
 	) {
-		sentences.push(
-			pick(`${seed}:mood`, ['Чудовий день для прогулянки.', 'Гарна нагода побути надворі.'])
-		);
+		sentences.push(pick(`${seed}:mood`, p.mood));
 	}
 
 	return { title, text: sentences.join(' ') };
 }
 
-/** Тривалість світлового дня: «11 год 57 хв» */
-export function daylight(sunrise: string, sunset: string): string {
+/** Тривалість світлового дня: «11 год 57 хв», «11 ч 57 мин» */
+export function daylight(sunrise: string, sunset: string, lang: Lang = 'uk'): string {
 	const minutes = Math.round((Date.parse(sunset) - Date.parse(sunrise)) / 60000);
-	return `${Math.floor(minutes / 60)} год ${minutes % 60} хв`;
+	return phrasebook(lang).daylight(Math.floor(minutes / 60), minutes % 60);
 }
 
 /**
@@ -392,7 +480,8 @@ export function daylight(sunrise: string, sunset: string): string {
  * «Заморозки до −2°», «Сильний вітер: пориви до 17 м/с».
  * Для сьогодні враховує лише години, що попереду.
  */
-export function dayWarnings(day: ForecastDay, fromHour = 0): string[] {
+export function dayWarnings(day: ForecastDay, fromHour = 0, lang: Lang = 'uk'): string[] {
+	const w = phrasebook(lang).warnings;
 	const ahead = day.hours.filter((h) => h.hour >= fromHour);
 	const hours = ahead.length ? ahead : day.hours;
 	if (hours.length === 0) return [];
@@ -404,20 +493,20 @@ export function dayWarnings(day: ForecastDay, fromHour = 0): string[] {
 	const precip = hours.reduce((sum, h) => sum + h.precip, 0);
 	const warnings: string[] = [];
 
-	if (low <= -15) warnings.push(`Сильний мороз до ${signed(low)}`);
-	else if (Math.round(low) <= 0) warnings.push(`Заморозки до ${signed(low)}`);
+	if (low <= -15) warnings.push(w.frostSevere(signed(low)));
+	else if (Math.round(low) <= 0) warnings.push(w.frost(signed(low)));
 
-	if (high >= 35) warnings.push(`Сильна спека до ${signed(high)}`);
-	else if (high >= 30) warnings.push(`Спека до ${signed(high)}`);
+	if (high >= 35) warnings.push(w.heatSevere(signed(high)));
+	else if (high >= 30) warnings.push(w.heat(signed(high)));
 
-	if (gusts >= 20) warnings.push(`Дуже сильний вітер: пориви до ${Math.round(gusts)} м/с`);
-	else if (gusts >= 15) warnings.push(`Сильний вітер: пориви до ${Math.round(gusts)} м/с`);
+	if (gusts >= 20) warnings.push(w.windSevere(Math.round(gusts)));
+	else if (gusts >= 15) warnings.push(w.wind(Math.round(gusts)));
 
-	if (hours.some((h) => h.code >= 95)) warnings.push('Можлива гроза');
+	if (hours.some((h) => h.code >= 95)) warnings.push(w.storm);
 
 	if (precip >= 20) {
 		const snow = hours.some((h) => sky(h.code) === 'snow');
-		warnings.push(`${snow ? 'Сильний снігопад' : 'Сильні опади'}: до ${Math.round(precip)} мм`);
+		warnings.push(snow ? w.snowfall(Math.round(precip)) : w.downpour(Math.round(precip)));
 	}
 
 	return warnings;

@@ -8,8 +8,12 @@ import { KYIV, isKyivQuery } from './regions';
 import { kyivNow } from '$lib/date';
 import type { OpenMeteoWeather, WeatherApiResponse } from '$lib/types';
 
-// Кеш живе 50 годин як запас на випадок збою Open-Meteo, але оновлюється, щойно старший за 2 години
-const CACHE_TTL = 50 * 60 * 60;
+/*
+	Кеш оновлюється, щойно старший за 2 години: моделі прогнозу оновлюються кожні 1–6 годин.
+	Живе 24 години — запас на випадок збою чи вичерпаного денного ліміту Open-Meteo
+	(ліміт скидається опівночі за UTC). Довше не треба: запис ~14 КБ, а місць — десятки тисяч.
+*/
+const CACHE_TTL = 24 * 60 * 60;
 const FRESH_MS = 2 * 60 * 60 * 1000;
 
 /**
@@ -34,6 +38,8 @@ const CITY_SELECT = {
 export interface CityRecord {
 	id: number;
 	nameUa: string;
+	/** Російська назва для /ru; може бути порожньою — тоді українська */
+	nameRu?: string;
 	region: string;
 	countryUa: string;
 	latitude: number;
@@ -84,6 +90,7 @@ function withPath(city: Candidate, group: Candidate[]): CityRecord {
 	return {
 		id: city.id,
 		nameUa: city.nameUa,
+		nameRu: city.nameRu,
 		region: city.region,
 		countryUa: city.countryUa,
 		latitude: city.latitude,
@@ -161,8 +168,6 @@ export function buildOpenMeteoUrl(latitude: number, longitude: number) {
 		`windgusts_10m,` +
 		`winddirection_10m,` +
 		`relativehumidity_2m,` +
-		`dewpoint_2m,` +
-		`visibility,` +
 		`precipitation,` +
 		`pressure_msl,` +
 		`precipitation_probability` +
@@ -175,7 +180,8 @@ export function buildOpenMeteoUrl(latitude: number, longitude: number) {
 		`sunrise,` +
 		`sunset,` +
 		`uv_index_max` +
-		`&forecast_days=7` +
+		// 10 днів — для сторінки «на 10 днів»; решта сторінок бере перші 7
+		`&forecast_days=10` +
 		// Без цього Open-Meteo віддає вітер у км/год, а сайт підписує м/с
 		`&wind_speed_unit=ms` +
 		`&timezone=Europe/Kyiv`
@@ -207,7 +213,7 @@ async function fetchForecast(city: CityRecord): Promise<OpenMeteoWeather> {
  */
 export async function getForecast(city: CityRecord): Promise<WeatherApiResponse> {
 	// Префікс версії: після зміни набору полів чи адрес старий кеш не підмішується
-	const key = `v3:${city.path}`;
+	const key = `v4:${city.path}`;
 
 	// Якість повітря — паралельно з прогнозом, тож сторінка від неї не повільнішає
 	const airPromise = getAirQuality(city);

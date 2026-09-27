@@ -7,6 +7,8 @@
 	import { page } from '$app/state';
 	import X from '@lucide/svelte/icons/x';
 	import ThemeSwitch from './ThemeSwitch.svelte';
+	import LanguageSwitch from './LanguageSwitch.svelte';
+	import { i18n } from '$lib/i18n/state.svelte';
 
 	/*
 		Бокове меню для телефона. Логотип, тема й посилання живуть тут,
@@ -71,12 +73,12 @@
 
 	const isCurrent = (href: string) => page.url.pathname === href;
 
-	const LINKS = [
-		{ href: resolve('/about'), label: 'Про нас' },
-		{ href: resolve('/support'), label: 'Техпідтримка' },
-		{ href: resolve('/privacypolicy'), label: 'Політика конфіденційності' },
-		{ href: resolve('/agreement'), label: 'Умови використання' }
-	];
+	const LINKS = $derived([
+		{ href: resolve('/about'), label: i18n.t.about },
+		{ href: resolve('/support'), label: i18n.t.support },
+		{ href: resolve('/privacypolicy'), label: i18n.t.privacy },
+		{ href: resolve('/agreement'), label: i18n.t.terms }
+	]);
 </script>
 
 <!-- Кнопка меню: три лінії -->
@@ -84,7 +86,7 @@
 	bind:this={triggerEl}
 	type="button"
 	onclick={show}
-	aria-label="Відкрити меню"
+	aria-label={i18n.t.menuOpen}
 	aria-haspopup="dialog"
 	aria-expanded={open}
 	aria-controls="mobile-menu"
@@ -114,7 +116,7 @@
 		id="mobile-menu"
 		role="dialog"
 		aria-modal="true"
-		aria-label="Меню"
+		aria-label={i18n.t.menu}
 		tabindex="-1"
 		onkeydown={onKeydown}
 		class="fixed inset-y-0 left-0 z-[61] flex w-[min(86vw,22rem)] flex-col bg-background shadow-[8px_0_40px_rgba(0,0,0,0.18)]"
@@ -123,22 +125,23 @@
 		<!-- Логотип і закриття -->
 		<div class="flex h-14 shrink-0 items-center justify-between px-4">
 			<a
-				href={resolve('/')}
+				href={i18n.href(resolve('/'))}
 				onclick={() => hide(false)}
 				class="flex items-center gap-2 text-foreground"
-				aria-label="Pogodka — на головну"
+				aria-label={i18n.t.home}
 			>
 				<svg class="h-6 w-auto shrink-0" viewBox="0 0 574 408" aria-hidden="true">
 					<use href="/icons.svg?v=11#favicon"></use>
 				</svg>
-				<span class="text-[20px] font-semibold tracking-[-0.02em]">Pogodka</span>
+				<!-- Текст 24 px: висота великої «P» майже дорівнює хмарі, знак і назва — одна вага -->
+				<span class="text-[24px] leading-none font-semibold tracking-[-0.025em]">Pogodka</span>
 			</a>
 
 			<button
 				bind:this={closeEl}
 				type="button"
 				onclick={() => hide()}
-				aria-label="Закрити меню"
+				aria-label={i18n.t.menuClose}
 				class="flex size-9 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-fill hover:text-foreground"
 			>
 				<X class="size-5" />
@@ -148,12 +151,17 @@
 		<div class="scroll-y flex-1 px-4 pb-8">
 			<!-- Налаштування -->
 			<section aria-labelledby="menu-theme" class="pt-4">
-				<h2 id="menu-theme" class="mb-2 px-1 text-[13px] text-tertiary">Тема</h2>
+				<h2 id="menu-theme" class="mb-2 px-1 text-[13px] text-tertiary">{i18n.t.theme}</h2>
 				<ThemeSwitch />
 			</section>
 
+			<section aria-labelledby="menu-language" class="pt-5">
+				<h2 id="menu-language" class="mb-2 px-1 text-[13px] text-tertiary">{i18n.t.language}</h2>
+				<LanguageSwitch onchoose={() => hide(false)} />
+			</section>
+
 			<!-- Інформація -->
-			<nav aria-label="Інформація" class="mt-8 border-t border-separator pt-4">
+			<nav aria-label={i18n.t.info} class="mt-8 border-t border-separator pt-4">
 				<ul>
 					{#each LINKS as link (link.href)}
 						<li>
@@ -171,7 +179,7 @@
 			</nav>
 
 			<p class="mt-6 px-1 text-[13px] text-tertiary">
-				Стежте за нами:
+				{i18n.t.followUs}
 				<a
 					href="https://www.youtube.com/@Pogodka-UA"
 					target="_blank"

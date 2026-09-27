@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { getTempColor } from '$lib/weather';
 	import { signed } from '$lib/dayInsights';
+	import { i18n } from '$lib/i18n/state.svelte';
 
 	interface Props {
 		/** Температури по колонках таблиці */
@@ -67,7 +68,11 @@
 	const gradientId = `temp-gradient-${uid}`;
 </script>
 
-<div class="relative h-full" role="img" aria-label={`Температура: ${temps.map(signed).join(', ')}`}>
+<div
+	class="relative h-full"
+	role="img"
+	aria-label={`${i18n.t.temperature}: ${temps.map(signed).join(', ')}`}
+>
 	<svg
 		class="absolute inset-0 h-full w-full overflow-visible"
 		viewBox="0 0 {width} 100"

@@ -4,13 +4,12 @@
 		'sticky left-0 z-10 bg-background py-2.5 pr-3 pl-3 text-left text-[13px] font-normal text-muted-foreground max-sm:p-0';
 	const cellClass =
 		'px-1 py-2.5 text-center tabular-nums max-sm:px-0 max-sm:pt-0 max-sm:pb-2.5 max-sm:text-[14px]';
-
-	// Частини доби, як на Синоптику: по дві тригодинні колонки
-	const DAY_PARTS = ['ніч', 'ранок', 'день', 'вечір'];
 </script>
 
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { fade } from 'svelte/transition';
+	import { resolve } from '$app/paths';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
 	import ArrowUp from '@lucide/svelte/icons/arrow-up';
 	import TempCurve from './TempCurve.svelte';
@@ -30,14 +29,25 @@
 	import { dayWarnings, daylight, describeDay, signed } from '$lib/dayInsights';
 	import { typograph } from '$lib/typography';
 	import { clock, dayOfMonth, isWeekend, kyivNow, monthName, weekdayName } from '$lib/date';
+	import { VIEWS, viewDays, type ForecastView } from '$lib/forecastViews';
+	import { i18n } from '$lib/i18n/state.svelte';
 	import type { AirQualityData, OpenMeteoWeather } from '$lib/types';
 
 	let {
 		weather,
 		now = kyivNow(),
-		air = null
+		air = null,
+		view = 'week',
+		city = 'kyiv',
+		home = false
 	}: {
 		weather: OpenMeteoWeather;
+		/** Сторінка прогнозу: які дні показати і який обрати одразу */
+		view?: ForecastView;
+		/** Адреса населеного пункту для перемикача: /pohoda/{city}/zavtra */
+		city?: string;
+		/** Головна (Київ): «7 днів» веде на «/» */
+		home?: boolean;
 		/** Якість повітря й пилок; null — даних немає */
 		air?: AirQualityData | null;
 		/** Поточні дата й година в Києві — спільні з шапкою сторінки */
@@ -46,12 +56,36 @@
 
 	const todayIso = $derived(now.date);
 	// Дні до сьогодні (прогноз, отриманий до півночі) не показуємо
-	const days = $derived.by(() => {
+	const upcoming = $derived.by(() => {
 		const all = buildForecastDays(weather);
-		const upcoming = all.filter((d) => d.date >= todayIso);
-		return upcoming.length > 0 ? upcoming : all;
+		const ahead = all.filter((d) => d.date >= todayIso);
+		return ahead.length > 0 ? ahead : all;
 	});
-	let selected = $state(0);
+	const picked = $derived(viewDays(upcoming, view));
+	const days = $derived(picked.days);
+	// Сторінка «на завтра» відкривається з обраним завтра — і на сервері теж, щоб його бачив пошуковик
+	let selected = $state(untrack(() => picked.initial));
+	const tomorrowIso = $derived(upcoming.find((d) => d.date > todayIso)?.date);
+
+	// Перемикач сторінок прогнозу. Посилання, а не кнопки: у кожної сторінки своя адреса в пошуку
+	const links = $derived(
+		VIEWS.map((id) => ({
+			id,
+			label: i18n.t.views[id].label,
+			href: i18n.href(
+				id === 'week'
+					? home
+						? resolve('/')
+						: resolve('/pohoda/[city]', { city })
+					: resolve('/pohoda/[city]/[view=view]', { city, view: id })
+			)
+		}))
+	);
+	const heading = $derived(i18n.t.views[view].heading);
+	const lang = $derived(i18n.lang);
+	const t = $derived(i18n.t);
+	// На десктопі картки завжди однакової ширини: 7 у ряд, для 10 днів — 10
+	const tileColumns = $derived(view === '10-dniv' ? 10 : 7);
 
 	const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -87,7 +121,7 @@
 	const isLast = (key: string) => rowKeys.at(-1) === key;
 
 	// Небезпечна погода — окремими рядками над описом, лише коли вона справді очікується
-	const warnings = $derived(day ? dayWarnings(day, isToday ? now.hour : 0) : []);
+	const warnings = $derived(day ? dayWarnings(day, isToday ? now.hour : 0, lang) : []);
 
 	// Повітря: сьогодні — поточна година, інші дні — найгірша; пилок — лише помітний
 	const aqi = $derived(
@@ -102,7 +136,7 @@
 	const pollen = $derived(air && day ? dayPollen(air, day.date) : null);
 
 	const insights = $derived(
-		day ? describeDay(day, isToday ? now.hour : 0, days[selected - 1], { aqi, pollen }) : null
+		day ? describeDay(day, isToday ? now.hour : 0, days[selected - 1], { aqi, pollen }, lang) : null
 	);
 
 	// Колонка «зараз» підсвічена ледь помітним primary, як виділення у Finder
@@ -120,13 +154,38 @@
 </script>
 
 <section aria-labelledby="forecast-title">
+	<h2 id="forecast-title" class="sr-only">{heading}</h2>
+
 	<!--
-		Тиха мітка замість гучного заголовка: місто вже є в шапці над блоком,
-		а що картки можна вибирати, видно й без підказки. Для пошуковиків це й далі h2.
+		Перемикач замість мітки «Прогноз на 7 днів»: той самий рядок, але тепер він ще й веде
+		на «завтра», «10 днів», «вихідні». Поточна сторінка — кольором тексту, вага не змінюється,
+		тож рядок не стрибає. Прокрутка сторінки при переході зберігається.
 	-->
-	<h2 id="forecast-title" class="text-[13px] font-medium text-muted-foreground sm:text-[14px]">
-		Прогноз на 7 днів
-	</h2>
+	<!--
+		Без прокрутки: чотири короткі пункти вміщуються навіть на вузькому телефоні,
+		а прокручуваний контейнер обрізав би збільшену зону натискання посилань.
+		На зовсім вузькому екрані рядок переноситься, а не ховається за край.
+	-->
+	<nav aria-label={t.forecastPeriod}>
+		<ul
+			class="flex flex-wrap gap-x-5 gap-y-1 text-[15px] font-medium whitespace-nowrap max-[359px]:gap-x-3.5"
+		>
+			{#each links as link (link.id)}
+				<li>
+					<a
+						href={link.href}
+						data-sveltekit-noscroll
+						aria-current={link.id === view ? 'page' : undefined}
+						class="-my-2 block py-2 transition-colors {link.id === view
+							? 'text-foreground'
+							: 'text-tertiary hover:text-foreground'}"
+					>
+						{link.label}
+					</a>
+				</li>
+			{/each}
+		</ul>
+	</nav>
 
 	<!--
 		Стрічка днів — як вибір конфігурації на apple.com: день тижня, число, іконка, макс./мін.
@@ -137,10 +196,11 @@
 	-->
 	<div
 		role="tablist"
-		aria-label="Дні прогнозу"
+		aria-label={t.forecastDays}
 		tabindex="-1"
 		onkeydown={onTabsKeydown}
-		class="scroll-x -mx-4 mt-1.5 grid snap-x scroll-px-4 auto-cols-[4.75rem] grid-flow-col gap-2 px-4 py-1.5 sm:-mx-1.5 sm:auto-cols-fr sm:gap-3 sm:px-1.5"
+		class="day-tabs scroll-x -mx-4 mt-2 grid snap-x scroll-px-4 auto-cols-[4.75rem] grid-flow-col gap-2 px-4 py-1.5 sm:-mx-1.5 sm:gap-3 sm:px-1.5"
+		style="--tile-columns: {tileColumns}; --tile-gap: {tileColumns > 7 ? '0.5rem' : '0.75rem'}"
 	>
 		{#each days as d, idx (d.date)}
 			{@const active = idx === selected}
@@ -151,7 +211,7 @@
 				aria-controls="day-panel"
 				tabindex={active ? 0 : -1}
 				onclick={() => (selected = idx)}
-				class="day-tab flex cursor-pointer snap-start flex-col items-center rounded-lg px-1 pt-3.5 pb-4 sm:pt-4 sm:pb-5"
+				class="day-tab @container relative flex cursor-pointer snap-start flex-col items-center rounded-lg px-1 pt-3.5 pb-4 sm:pt-4 sm:pb-5"
 				class:day-tab-active={active}
 			>
 				<span
@@ -160,16 +220,26 @@
 						: 'text-muted-foreground'}"
 				>
 					{#if d.date === todayIso}
-						Сьогодні
+						{t.today}
 					{:else}
-						<span class="sm:hidden">{cap(weekdayName(d.date, true))}</span>
-						<span class="max-sm:hidden">{cap(weekdayName(d.date))}</span>
+						<!--
+							Повна назва — лише якщо вміщується в картку: картка сама знає свою ширину.
+							Найдовші: «Понеділок» — 74 px, «Понедельник» — 95 px (ширина картки — без її відступів).
+							Вужча картка (телефон, 10 днів, невеликий екран) — «Пн», як у календарі.
+						-->
+						<span class={lang === 'ru' ? '@min-[6rem]:hidden' : '@min-[4.75rem]:hidden'}
+							>{cap(weekdayName(d.date, true, lang))}</span
+						>
+						<span
+							class={lang === 'ru' ? 'hidden @min-[6rem]:inline' : 'hidden @min-[4.75rem]:inline'}
+							>{cap(weekdayName(d.date, false, lang))}</span
+						>
 					{/if}
 				</span>
 				<span
 					class="mt-2 text-[26px] leading-none font-semibold tracking-[-0.01em] tabular-nums sm:text-[30px]"
 				>
-					{dayOfMonth(d.date)}<span class="sr-only">&nbsp;{monthName(d.date)}</span>
+					{dayOfMonth(d.date)}<span class="sr-only">&nbsp;{monthName(d.date, lang)}</span>
 				</span>
 
 				<svg
@@ -177,18 +247,22 @@
 					style="color: {getConditionTint(d.code)}"
 					viewBox="0 0 24 24"
 					role="img"
-					aria-label={getWeatherText(d.code)}
+					aria-label={getWeatherText(d.code, lang)}
 				>
 					<use href={`/icons.svg?v=11#${getWeatherIconId(d.code)}`}></use>
 				</svg>
 
-				<!-- Макс. і мін., як у «Погоді» на iPhone: вища — чорним, нижча — сірим -->
+				<!--
+					Макс. і мін., як у «Погоді» на iPhone: вища — чорним, нижча — сірим.
+					Поруч — лише якщо обидві вміщуються (~84 px), інакше одна під одною:
+					телефон, 10 днів, невеликий екран
+				-->
 				<span
-					class="flex flex-col items-center gap-0.5 text-[15px] leading-tight tabular-nums sm:flex-row sm:gap-1.5 sm:text-[17px]"
+					class="flex flex-col items-center gap-0.5 text-[15px] leading-tight tabular-nums sm:text-[17px] @min-[5.25rem]:flex-row @min-[5.25rem]:gap-1.5"
 				>
-					<span class="font-semibold"><span class="sr-only">макс. </span>{signed(d.max)}</span>
+					<span class="font-semibold"><span class="sr-only">{t.max} </span>{signed(d.max)}</span>
 					<span class="text-muted-foreground"
-						><span class="sr-only">мін. </span>{signed(d.min)}</span
+						><span class="sr-only">{t.min} </span>{signed(d.min)}</span
 					>
 				</span>
 			</button>
@@ -216,10 +290,14 @@
 				<h3
 					class="text-[19px] leading-[1.26] font-semibold tracking-[-0.01em] text-pretty sm:text-[24px] sm:leading-[1.17]"
 				>
-					{isToday ? 'Сьогодні' : cap(weekdayName(day.date))},&nbsp;{dayOfMonth(
+					{isToday
+						? t.today
+						: day.date === tomorrowIso
+							? t.tomorrow
+							: cap(weekdayName(day.date, false, lang))},&nbsp;{dayOfMonth(
 						day.date
-					)}&nbsp;{monthName(day.date)}.
-					<span class="text-tertiary max-sm:block">{typograph(insights.title)}.</span>
+					)}&nbsp;{monthName(day.date, lang)}.
+					<span class="text-tertiary max-sm:block">{typograph(insights.title, lang)}.</span>
 				</h3>
 				{#if warnings.length > 0}
 					<ul class="mt-4 flex flex-col gap-2">
@@ -229,13 +307,13 @@
 									class="mt-[3px] size-[18px] shrink-0 text-warning"
 									aria-hidden="true"
 								/>
-								{typograph(warning)}
+								{typograph(warning, lang)}
 							</li>
 						{/each}
 					</ul>
 				{/if}
 				<p class="mt-3 max-w-[40rem] text-[17px] leading-[1.47] text-pretty">
-					{typograph(insights.text)}
+					{typograph(insights.text, lang)}
 				</p>
 
 				<!-- Погодинна таблиця в стилі Finder: смуги замість ліній -->
@@ -254,9 +332,9 @@
 							<!-- Частини доби -->
 							<tr>
 								<th class="sticky left-0 z-10 bg-background" scope="col">
-									<span class="sr-only">Показник</span>
+									<span class="sr-only">{t.metric}</span>
 								</th>
-								{#each DAY_PARTS as part, i (part)}
+								{#each t.dayParts as part, i (part)}
 									<th
 										colspan="2"
 										scope="colgroup"
@@ -280,7 +358,7 @@
 											? 'now rounded-t-[10px] font-semibold text-primary'
 											: 'text-tertiary'} {groupStart(idx) ? 'border-l border-separator' : ''}"
 									>
-										{idx === currentIndex ? 'Зараз' : clock(slot.time, false)}
+										{idx === currentIndex ? t.now : clock(slot.time, false)}
 									</th>
 								{/each}
 							</tr>
@@ -290,7 +368,7 @@
 							<!-- Стан погоди -->
 							<tr>
 								<th scope="row" class="sticky left-0 z-10 bg-background">
-									<span class="sr-only">Стан погоди</span>
+									<span class="sr-only">{t.condition}</span>
 								</th>
 								{#each slots as slot, idx (slot.time)}
 									<td class="px-1 pt-1 pb-2 text-center max-sm:px-0 {nowCell(idx)}">
@@ -299,7 +377,7 @@
 											style="color: {getConditionTint(slot.code, nightOf(slot))}"
 											viewBox="0 0 24 24"
 											role="img"
-											aria-label={getWeatherText(slot.code)}
+											aria-label={getWeatherText(slot.code, lang)}
 										>
 											<use href={`/icons.svg?v=11#${getWeatherIconId(slot.code, nightOf(slot))}`}
 											></use>
@@ -309,10 +387,10 @@
 							</tr>
 
 							<!-- Фішка: температура плавною кривою через увесь день -->
-							{@render caption('Температура', false)}
+							{@render caption(t.temperature, false)}
 							<tr>
 								<th scope="row" class={labelClass}>
-									<span class="max-sm:sr-only">Температура</span>
+									<span class="max-sm:sr-only">{t.temperature}</span>
 								</th>
 								{#each slots as slot, idx (slot.time)}
 									<td class="relative h-[5.5rem] p-0 {nowCell(idx)}">
@@ -331,23 +409,19 @@
 
 							{#if showFeelsRow}
 								{@render row(
-									'Відчувається як',
+									t.feelsLike,
 									(s) => signed(s.feels),
 									striped('feels'),
 									'text-muted-foreground'
 								)}
 							{/if}
-							{@render row('Тиск, мм', (s) => String(hpaToMmHg(s.pressure)), striped('pressure'))}
-							{@render row(
-								'Вологість, %',
-								(s) => String(Math.round(s.humidity)),
-								striped('humidity')
-							)}
+							{@render row(t.pressure, (s) => String(hpaToMmHg(s.pressure)), striped('pressure'))}
+							{@render row(t.humidity, (s) => String(Math.round(s.humidity)), striped('humidity'))}
 
-							{@render caption('Вітер, м/с', striped('wind'))}
+							{@render caption(t.wind, striped('wind'))}
 							<tr class={striped('wind') ? 'stripe' : ''}>
 								<th scope="row" class={labelClass}>
-									<span class="max-sm:sr-only">Вітер, м/с</span>
+									<span class="max-sm:sr-only">{t.wind}</span>
 								</th>
 								{#each slots as slot, idx (slot.time)}
 									<td
@@ -357,7 +431,7 @@
 									>
 										<span
 											class="inline-flex items-center gap-0.5 sm:gap-1"
-											title={`${windDirectionText(slot.windDir)}, пориви до ${Math.round(slot.gusts)} м/с`}
+											title={`${windDirectionText(slot.windDir, lang)}, ${t.gustsUpTo} ${Math.round(slot.gusts)} м/с`}
 										>
 											<!-- Стрілка показує, куди дме вітер -->
 											<ArrowUp
@@ -374,7 +448,7 @@
 
 							{#if showProbRow}
 								{@render row(
-									'Ймовірність опадів, %',
+									t.precipProb,
 									(s) => (s.precipProb === undefined ? '—' : String(s.precipProb)),
 									striped('prob'),
 									'',
@@ -385,7 +459,7 @@
 
 							{#if showPrecipRow}
 								{@render row(
-									'Опади, мм',
+									t.precip,
 									(s) => (s.precip > 0 ? s.precip.toFixed(1) : '—'),
 									striped('precip'),
 									'',
@@ -409,12 +483,12 @@
 						class="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-[18px] bg-separator sm:grid-cols-4"
 					>
 						{#if day.sunrise && day.sunset}
-							{@render stat('Схід сонця', clock(day.sunrise, false))}
-							{@render stat('Захід сонця', clock(day.sunset, false))}
-							{@render stat('Світловий день', daylight(day.sunrise, day.sunset))}
+							{@render stat(t.sunrise, clock(day.sunrise, false))}
+							{@render stat(t.sunset, clock(day.sunset, false))}
+							{@render stat(t.daylight, daylight(day.sunrise, day.sunset, lang))}
 						{/if}
 						{#if day.uvMax !== undefined}
-							{@render stat('УФ-індекс', String(Math.round(day.uvMax)), uvText(day.uvMax))}
+							{@render stat(t.uvIndex, String(Math.round(day.uvMax)), uvText(day.uvMax, lang))}
 						{/if}
 					</dl>
 				{/if}
@@ -486,6 +560,24 @@
 		радіус 12px, тонка рамка кольору роздільника, на наведенні — темніша,
 		у вибраного — така сама тонка, але кольору primary. Ні тіней, ні заливки.
 		Рамка намальована тінню всередину і не займає місця у розмітці.
+	*/
+	/*
+		Десктоп: ширина картки не залежить від їх кількості — 2 дні вихідних не розтягуються на весь ряд.
+		Для 10 днів проміжки вужчі (8 px замість 12), щоб самим карткам лишилося більше місця
+	*/
+	@media (min-width: 640px) {
+		.day-tabs {
+			column-gap: var(--tile-gap);
+			grid-auto-columns: calc(
+				(100% - (var(--tile-columns) - 1) * var(--tile-gap)) / var(--tile-columns)
+			);
+		}
+	}
+
+	/*
+		relative — обовʼязково: приховані підписи для скрінрідерів (місяць, «макс.», «мін.»)
+		позиціюються абсолютно. Без цього вони чіплялися за блок поза стрічкою з прокруткою,
+		і картки за правим краєм розтягували всю сторінку — зʼявлявся горизонтальний скрол.
 	*/
 	.day-tab {
 		box-shadow: inset 0 0 0 1px var(--separator);

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { i18n } from '$lib/i18n/state.svelte';
 	import ArrowLeft from '@lucide/svelte/icons/arrow-left';
 </script>
 
@@ -11,7 +12,7 @@
 
 <div class="mx-auto mb-4 w-full px-4 sm:w-[100%] sm:px-6 lg:w-[70%] lg:px-8">
 	<div class="mt-4 mb-4 w-1">
-		<a href={resolve('/')} class="hover:text-gray-500" aria-label="На головну">
+		<a href={i18n.href(resolve('/'))} class="hover:text-gray-500" aria-label={i18n.t.toHome}>
 			<ArrowLeft size={40} />
 		</a>
 	</div>

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { APP_VERSION } from '$lib/version';
+	import { i18n } from '$lib/i18n/state.svelte';
 
 	interface Props {
 		/** Останній елемент ланцюжка — назва сторінки або міста */
@@ -15,13 +16,13 @@
 <footer class="mt-12 bg-footer sm:mt-20" itemscope itemtype="https://schema.org/WPFooter">
 	<div class="mx-auto max-w-[980px] px-4 sm:px-6">
 		<!-- Ланцюжок навігації: іконка проєкту → розділ → поточна сторінка -->
-		<nav class="py-5" aria-label="Навігаційний ланцюжок">
+		<nav class="py-5" aria-label={i18n.t.breadcrumb}>
 			<ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem]">
 				<li class="flex items-center">
 					<a
-						href={resolve('/')}
+						href={i18n.href(resolve('/'))}
 						class="footer-mark flex transition-colors"
-						aria-label="Pogodka — на головну"
+						aria-label={i18n.t.home}
 					>
 						<svg class="h-4 w-auto" viewBox="0 0 574 408" aria-hidden="true">
 							<use href="/icons.svg?v=11#favicon"></use>
@@ -43,10 +44,10 @@
 
 				<li>
 					<a
-						href={resolve('/')}
+						href={i18n.href(resolve('/'))}
 						class="text-muted-foreground transition-colors hover:text-foreground hover:underline"
 					>
-						Прогноз погоди
+						{i18n.t.forecast}
 					</a>
 				</li>
 
@@ -80,14 +81,14 @@
 		<div class="py-5">
 			<!-- Соцмережі -->
 			<p class="text-[0.75rem] text-muted-foreground">
-				Стежте за нами:
+				{i18n.t.followUs}
 				<a
 					href="https://www.youtube.com/@Pogodka-UA"
 					target="_blank"
 					rel="noopener noreferrer me"
 					class="text-primary hover:underline"
 					itemprop="sameAs">YouTube</a
-				>. Дані прогнозу:
+				>. {i18n.t.forecastData}
 				<!-- Ліцензія CC BY 4.0 вимагає вказувати джерело -->
 				<a
 					href="https://open-meteo.com/"
@@ -103,46 +104,46 @@
 			>
 				<p class="m-0">
 					Copyright © {new Date().getFullYear()}
-					<span itemprop="name">Pogodka.org</span>. Усі права захищено.
+					<span itemprop="name">Pogodka.org</span>. {i18n.t.rights}
 				</p>
 
 				<nav
 					class="flex flex-wrap items-center gap-x-4 gap-y-1 whitespace-nowrap sm:gap-x-3"
-					aria-label="Правова інформація"
+					aria-label={i18n.t.legal}
 				>
 					<a
 						href={resolve('/about')}
 						class="transition-colors hover:text-foreground hover:underline"
 					>
-						Про нас
+						{i18n.t.about}
 					</a>
 					<span class="text-separator max-sm:hidden" aria-hidden="true">|</span>
 					<a
 						href={resolve('/privacypolicy')}
 						class="transition-colors hover:text-foreground hover:underline"
 					>
-						Політика конфіденційності
+						{i18n.t.privacy}
 					</a>
 					<span class="text-separator max-sm:hidden" aria-hidden="true">|</span>
 					<a
 						href={resolve('/agreement')}
 						class="transition-colors hover:text-foreground hover:underline"
 					>
-						Умови використання
+						{i18n.t.terms}
 					</a>
 					<span class="text-separator max-sm:hidden" aria-hidden="true">|</span>
 					<a
 						href={resolve('/support')}
 						class="transition-colors hover:text-foreground hover:underline"
 					>
-						Техпідтримка
+						{i18n.t.support}
 					</a>
 				</nav>
 
 				<p class="m-0 flex items-center gap-1.5 sm:ml-auto">
 					<span class="text-tertiary">v{APP_VERSION}</span>
 					<span class="text-separator" aria-hidden="true">|</span>
-					<span>Україна</span>
+					<span>{i18n.t.country}</span>
 				</p>
 			</div>
 		</div>

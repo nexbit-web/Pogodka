@@ -1,7 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import {
-	HOME_DESCRIPTION,
-	HOME_TITLE,
 	absoluteUrl,
 	breadcrumbLd,
 	cityDescription,
@@ -12,8 +10,15 @@ import {
 	serializeLd,
 	shortRegion,
 	websiteLd,
+	viewDescription,
+	viewTitle,
+	homeDescription,
+	homeTitle,
 	type CitySeoInput
 } from '$lib/seo';
+import { buildForecastDays } from '$lib/weather';
+import { viewDays } from '$lib/forecastViews';
+import { makeForecast } from '../fixtures/forecast';
 
 const kharkiv: CitySeoInput = {
 	name: 'Харків',
@@ -58,11 +63,11 @@ describe('заголовки й описи', () => {
 		expect(text).not.toMatch(/undefined|NaN/);
 	});
 
-	it('заголовок головної — під запит «погода в Україні»', () => {
-		expect(HOME_TITLE).toMatch(/^Погода в Україні/);
-		expect(HOME_TITLE.length).toBeLessThanOrEqual(65);
-		expect(HOME_DESCRIPTION.length).toBeGreaterThan(120);
-		expect(HOME_DESCRIPTION.length).toBeLessThanOrEqual(200);
+	it('заголовок головної — назва сайту першою, латиницею й кирилицею', () => {
+		expect(homeTitle()).toMatch(/^Pogodka \(Погодка\) — прогноз погоди в Україні/);
+		expect(homeTitle().length).toBeLessThanOrEqual(65);
+		expect(homeDescription().length).toBeGreaterThan(120);
+		expect(homeDescription().length).toBeLessThanOrEqual(200);
 	});
 
 	it('скорочення області', () => {
@@ -86,7 +91,7 @@ describe('структуровані дані schema.org', () => {
 
 	it('WebSite з пошуком, який справді працює на сайті', () => {
 		const site = websiteLd();
-		expect(site.inLanguage).toBe('uk');
+		expect(site.inLanguage).toEqual(['uk', 'ru']);
 		expect(JSON.stringify(site.potentialAction)).toContain('/pohoda/{search_term_string}');
 	});
 
@@ -106,7 +111,7 @@ describe('структуровані дані schema.org', () => {
 		const page = cityPageLd({
 			name: 'Харків',
 			region: 'Харківська область',
-			path: 'kharkiv',
+			pagePath: '/pohoda/kharkiv',
 			title: 't',
 			description: 'd',
 			latitude: 49.99,
@@ -127,7 +132,7 @@ describe('структуровані дані schema.org', () => {
 		const page = cityPageLd({
 			name: 'Київ',
 			region: 'Київ',
-			path: 'kyiv',
+			pagePath: '/pohoda/kyiv',
 			title: 't',
 			description: 'd',
 			latitude: 50.45,
@@ -148,5 +153,71 @@ describe('структуровані дані schema.org', () => {
 		const text = serializeLd({ name: '</script><script>alert(1)</script>' });
 		expect(text).not.toContain('</script>');
 		expect(JSON.parse(text).name).toBe('</script><script>alert(1)</script>');
+	});
+});
+
+describe('сторінки «на завтра», «на 10 днів», «на вихідні»', () => {
+	// Прогноз від неділі: 27 вересня 2026 — неділя
+	const days = buildForecastDays(
+		makeForecast({ start: '2026-09-27', days: 10, hour: (d) => ({ temp: 10 + d, code: 2 }) })
+	);
+
+	it('заголовки: ключова фраза на початку, до 65 символів', () => {
+		for (const view of ['zavtra', '10-dniv', 'vykhidni'] as const) {
+			const title = viewTitle(kharkiv, view);
+			expect(title).toMatch(/^Погода Харків на /);
+			expect(title.length, title).toBeLessThanOrEqual(65);
+		}
+	});
+
+	it('«на завтра» — дата і температура завтра', () => {
+		expect(viewDescription(kharkiv, 'zavtra', viewDays(days, 'zavtra').days)).toMatch(
+			/^Погода Харків на завтра, 28 вересня: від \+\d+° до \+\d+°, частково хмарно\./
+		);
+	});
+
+	it('«на 10 днів» — діапазон за всі дні', () => {
+		expect(viewDescription(kharkiv, '10-dniv', days)).toMatch(/^Погода Харків на 10 днів: від /);
+	});
+
+	it('«на вихідні» в неділю: сьогодні й наступні вихідні, а не «неділя; субота»', () => {
+		const weekend = viewDays(days, 'vykhidni').days;
+		expect(weekend.map((d) => d.date)).toEqual(['2026-09-27', '2026-10-03', '2026-10-04']);
+		const text = viewDescription(kharkiv, 'vykhidni', weekend);
+		expect(text).toMatch(/^Погода Харків на вихідні: сьогодні неділя 27 вересня — /);
+		expect(text).toContain('; наступні вихідні — ');
+	});
+
+	it('російською', () => {
+		const ru = { ...kharkiv, name: 'Харьков', region: 'Харьковская область', lang: 'ru' as const };
+		expect(viewTitle(ru, 'vykhidni')).toBe(
+			'Погода Харьков на выходные — суббота и воскресенье | Pogodka'
+		);
+		expect(viewDescription(ru, 'zavtra', viewDays(days, 'zavtra').days)).toMatch(
+			/^Погода Харьков на завтра, 28 сентября: от \+\d+° до \+\d+°, переменная облачность\./
+		);
+		expect(cityTitle(ru)).toBe('Погода Харьков: прогноз на сегодня, завтра и 7 дней | Pogodka');
+		expect(cityDescription(ru)).toMatch(
+			/^Погода Харьков сейчас: \+16°, пасмурно, ощущается как \+15°/
+		);
+		expect(homeTitle('ru')).toBe('Pogodka (Погодка) — прогноз погоды в Украине на 7 дней');
+	});
+
+	it('WebPage з мовою й повною адресою сторінки', () => {
+		const page = cityPageLd({
+			name: 'Харьков',
+			region: 'Харьковская область',
+			pagePath: '/ru/pohoda/kharkiv/zavtra',
+			lang: 'ru',
+			title: 't',
+			description: 'd',
+			latitude: 49.99,
+			longitude: 36.23,
+			updated: '2026-09-25T12:00:00.000Z'
+		});
+		expect(page).toMatchObject({
+			url: 'https://www.pogodka.org/ru/pohoda/kharkiv/zavtra',
+			inLanguage: 'ru'
+		});
 	});
 });

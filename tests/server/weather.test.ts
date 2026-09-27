@@ -9,6 +9,8 @@ const { prisma, redis } = vi.hoisted(() => ({
 
 vi.mock('$lib/server/prisma', () => ({ default: prisma }));
 vi.mock('$lib/server/upstash', () => ({ redisGet: redis.get, redisSet: redis.set }));
+// Якість повітря — окремий модуль зі своїм запитом; тут перевіряємо лише прогноз
+vi.mock('$lib/server/air', () => ({ getAirQuality: vi.fn().mockResolvedValue(null) }));
 
 const {
 	buildOpenMeteoUrl,
@@ -120,6 +122,7 @@ describe('findCity', () => {
 			id: 11272,
 			slug: 'lviv',
 			nameUa: 'Львів',
+			nameRu: 'Львів',
 			region: 'Львівська область',
 			countryUa: 'Україна',
 			latitude: 49.8,
@@ -189,7 +192,8 @@ describe('buildOpenMeteoUrl', () => {
 	it('запитує 7 днів у київському часі й вітер у м/с', () => {
 		expect(url.origin).toBe('https://api.open-meteo.com');
 		expect(url.searchParams.get('latitude')).toBe('49.84');
-		expect(url.searchParams.get('forecast_days')).toBe('7');
+		// 10 днів — для сторінки «на 10 днів»; решта бере перші 7
+		expect(url.searchParams.get('forecast_days')).toBe('10');
 		expect(url.searchParams.get('wind_speed_unit')).toBe('ms');
 		expect(url.searchParams.get('timezone')).toBe('Europe/Kyiv');
 	});
@@ -260,7 +264,7 @@ describe('getForecast', () => {
 		const data = await getForecast(LVIV);
 
 		expect(data).toMatchObject({ misto: 'Львів', oblast: 'Львівська область', path: 'lviv' });
-		expect(redis.get).toHaveBeenCalledWith('v3:lviv');
+		expect(redis.get).toHaveBeenCalledWith('v4:lviv');
 		expect(fetchMock).not.toHaveBeenCalled();
 	});
 
@@ -272,9 +276,9 @@ describe('getForecast', () => {
 
 		expect(data.weather).toEqual(forecast);
 		const [key, value, ttl] = redis.set.mock.calls[0];
-		expect(key).toBe('v3:lviv');
+		expect(key).toBe('v4:lviv');
 		expect(JSON.parse(value).fetchedAt).toBeGreaterThan(Date.now() - 5000);
-		expect(ttl).toBe(50 * 60 * 60);
+		expect(ttl).toBe(24 * 60 * 60);
 		expect(fetchMock.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
 	});
 

@@ -33,8 +33,6 @@ export interface OpenMeteoWeather {
 		windgusts_10m: number[];
 		winddirection_10m: number[];
 		relativehumidity_2m: number[];
-		dewpoint_2m: number[];
-		visibility: number[];
 		precipitation: number[];
 		pressure_msl: number[];
 		surface_pressure?: number[];
@@ -58,13 +56,11 @@ export interface OpenMeteoWeather {
 export interface CurrentWeather {
 	temp: number;
 	feels: number;
-	dewPoint: number;
 	code: number;
 	windDir: number;
 	humidity: number;
 	wind: number;
 	gusts: number;
-	visibility: number;
 	precipitation: number;
 	pressure: number;
 }

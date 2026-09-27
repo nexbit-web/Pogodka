@@ -28,3 +28,40 @@ describe('hooks.server', () => {
 		expect(res.headers.get('X-Frame-Options')).toBe('DENY');
 	});
 });
+
+describe('мова сторінки', () => {
+	const html = async (path: string) => {
+		let transform: ((o: { html: string }) => string) | undefined;
+		await handle({
+			event: { url: new URL(`https://www.pogodka.org${path}`) },
+			resolve: async (_e: unknown, opts: { transformPageChunk: typeof transform }) => {
+				transform = opts.transformPageChunk;
+				return new Response('ok');
+			}
+		} as never);
+		return transform!({ html: '<html lang="%lang%">' });
+	};
+
+	it('<html lang> — з адреси', async () => {
+		expect(await html('/pohoda/lviv')).toBe('<html lang="uk">');
+		expect(await html('/ru/pohoda/lviv')).toBe('<html lang="ru">');
+		expect(await html('/ru')).toBe('<html lang="ru">');
+	});
+});
+
+describe('reroute', async () => {
+	const { reroute } = await import('../../src/hooks');
+	const to = (path: string) => reroute({ url: new URL(`https://www.pogodka.org${path}`) } as never);
+
+	it('/ru-сторінки відкривають ті самі маршрути', () => {
+		expect(to('/ru')).toBe('/');
+		expect(to('/ru/pohoda/kyiv')).toBe('/pohoda/kyiv');
+		expect(to('/ru/pohoda/kyiv/zavtra')).toBe('/pohoda/kyiv/zavtra');
+	});
+
+	it('українські адреси й неперекладені сторінки не чіпає', () => {
+		expect(to('/pohoda/kyiv')).toBeUndefined();
+		expect(to('/ru/about')).toBeUndefined();
+		expect(to('/russia')).toBeUndefined();
+	});
+});

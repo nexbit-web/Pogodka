@@ -7,6 +7,8 @@ import type {
 	OpenMeteoWeather,
 	WeeklyDay
 } from './types';
+import type { Lang } from './i18n';
+import { ruPack } from './i18n/pack';
 
 export { KYIV_TZ };
 
@@ -25,13 +27,11 @@ export function getCurrentWeather(weather: OpenMeteoWeather, hourIndex: number):
 	const {
 		temperature_2m,
 		apparent_temperature,
-		dewpoint_2m,
 		weathercode,
 		relativehumidity_2m,
 		windspeed_10m,
 		windgusts_10m,
 		winddirection_10m,
-		visibility,
 		precipitation,
 		surface_pressure,
 		pressure_msl
@@ -40,13 +40,11 @@ export function getCurrentWeather(weather: OpenMeteoWeather, hourIndex: number):
 	return {
 		temp: temperature_2m[index] ?? 0, // Поточна температура (°C)
 		feels: apparent_temperature[index] ?? 0, // "Відчувається як" температура (°C)
-		dewPoint: dewpoint_2m?.[index] ?? 0, // Точка роси (°C)
 		code: weathercode[index] ?? 0, // Код погоди (для іконок)
 		humidity: relativehumidity_2m[index] ?? 0, // Відносна вологість (%)
 		wind: windspeed_10m[index] ?? 0, // Швидкість вітру (м/с)
 		windDir: winddirection_10m?.[index] ?? 0, // Напрямок вітру (градуси)
 		gusts: windgusts_10m[index] ?? 0, // Пориви вітру (м/с)
-		visibility: (visibility?.[index] ?? 0) / 1000, // Видимість (км)
 		precipitation: precipitation?.[index] ?? 0, // Опади (мм)
 		pressure: surface_pressure?.[index] ?? pressure_msl?.[index] ?? 0 // Тиск (гПа)
 	};
@@ -64,7 +62,7 @@ export function buildWeeklyDays(weather: OpenMeteoWeather): WeeklyDay[] {
 	}));
 }
 
-const WEATHER_TEXT: Record<number, string> = {
+const WEATHER_TEXT_UK: Record<number, string> = {
 	0: 'Ясно',
 	1: 'Майже ясно',
 	2: 'Частково хмарно',
@@ -93,8 +91,9 @@ const WEATHER_TEXT: Record<number, string> = {
 	99: 'Гроза з великим градом'
 };
 
-export function getWeatherText(code: number): string {
-	return WEATHER_TEXT[code] || 'Невідомо';
+export function getWeatherText(code: number, lang: Lang = 'uk'): string {
+	const text = (lang === 'ru' ? ruPack()?.weatherText : undefined)?.[code] ?? WEATHER_TEXT_UK[code];
+	return text || (lang === 'ru' ? (ruPack()?.unknown ?? 'Невідомо') : 'Невідомо');
 }
 
 // Іконки, в яких є сонце: вночі замість нього малюємо місяць
@@ -275,13 +274,30 @@ export function buildForecastDays(weather: OpenMeteoWeather): ForecastDay[] {
 	});
 }
 
-// Назва опадів за кодом погоди — для рядка «Дощ почнеться близько 15:00»
-function precipWord(code: number): string {
-	if (code >= 95) return 'Гроза';
-	if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'Сніг';
-	if (code >= 51 && code <= 57) return 'Мряка';
-	return 'Дощ';
+// Назва опадів за кодом погоди — для рядка «Дощ почнеться близько 15:00».
+// Рід потрібен російській («дождь начнётся», «морось закончится»), тож слово й дієслова — разом
+export type PrecipKind = 'storm' | 'snow' | 'drizzle' | 'rain';
+
+const outlook = (lang: Lang): Outlook => (lang === 'ru' && ruPack()?.outlook) || OUTLOOK_UK;
+
+function precipKind(code: number): PrecipKind {
+	if (code >= 95) return 'storm';
+	if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
+	if (code >= 51 && code <= 57) return 'drizzle';
+	return 'rain';
 }
+
+export type Outlook = Record<
+	PrecipKind,
+	{ word: string; starts: string; ends: string; lasts: string }
+>;
+
+const OUTLOOK_UK: Outlook = {
+	storm: { word: 'Гроза', starts: 'почнеться', ends: 'закінчиться', lasts: 'триватиме' },
+	snow: { word: 'Сніг', starts: 'почнеться', ends: 'закінчиться', lasts: 'триватиме' },
+	drizzle: { word: 'Мряка', starts: 'почнеться', ends: 'закінчиться', lasts: 'триватиме' },
+	rain: { word: 'Дощ', starts: 'почнеться', ends: 'закінчиться', lasts: 'триватиме' }
+};
 
 /**
  * Найближчі опади на кілька годин уперед — щоб одразу знати, чи брати парасольку:
@@ -295,7 +311,8 @@ function precipWord(code: number): string {
 export function precipOutlook(
 	weather: OpenMeteoWeather,
 	hourIndex: number,
-	horizon = 6
+	horizon = 6,
+	lang: Lang = 'uk'
 ): string | null {
 	const { time, precipitation, weathercode } = weather.hourly;
 	if (hourIndex < 0 || !precipitation) return null;
@@ -306,16 +323,21 @@ export function precipOutlook(
 	const now = hourIndex + 1;
 	const last = Math.min(hourIndex + horizon, time.length - 1);
 
+	const about = lang === 'ru' ? 'около' : 'близько';
+
 	if (wet(now)) {
-		const word = precipWord(weathercode[now]);
+		const o = outlook(lang)[precipKind(weathercode[now])];
 		for (let i = now + 1; i <= last; i++) {
-			if (!wet(i)) return `${word} закінчиться близько ${at(i - 1)}`;
+			if (!wet(i)) return `${o.word} ${o.ends} ${about} ${at(i - 1)}`;
 		}
-		return `${word} триватиме ще кілька годин`;
+		return `${o.word} ${o.lasts} ${lang === 'ru' ? 'ещё несколько часов' : 'ще кілька годин'}`;
 	}
 
 	for (let i = now + 1; i <= last; i++) {
-		if (wet(i)) return `${precipWord(weathercode[i])} почнеться близько ${at(i - 1)}`;
+		if (wet(i)) {
+			const o = outlook(lang)[precipKind(weathercode[i])];
+			return `${o.word} ${o.starts} ${about} ${at(i - 1)}`;
+		}
 	}
 	return null;
 }
@@ -367,13 +389,18 @@ export function buildTableSlots(hours: DayHour[], currentHour?: number): TableSl
 // ——— Якість повітря й пилок ———
 
 /** Європейський індекс якості повітря словами (шкала EEA) */
-export function aqiText(aqi: number): string {
-	if (aqi <= 20) return 'добра';
-	if (aqi <= 40) return 'задовільна';
-	if (aqi <= 60) return 'помірна';
-	if (aqi <= 80) return 'погана';
-	if (aqi <= 100) return 'дуже погана';
-	return 'надзвичайно погана';
+const AQI_TEXT_UK = [
+	'добра',
+	'задовільна',
+	'помірна',
+	'погана',
+	'дуже погана',
+	'надзвичайно погана'
+];
+
+export function aqiText(aqi: number, lang: Lang = 'uk'): string {
+	const level = aqi <= 20 ? 0 : aqi <= 40 ? 1 : aqi <= 60 ? 2 : aqi <= 80 ? 3 : aqi <= 100 ? 4 : 5;
+	return ((lang === 'ru' && ruPack()?.aqi) || AQI_TEXT_UK)[level];
 }
 
 const hoursOf = (air: AirQualityData, date: string) =>
@@ -392,23 +419,26 @@ export function dayAqi(air: AirQualityData, date: string, currentTime?: string):
 	return values.length ? Math.round(Math.max(...values)) : null;
 }
 
-// Пилок: назва і пороги «помірний» / «високий», зерен/м³. Пороги обережні —
-// показуємо лише помітний пилок, щоб не лякати дрібницями
+// Пилок: рослина і пороги «помірний» / «високий», зерен/м³. Пороги обережні —
+// показуємо лише помітний пилок, щоб не лякати дрібницями. Назви — в описі дня (dayInsights)
+export type PollenPlant = 'ragweed' | 'birch' | 'alder' | 'grass' | 'mugwort';
+export type PollenLevel = 'moderate' | 'high';
+
 const POLLEN = [
-	{ key: 'ragweed_pollen', name: 'Амброзія', moderate: 10, high: 50 },
-	{ key: 'birch_pollen', name: 'Береза', moderate: 10, high: 100 },
-	{ key: 'alder_pollen', name: 'Вільха', moderate: 10, high: 100 },
-	{ key: 'grass_pollen', name: 'Злаки', moderate: 10, high: 50 },
-	{ key: 'mugwort_pollen', name: 'Полин', moderate: 10, high: 50 }
+	{ key: 'ragweed_pollen', plant: 'ragweed', moderate: 10, high: 50 },
+	{ key: 'birch_pollen', plant: 'birch', moderate: 10, high: 100 },
+	{ key: 'alder_pollen', plant: 'alder', moderate: 10, high: 100 },
+	{ key: 'grass_pollen', plant: 'grass', moderate: 10, high: 50 },
+	{ key: 'mugwort_pollen', plant: 'mugwort', moderate: 10, high: 50 }
 ] as const;
 
 /** Найпомітніший пилок дня або null, якщо жодного не багато */
 export function dayPollen(
 	air: AirQualityData,
 	date: string
-): { name: string; level: 'помірний' | 'високий' } | null {
+): { plant: PollenPlant; level: PollenLevel } | null {
 	const hours = hoursOf(air, date);
-	let best: { name: string; level: 'помірний' | 'високий'; ratio: number } | null = null;
+	let best: { plant: PollenPlant; level: PollenLevel; ratio: number } | null = null;
 
 	for (const p of POLLEN) {
 		const values = hours.flatMap((i) => air[p.key][i] ?? []);
@@ -417,28 +447,29 @@ export function dayPollen(
 		// Порівнюємо відносно порогу: 60 зерен амброзії важать більше, ніж 60 берези
 		const ratio = max / p.high;
 		if (!best || ratio > best.ratio) {
-			best = { name: p.name, level: max >= p.high ? 'високий' : 'помірний', ratio };
+			best = { plant: p.plant, level: max >= p.high ? 'high' : 'moderate', ratio };
 		}
 	}
-	return best && { name: best.name, level: best.level };
+	return best && { plant: best.plant, level: best.level };
 }
 
 /** гПа → мм рт. ст. (так тиск звично показують в Україні) */
 export const hpaToMmHg = (hpa: number) => Math.round(hpa * 0.750062);
 
 /** Напрямок вітру словами: звідки дме */
-export function windDirectionText(deg: number) {
-	const directions = ['Пн', 'ПнСх', 'Сх', 'ПдСх', 'Пд', 'ПдЗх', 'Зх', 'ПнЗх'];
-	return directions[Math.round(deg / 45) % 8];
+const DIRECTIONS_UK = ['Пн', 'ПнСх', 'Сх', 'ПдСх', 'Пд', 'ПдЗх', 'Зх', 'ПнЗх'];
+
+export function windDirectionText(deg: number, lang: Lang = 'uk') {
+	return ((lang === 'ru' && ruPack()?.directions) || DIRECTIONS_UK)[Math.round(deg / 45) % 8];
 }
 
 /** Оцінка УФ-індексу за шкалою ВООЗ */
-export function uvText(uv: number) {
-	if (uv < 3) return 'низький';
-	if (uv < 6) return 'помірний';
-	if (uv < 8) return 'високий';
-	if (uv < 11) return 'дуже високий';
-	return 'екстремальний';
+const UV_TEXT_UK = ['низький', 'помірний', 'високий', 'дуже високий', 'екстремальний'];
+
+export function uvText(uv: number, lang: Lang = 'uk') {
+	return ((lang === 'ru' && ruPack()?.uv) || UV_TEXT_UK)[
+		uv < 3 ? 0 : uv < 6 ? 1 : uv < 8 ? 2 : uv < 11 ? 3 : 4
+	];
 }
 
 /**

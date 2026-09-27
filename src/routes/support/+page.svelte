@@ -3,6 +3,7 @@
 	import { applyAction, enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { i18n } from '$lib/i18n/state.svelte';
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
 	import * as Field from '$lib/components/ui/field';
@@ -65,7 +66,7 @@
 				touched = { email: false, subject: false, message: false };
 				errors = { ...emptyErrors };
 				toast.success('Готово! Повідомлення надіслано.');
-				await goto(resolve('/'), { replaceState: true });
+				await goto(i18n.href(resolve('/')), { replaceState: true });
 				return;
 			}
 

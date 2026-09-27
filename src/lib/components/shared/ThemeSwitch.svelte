@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { setMode, userPrefersMode } from 'mode-watcher';
 	import { THEMES, asTheme } from '$lib/theme';
+	import { i18n } from '$lib/i18n/state.svelte';
 
 	// Сегментований перемикач, як у налаштуваннях iOS: вибраний сегмент — біла «пігулка»
 	const current = $derived(asTheme(userPrefersMode.current));
@@ -8,7 +9,7 @@
 
 <div
 	role="radiogroup"
-	aria-label="Тема"
+	aria-label={i18n.t.theme}
 	class="grid grid-cols-2 gap-0.5 rounded-[10px] bg-fill p-0.5"
 >
 	{#each THEMES as theme (theme.value)}
@@ -23,7 +24,7 @@
 				: 'font-medium text-muted-foreground hover:text-foreground'}"
 		>
 			<theme.icon class="size-4" aria-hidden="true" />
-			{theme.label}
+			{i18n.t[theme.label]}
 		</button>
 	{/each}
 </div>

@@ -7,8 +7,9 @@ import type { AirQualityData } from '$lib/types';
 	якщо сервіс недоступний, сторінка працює без нього, а блок просто не показується.
 */
 
-const FRESH_MS = 2 * 60 * 60 * 1000;
-const CACHE_TTL = 12 * 60 * 60;
+// Прогноз CAMS оновлюється раз-двічі на добу, тож частіше ніж раз на 6 годин питати марно
+const FRESH_MS = 6 * 60 * 60 * 1000;
+const CACHE_TTL = 24 * 60 * 60;
 const TIMEOUT_MS = 4000;
 
 const VARIABLES = [

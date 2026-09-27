@@ -1,19 +1,30 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from 'vitest';
 import { render, screen, within } from '@testing-library/svelte';
 import userEvent from '@testing-library/user-event';
 import { DateTime } from 'luxon';
 import DayForecast from '$lib/components/shared/DayForecast.svelte';
 import { makeForecast, todayKyiv } from '../fixtures/forecast';
+import { setTestPath } from '../setup/app';
+import type { ForecastView } from '$lib/forecastViews';
 
 const today = todayKyiv();
 const weekdayOf = (offset: number) =>
 	DateTime.fromISO(today, { zone: 'Europe/Kyiv' }).plus({ days: offset }).weekday;
 
-function setup(weather = makeForecast()) {
+function setup(weather = makeForecast(), view: ForecastView = 'week') {
 	const user = userEvent.setup();
-	render(DayForecast, { weather });
+	render(DayForecast, { weather, view, city: 'kharkiv' });
 	return { user, tabs: screen.getAllByRole('tab') };
 }
+
+// Дощ опівдні першого дня — щоб рядки опадів у таблиці були
+const rainy = () =>
+	makeForecast({
+		days: 10,
+		hour: (d, hr) => (d === 0 && hr === 12 ? { code: 63, precip: 2.4, precipProb: 70 } : {})
+	});
+
+afterEach(() => setTestPath('/'));
 
 describe('DayForecast — стрічка днів', () => {
 	it('показує 7 днів, перший — «Сьогодні» і вибраний', () => {
@@ -94,7 +105,7 @@ describe('DayForecast — таблиця дня', () => {
 	});
 
 	it('усі рядки показників на місці', () => {
-		setup();
+		setup(rainy());
 		for (const label of [
 			'Температура',
 			'Відчувається як',
@@ -108,13 +119,21 @@ describe('DayForecast — таблиця дня', () => {
 		}
 	});
 
-	it('тиск — у мм рт. ст., опади — прочерк, коли їх немає', () => {
+	it('тиск — у мм рт. ст.; день без опадів — без рядків опадів, а не з рядом прочерків', () => {
 		setup(makeForecast({ hour: () => ({ pressure: 1013.25 }) }));
 		const pressureRow = screen.getByRole('rowheader', { name: 'Тиск, мм' }).closest('tr')!;
 		expect(within(pressureRow).getAllByText('760')).toHaveLength(8);
 
+		expect(screen.queryByRole('rowheader', { name: 'Опади, мм' })).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole('rowheader', { name: 'Ймовірність опадів, %' })
+		).not.toBeInTheDocument();
+	});
+
+	it('у дощовий день проміжки без опадів — прочерк', () => {
+		setup(rainy());
 		const precipRow = screen.getByRole('rowheader', { name: 'Опади, мм' }).closest('tr')!;
-		expect(within(precipRow).getAllByText('—')).toHaveLength(8);
+		expect(within(precipRow).getAllByText('—')).toHaveLength(7);
 	});
 
 	it('дощові значення виділені кольором', () => {
@@ -147,17 +166,16 @@ describe('DayForecast — таблиця дня', () => {
 		expect(icons[7]).toContain('#clear-night');
 	});
 
-	it('картка сонця: схід, захід, світловий день і УФ зі шкалою', () => {
+	it('картка сонця: схід, захід, світловий день і УФ — підпис і значення, без іконок', () => {
 		setup();
 		const card = screen.getByText('Схід сонця').closest('dl')!;
 
-		expect(within(card).getByText('06:30')).toBeInTheDocument();
+		// Час без нуля попереду, як у таблиці
+		expect(within(card).getByText('6:30')).toBeInTheDocument();
 		expect(within(card).getByText('18:30')).toBeInTheDocument();
 		expect(within(card).getByText('12 год 0 хв')).toBeInTheDocument();
 		expect(within(card).getByText('помірний')).toBeInTheDocument();
-		// Позначка на шкалі УФ стоїть пропорційно індексу (3 з 11)
-		const marker = card.querySelector<HTMLElement>('[style*="left"]')!;
-		expect(parseFloat(marker.style.left)).toBeCloseTo((3 / 11) * 100, 1);
+		expect(card.querySelector('svg')).toBeNull();
 	});
 
 	it('двотонний заголовок дня і опис людською мовою', () => {
@@ -170,11 +188,9 @@ describe('DayForecast — таблиця дня', () => {
 		expect(heading.nextElementSibling?.textContent).toMatch(/\.$/);
 	});
 
-	it('заголовок розділу двотонний', () => {
+	it('заголовок розділу — для пошуковиків і скрінрідерів', () => {
 		setup();
-		expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(
-			'Прогноз на 7 днів. Оберіть день.'
-		);
+		expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Прогноз на 7 днів');
 	});
 
 	it('колонка «Зараз» підсвічена в кожному рядку таблиці', () => {
@@ -227,5 +243,86 @@ describe('DayForecast — узгодженість із шапкою', () => {
 		const tabs = screen.getAllByRole('tab');
 		expect(tabs).toHaveLength(7);
 		expect(tabs[0]).toHaveTextContent('Сьогодні');
+	});
+});
+
+describe('DayForecast — сторінки прогнозу', () => {
+	it('перемикач: чотири посилання, поточне позначене, прокрутка зберігається', () => {
+		setup(makeForecast({ days: 10 }), 'zavtra');
+		const nav = screen.getByRole('navigation', { name: 'Період прогнозу' });
+		const links = within(nav).getAllByRole('link');
+
+		expect(links.map((a) => [a.textContent?.trim(), a.getAttribute('href')])).toEqual([
+			['7 днів', '/pohoda/kharkiv'],
+			['Завтра', '/pohoda/kharkiv/zavtra'],
+			['10 днів', '/pohoda/kharkiv/10-dniv'],
+			['Вихідні', '/pohoda/kharkiv/vykhidni']
+		]);
+		expect(links[1]).toHaveAttribute('aria-current', 'page');
+		expect(links.every((a) => a.hasAttribute('data-sveltekit-noscroll'))).toBe(true);
+	});
+
+	it('7 днів — навіть коли прогноз на 10', () => {
+		const { tabs } = setup(makeForecast({ days: 10 }));
+		expect(tabs).toHaveLength(7);
+	});
+
+	it('«на завтра» — одразу обране завтра, заголовок «Завтра, …»', () => {
+		const { tabs } = setup(makeForecast({ days: 10 }), 'zavtra');
+		expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+		expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(/^Завтра, \d{1,2} /);
+	});
+
+	it('«на 10 днів» — десять карток', () => {
+		const { tabs } = setup(makeForecast({ days: 10 }), '10-dniv');
+		expect(tabs).toHaveLength(10);
+		expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent('Прогноз на 10 днів');
+	});
+
+	it('«на вихідні» — лише субота й неділя', () => {
+		const { tabs } = setup(makeForecast({ days: 10 }), 'vykhidni');
+		const weekend = [...Array(10).keys()].filter((i) => weekdayOf(i) >= 6);
+		expect(tabs).toHaveLength(weekend.length);
+		expect(tabs.every((t) => t.querySelector('.text-weekend'))).toBe(true);
+	});
+
+	it('приховані підписи не виходять за стрічку: картка — точка відліку для них', () => {
+		const { tabs } = setup(makeForecast({ days: 10 }), '10-dniv');
+		expect(tabs.every((t) => t.classList.contains('relative'))).toBe(true);
+	});
+});
+
+describe('DayForecast — попередження', () => {
+	it('сильний вітер — рядком над описом', () => {
+		setup(makeForecast({ hour: (d) => (d === 0 ? { gusts: 18 } : {}) }));
+		const panel = screen.getByRole('tabpanel');
+		expect(within(panel).getByText(/Сильний вітер: пориви до 18/)).toBeInTheDocument();
+	});
+});
+
+describe('DayForecast — російською', () => {
+	it('перемикач, таблиця, картка сонця й опис — російською, посилання з /ru', () => {
+		setTestPath('/ru/pohoda/kharkiv');
+		const { tabs } = setup(rainy());
+
+		expect(tabs[0]).toHaveTextContent('Сегодня');
+		const links = within(screen.getByRole('navigation', { name: 'Период прогноза' })).getAllByRole(
+			'link'
+		);
+		expect(links.map((a) => a.getAttribute('href'))).toEqual([
+			'/ru/pohoda/kharkiv',
+			'/ru/pohoda/kharkiv/zavtra',
+			'/ru/pohoda/kharkiv/10-dniv',
+			'/ru/pohoda/kharkiv/vykhidni'
+		]);
+		for (const label of ['Давление, мм', 'Влажность, %', 'Ветер, м/с', 'Осадки, мм']) {
+			expect(screen.getByRole('rowheader', { name: label })).toBeInTheDocument();
+		}
+		expect(screen.getByText('Восход солнца')).toBeInTheDocument();
+		expect(screen.getByText('12 ч 0 мин')).toBeInTheDocument();
+		expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(
+			/^Сегодня, \d{1,2} [а-я]+\./
+		);
+		expect(screen.getByRole('tabpanel').textContent).not.toMatch(/[іїєґ]/);
 	});
 });

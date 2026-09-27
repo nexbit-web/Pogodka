@@ -1,4 +1,10 @@
 import type { Handle } from '@sveltejs/kit';
+import { langFromPath } from '$lib/i18n';
+import { registerRu } from '$lib/i18n/pack';
+import { RU_PACK } from '$lib/i18n/ru';
+
+// Сервер рендерить обидві мови, тож російські тексти підключаємо одразу
+registerRu(RU_PACK);
 
 /*
 	Заголовки безпеки для кожної відповіді. Пошуковики враховують безпечність сайту,
@@ -13,7 +19,11 @@ const SECURITY_HEADERS: Record<string, string> = {
 };
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const response = await resolve(event);
+	// Мова сторінки — з адреси: /ru/… — російська, решта — українська
+	const lang = langFromPath(event.url.pathname);
+	const response = await resolve(event, {
+		transformPageChunk: ({ html }) => html.replace('%lang%', lang)
+	});
 
 	for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
 		if (!response.headers.has(name)) response.headers.set(name, value);

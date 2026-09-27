@@ -5,6 +5,7 @@
 	import Navigation from '@lucide/svelte/icons/navigation';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
 	import { GeoError, locateNearestCity, markGeoPromptSeen } from '$lib/geolocate';
+	import { i18n } from '$lib/i18n/state.svelte';
 
 	/*
 		Плашка при першому візиті: «Погода там, де ви зараз».
@@ -34,11 +35,11 @@
 		error = '';
 		locating = true;
 		try {
-			const path = await locateNearestCity();
+			const path = await locateNearestCity(i18n.lang);
 			dismiss();
-			goto(resolve('/pohoda/[city]', { city: path }));
+			goto(i18n.href(resolve('/pohoda/[city]', { city: path })));
 		} catch (err) {
-			error = err instanceof Error ? err.message : 'Не вдалося визначити місцезнаходження';
+			error = err instanceof Error ? err.message : i18n.t.geoFailed;
 			// Доступ заборонено — питати знову немає сенсу
 			if (err instanceof GeoError && err.denied) markGeoPromptSeen();
 		} finally {
@@ -65,8 +66,7 @@
 			<div class="min-w-0">
 				<!-- Одне речення-прохання, як на Синоптику; помилка стає на його місце -->
 				<p id="geo-prompt-text" class="text-[15px] leading-snug">
-					{error ||
-						'Дозвольте Pogodka доступ до вашої геолокації, щоб дізнаватися про погоду там, де ви знаходитесь.'}
+					{error || i18n.t.geoPrompt}
 				</p>
 
 				<div class="mt-3.5 flex items-center gap-2">
@@ -78,9 +78,9 @@
 					>
 						{#if locating}
 							<LoaderCircle size={15} class="animate-spin" aria-hidden="true" />
-							Визначаємо…
+							{i18n.t.geoAllowing}
 						{:else}
-							Дозволити
+							{i18n.t.geoAllow}
 						{/if}
 					</button>
 					<button
@@ -88,7 +88,7 @@
 						onclick={dismiss}
 						class="h-9 cursor-pointer rounded-full px-3 text-[14px] text-primary transition-colors hover:bg-fill"
 					>
-						Не зараз
+						{i18n.t.geoLater}
 					</button>
 				</div>
 			</div>

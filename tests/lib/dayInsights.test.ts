@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { daylight, describeDay, signed } from '$lib/dayInsights';
+import { dayWarnings, daylight, describeDay, signed } from '$lib/dayInsights';
 import { buildForecastDays } from '$lib/weather';
 import { makeForecast, type HourOverrides } from '../fixtures/forecast';
 import type { ForecastDay } from '$lib/types';
@@ -117,9 +117,10 @@ describe('describeDay', () => {
 		expect(story.text).not.toMatch(/Мряка[^.]*мм/);
 	});
 
-	it('попереджає про сильний і поривчастий вітер', () => {
-		expect(describeDay(day(() => ({ gusts: 18 }))).text).toContain('пориви до 18 м/с');
+	it('поривчастий вітер — в описі, сильний — лише в попередженнях, без повтору', () => {
 		expect(describeDay(day(() => ({ gusts: 12 }))).text).toMatch(/12 м\/с/);
+		expect(describeDay(day(() => ({ gusts: 18 }))).text).not.toMatch(/18 м\/с/);
+		expect(dayWarnings(day(() => ({ gusts: 18 })))).toContain('Сильний вітер: пориви до 18 м/с');
 	});
 
 	it('пояснює, чому надворі холодніше, ніж на термометрі', () => {
@@ -151,9 +152,8 @@ describe('describeDay', () => {
 		expect(story.text).toContain('погана видимість');
 	});
 
-	it('попереджає про заморозки', () => {
-		const story = describeDay(day((hr) => ({ temp: hr < 8 ? -1 : 6 })));
-		expect(story.text).toContain('заморозки');
+	it('заморозки — у попередженнях', () => {
+		expect(dayWarnings(day((hr) => ({ temp: hr < 8 ? -1 : 6 })))).toContain('Заморозки до −1°');
 	});
 
 	describe('сьогоднішній день', () => {
@@ -206,6 +206,95 @@ describe('describeDay', () => {
 						/undefined|NaN|null|\{|\s{2}/
 					);
 					expect(text.trim().endsWith('.')).toBe(true);
+				}
+			}
+		}
+	});
+});
+
+describe('повітря й пилок в описі', () => {
+	it('якість повітря за шкалою EEA — одним реченням', () => {
+		expect(describeDay(day(), 0, undefined, { aqi: 15, pollen: null }).text).toContain(
+			'Повітря чисте.'
+		);
+		expect(describeDay(day(), 0, undefined, { aqi: 70, pollen: null }).text).toContain(
+			'Повітря забруднене'
+		);
+	});
+
+	it('пилок — у родовому відмінку, високий — з порадою алергікам', () => {
+		const story = describeDay(day(), 0, undefined, {
+			aqi: null,
+			pollen: { plant: 'ragweed', level: 'high' }
+		});
+		expect(story.text).toContain('Висока концентрація пилку амброзії — алергікам');
+	});
+
+	it('немає даних — немає речень про повітря', () => {
+		expect(describeDay(day(), 0, undefined, { aqi: null, pollen: null }).text).not.toMatch(
+			/Повітря|пилку/
+		);
+	});
+});
+
+describe('dayWarnings', () => {
+	it('спокійний день — без попереджень', () => {
+		expect(dayWarnings(day(() => ({ temp: 15, gusts: 6 })))).toEqual([]);
+	});
+
+	it('спека, сильний мороз, гроза й сильні опади', () => {
+		expect(dayWarnings(day(() => ({ temp: 36 })))).toContain('Сильна спека до +36°');
+		expect(dayWarnings(day(() => ({ temp: -20 })))).toContain('Сильний мороз до −20°');
+		expect(dayWarnings(day(() => ({ code: 95 })))).toContain('Можлива гроза');
+		expect(dayWarnings(day(() => ({ code: 63, precip: 2 })))).toContain('Сильні опади: до 48 мм');
+	});
+
+	it('для сьогодні — лише години, що попереду', () => {
+		const d = day((hr) => ({ temp: hr < 6 ? -2 : 8 }));
+		expect(dayWarnings(d)).toContain('Заморозки до −2°');
+		expect(dayWarnings(d, 12)).toEqual([]);
+	});
+});
+
+describe('російською', () => {
+	it('опис, заголовок, попередження й тривалість дня', () => {
+		const d = day((hr) => ({ temp: hr < 8 ? -1 : 6, gusts: 16 }));
+		const story = describeDay(d, 0, undefined, { aqi: 30, pollen: null }, 'ru');
+
+		expect(story.title).toMatch(/день/);
+		expect(story.text).toContain('Качество воздуха удовлетворительное.');
+		expect(dayWarnings(d, 0, 'ru')).toEqual([
+			'Заморозки до −1°',
+			'Сильный ветер: порывы до 16 м/с'
+		]);
+		expect(daylight('2026-09-25T06:48', '2026-09-25T18:52', 'ru')).toBe('12 ч 4 мин');
+	});
+
+	it('той самий день — та сама будова опису, що й українською', () => {
+		const d = day((hr) => (hr >= 14 && hr < 17 ? { code: 63, precip: 1 } : { code: 2 }));
+		const uk = describeDay(d);
+		const ru = describeDay(d, 0, undefined, undefined, 'ru');
+		expect(uk.text.split('. ').length).toBe(ru.text.split('. ').length);
+		expect(ru.text).toContain('примерно с 14:00 до 17:00');
+	});
+
+	it('жодних українських літер, undefined чи NaN за будь-якої погоди', () => {
+		const codes = [0, 1, 2, 3, 45, 51, 61, 63, 65, 71, 73, 75, 80, 85, 95, 99];
+		for (const code of codes) {
+			for (const temp of [-15, 0, 12, 25, 34]) {
+				for (const fromHour of [0, 10, 16, 20]) {
+					const d = day(() => ({ code, temp, precip: code >= 51 ? 1 : 0, gusts: 11 }));
+					const { title, text } = describeDay(
+						d,
+						fromHour,
+						undefined,
+						{ aqi: 50, pollen: { plant: 'birch', level: 'moderate' } },
+						'ru'
+					);
+					const all = `${title} ${text} ${dayWarnings(d, fromHour, 'ru').join(' ')}`;
+					expect(all, `код ${code}, ${temp}°, з ${fromHour}:00`).not.toMatch(
+						/[іїєґІЇЄҐʼ]|undefined|NaN|null|\{|\s{2}/
+					);
 				}
 			}
 		}

@@ -3,8 +3,19 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import Header from '$lib/components/shared/Header.svelte';
 	import TopLoader from '$lib/components/shared/TopLoader.svelte';
+	import { page } from '$app/state';
+	import { langFromPath } from '$lib/i18n';
+	import { trackLang } from '$lib/i18n/state.svelte';
 
 	let { children } = $props();
+
+	// При кожному переході: мова документа — мова вмісту сторінки (на сервері її ставить
+	// hooks.server.ts), а вибрана людиною мова зберігається й на сторінках без перекладу
+	$effect(() => {
+		const path = page.url.pathname;
+		document.documentElement.lang = langFromPath(path);
+		trackLang(path);
+	});
 
 	// Сповіщення потрібні рідко (форма підтримки), тож їх код довантажується
 	// окремо вже після показу сторінки і не гальмує перше завантаження

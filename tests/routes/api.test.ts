@@ -212,11 +212,15 @@ describe('Карта сайту', () => {
 		);
 	};
 
-	// 2 500 населених пунктів у базі + столиця + головна й «Про нас» = 2 503 адреси
+	// 2 500 населених пунктів у базі + столиця — по дві мовні версії
 	const manyCities = () =>
 		Array.from({ length: 2500 }, (_, i) =>
 			row(i + 1, `city-${i + 1}`, `Місто${i + 1}`, 'Київська область')
 		);
+
+	// Головна обома мовами, «Про нас», 3 сторінки прогнозу × 24 центри (столиця й 23 обласні) × 2 мови
+	const STATIC = 2 + 1 + 24 * 3 * 2;
+	const TOTAL = STATIC + 2501 * 2;
 
 	const locsOf = (xml: string) => [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1]);
 
@@ -228,14 +232,14 @@ describe('Карта сайту', () => {
 		const xml = await res.text();
 
 		expect(res.headers.get('Content-Type')).toContain('application/xml');
-		expect(xml.match(/<sitemap>/g)).toHaveLength(3);
-		expect(xml).toContain('<loc>https://www.pogodka.org/sitemaps/3.xml</loc>');
+		expect(xml.match(/<sitemap>/g)).toHaveLength(Math.ceil(TOTAL / 1000));
+		expect(xml).toContain('<loc>https://www.pogodka.org/sitemaps/6.xml</loc>');
 		expect(xml).not.toContain('/api/');
 		// Індексу досить підрахунку — усі рядки з бази не читаються
 		expect(prisma.city.findMany).not.toHaveBeenCalled();
 	});
 
-	it('перший файл: головна, «Про нас», столиця, далі населені пункти — без дублів', async () => {
+	it('перший файл: головна обома мовами, «Про нас», сторінки обласних центрів, далі населені пункти', async () => {
 		useTable([
 			row(2732, 'lviv', 'Львів', 'Дніпропетровська область'),
 			row(11272, 'lviv', 'Львів', 'Львівська область'),
@@ -243,36 +247,69 @@ describe('Карта сайту', () => {
 		]);
 		const { GET } = await import('../../src/routes/sitemaps/[file]/+server');
 
-		const locs = locsOf(await (await GET(event({ params: { file: '1.xml' } }))).text());
+		const xml = await (await GET(event({ params: { file: '1.xml' } }))).text();
+		const locs = locsOf(xml);
 
-		expect(locs).toEqual([
+		expect(locs.slice(0, 3)).toEqual([
 			'https://www.pogodka.org',
-			'https://www.pogodka.org/about',
+			'https://www.pogodka.org/ru',
+			'https://www.pogodka.org/about'
+		]);
+		expect(locs).toContain('https://www.pogodka.org/pohoda/kyiv/zavtra');
+		expect(locs).toContain('https://www.pogodka.org/ru/pohoda/lviv/vykhidni');
+		expect(locs).toContain('https://www.pogodka.org/pohoda/uzhhorod/10-dniv');
+		expect(locs.slice(STATIC)).toEqual([
 			'https://www.pogodka.org/pohoda/kyiv',
+			'https://www.pogodka.org/ru/pohoda/kyiv',
 			'https://www.pogodka.org/pohoda/lviv-dnipropetrovska',
+			'https://www.pogodka.org/ru/pohoda/lviv-dnipropetrovska',
 			'https://www.pogodka.org/pohoda/lviv',
-			'https://www.pogodka.org/pohoda/kyiv-mykolaivska'
+			'https://www.pogodka.org/ru/pohoda/lviv',
+			'https://www.pogodka.org/pohoda/kyiv-mykolaivska',
+			'https://www.pogodka.org/ru/pohoda/kyiv-mykolaivska'
 		]);
 		expect(new Set(locs).size).toBe(locs.length);
+	});
+
+	it('мовні версії звʼязані hreflang; «Про нас» — лише українською', async () => {
+		useTable([row(11272, 'lviv', 'Львів', 'Львівська область')]);
+		const { GET } = await import('../../src/routes/sitemaps/[file]/+server');
+		const xml = await (await GET(event({ params: { file: '1.xml' } }))).text();
+
+		expect(xml).toContain('xmlns:xhtml="http://www.w3.org/1999/xhtml"');
+		const ru = xml.match(
+			/<url><loc>https:\/\/www\.pogodka\.org\/ru\/pohoda\/lviv<\/loc>.*?<\/url>/
+		)![0];
+		expect(ru).toContain('hreflang="uk" href="https://www.pogodka.org/pohoda/lviv"');
+		expect(ru).toContain('hreflang="ru" href="https://www.pogodka.org/ru/pohoda/lviv"');
+		expect(ru).toContain('hreflang="x-default" href="https://www.pogodka.org/pohoda/lviv"');
+
+		const about = xml.match(/<url><loc>https:\/\/www\.pogodka\.org\/about<\/loc>.*?<\/url>/)![0];
+		expect(about).not.toContain('xhtml:link');
 	});
 
 	it('файли разом містять кожну адресу рівно один раз, у кожному не більше 1 000', async () => {
 		useTable(manyCities());
 		const { GET } = await import('../../src/routes/sitemaps/[file]/+server');
+		const count = Math.ceil(TOTAL / 1000);
 
 		const files = await Promise.all(
-			['1.xml', '2.xml', '3.xml'].map(async (file) =>
-				locsOf(await (await GET(event({ params: { file } }))).text())
+			Array.from({ length: count }, async (_, i) =>
+				locsOf(await (await GET(event({ params: { file: `${i + 1}.xml` } }))).text())
 			)
 		);
 
-		expect(files.map((f) => f.length)).toEqual([1000, 1000, 503]);
+		expect(files.slice(0, -1).every((f) => f.length === 1000)).toBe(true);
 		const all = files.flat();
-		expect(new Set(all).size).toBe(2503);
-		expect(all.at(-1)).toBe('https://www.pogodka.org/pohoda/city-2500');
+		expect(all).toHaveLength(TOTAL);
+		expect(new Set(all).size).toBe(TOTAL);
+		expect(all.slice(-2)).toEqual([
+			'https://www.pogodka.org/pohoda/city-2500',
+			'https://www.pogodka.org/ru/pohoda/city-2500'
+		]);
 	});
 
-	it.each(['0.xml', '4.xml', '10000.xml', 'abc', '1', '-1.xml'])(
+	it.each(['0.xml', '7.xml', '10000.xml', 'abc', '1', '-1.xml'])(
 		'невідомий файл «%s» — 404',
 		async (file) => {
 			useTable(manyCities());

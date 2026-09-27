@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { getWeatherText } from '$lib/weather';
+	import { i18n } from '$lib/i18n/state.svelte';
 
 	interface Props {
 		city: string;
@@ -9,9 +10,11 @@
 		isFelt: number;
 		/** Найближчі опади: «Дощ почнеться близько 15:00»; null — сухо, рядка немає */
 		outlook?: string | null;
+		/** Кінець заголовка для пошуковиків: «на завтра» → «Погода Київ на завтра» */
+		period?: string;
 	}
 
-	let { city, temperature, weather, isFelt, outlook = null }: Props = $props();
+	let { city, temperature, weather, isFelt, outlook = null, period }: Props = $props();
 
 	/*
 		Як це працює (за зразком «Погоди» на iPhone):
@@ -206,10 +209,11 @@
 				cityScale}px; transform: scale({collapseScale}); transform-origin: 50% 70%"
 			title={city}
 		>
-			<!-- Для пошуковиків і скрінрідерів заголовок — «Погода Харків» -->
-			<span class="sr-only">Погода&nbsp;</span><span bind:this={cityTextEl} class="inline-block"
-				>{city}</span
-			>
+			<!-- Для пошуковиків і скрінрідерів заголовок — «Погода Харків» або «Погода Харків на завтра» -->
+			<span class="sr-only">{i18n.t.weather}&nbsp;</span><span
+				bind:this={cityTextEl}
+				class="inline-block">{city}</span
+			>{#if period}<span class="sr-only">&nbsp;{period}</span>{/if}
 		</h1>
 
 		<!-- Згорнутий рядок: 18° | Похмуро -->
@@ -220,7 +224,7 @@
 		>
 			<span class="tabular-nums">{degrees(temperature)}°</span>
 			<span class="font-normal text-separator">|</span>
-			<span>{getWeatherText(weather)}</span>
+			<span>{getWeatherText(weather, i18n.lang)}</span>
 		</p>
 
 		<!-- Розгорнутий блок: їде разом зі сторінкою і мʼяко ховається під назвою міста -->
@@ -237,7 +241,7 @@
 					class="absolute inset-x-4 top-[140px] text-center text-[19px] leading-[26px] font-medium sm:inset-x-6"
 					style="opacity: {rowOpacity(ROWS.condition)}"
 				>
-					{getWeatherText(weather)}
+					{getWeatherText(weather, i18n.lang)}
 				</p>
 
 				{#if showFeels}
@@ -245,7 +249,8 @@
 						class="absolute inset-x-4 top-[168px] text-center text-[14px] leading-[20px] text-tertiary sm:inset-x-6"
 						style="opacity: {rowOpacity(ROWS.feels)}"
 					>
-						Відчувається як {degrees(isFelt)}°
+						{i18n.t.feelsLike}
+						{degrees(isFelt)}°
 					</p>
 				{/if}
 

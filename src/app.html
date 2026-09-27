@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="uk">
+<html lang="%lang%">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -26,21 +26,22 @@
 		/>
 
 		<!--
-			Свій населений пункт одразу: прямий вхід на головну відкриває останній переглянутий.
+			Свій населений пункт і своя мова одразу: прямий вхід на головну відкриває
+			останній переглянутий населений пункт мовою, яку людина обрала в меню.
 			Виконується до показу сторінки, тож Київ не блимає. Переходи всередині сайту
 			(зокрема клік по логотипу) і пошукові роботи без сховища сюди не потрапляють.
 		-->
 		<script>
 			try {
-				var lastCity = localStorage.getItem('pogodka-city');
-				if (
-					location.pathname === '/' &&
-					lastCity &&
-					lastCity !== 'kyiv' &&
-					/^[a-z0-9-]+$/.test(lastCity) &&
-					document.referrer.indexOf(location.origin) !== 0
-				) {
-					location.replace('/pohoda/' + lastCity);
+				var path = location.pathname;
+				if ((path === '/' || path === '/ru') && document.referrer.indexOf(location.origin) !== 0) {
+					var lastCity = localStorage.getItem('pogodka-city');
+					var prefix = path === '/ru' || localStorage.getItem('pogodka-lang') === 'ru' ? '/ru' : '';
+					var target =
+						lastCity && lastCity !== 'kyiv' && /^[a-z0-9-]+$/.test(lastCity)
+							? prefix + '/pohoda/' + lastCity
+							: prefix || '/';
+					if (target !== path) location.replace(target);
 				}
 			} catch (e) {}
 		</script>
