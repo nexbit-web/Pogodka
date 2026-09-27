@@ -3,14 +3,44 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import Header from '$lib/components/shared/Header.svelte';
 	import TopLoader from '$lib/components/shared/TopLoader.svelte';
+	import { page } from '$app/state';
+	import { langFromPath } from '$lib/i18n';
+	import { trackLang } from '$lib/i18n/state.svelte';
 
 	let { children } = $props();
+
+	// При кожному переході: мова документа — мова вмісту сторінки (на сервері її ставить
+	// hooks.server.ts), а вибрана людиною мова зберігається й на сторінках без перекладу
+	$effect(() => {
+		const path = page.url.pathname;
+		document.documentElement.lang = langFromPath(path);
+		trackLang(path);
+	});
 
 	// Сповіщення потрібні рідко (форма підтримки), тож їх код довантажується
 	// окремо вже після показу сторінки і не гальмує перше завантаження
 	let Toaster = $state<typeof import('$lib/components/ui/sonner').Toaster | null>(null);
 	$effect(() => {
 		import('$lib/components/ui/sonner').then((m) => (Toaster = m.Toaster));
+	});
+
+	// Плашка «Погода там, де ви зараз» — лише при першому візиті і лише там, де геолокація можлива.
+	// Її код вантажиться окремо і тільки тим, кому її покажуть; зʼявляється через 1,5 с після сторінки
+	let GeoPrompt = $state<typeof import('$lib/components/shared/GeoPrompt.svelte').default | null>(
+		null
+	);
+	$effect(() => {
+		let cancelled = false;
+		const timer = setTimeout(async () => {
+			const { shouldOfferGeolocation } = await import('$lib/geolocate');
+			if (cancelled || !(await shouldOfferGeolocation())) return;
+			const m = await import('$lib/components/shared/GeoPrompt.svelte');
+			if (!cancelled) GeoPrompt = m.default;
+		}, 1500);
+		return () => {
+			cancelled = true;
+			clearTimeout(timer);
+		};
 	});
 </script>
 
@@ -26,6 +56,9 @@
 />
 {#if Toaster}
 	<Toaster position="top-center" />
+{/if}
+{#if GeoPrompt}
+	<GeoPrompt />
 {/if}
 <TopLoader />
 

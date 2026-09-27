@@ -4,6 +4,8 @@
 	import { tick } from 'svelte';
 	import { setMode, userPrefersMode } from 'mode-watcher';
 	import { THEMES, asTheme, type Theme } from '$lib/theme';
+	import { LANGS } from '$lib/i18n';
+	import { i18n, rememberLang } from '$lib/i18n/state.svelte';
 
 	/*
 		Власне легке меню замість bits-ui: воно в шапці кожної сторінки,
@@ -74,13 +76,13 @@
 	}
 </script>
 
-<!-- Налаштування сайту. Поки тут лише тема, сюди ж додаватимуться інші параметри -->
+<!-- Налаштування сайту: тема й мова -->
 <div class="relative" bind:this={rootEl}>
 	<button
 		bind:this={triggerEl}
 		type="button"
 		onclick={toggle}
-		aria-label="Налаштування"
+		aria-label={i18n.t.settings}
 		aria-haspopup="menu"
 		aria-expanded={open}
 		aria-controls="settings-menu"
@@ -95,11 +97,13 @@
 			id="settings-menu"
 			role="menu"
 			tabindex="-1"
-			aria-label="Налаштування"
+			aria-label={i18n.t.settings}
 			onkeydown={onMenuKeydown}
 			class="absolute top-[calc(100%+6px)] right-0 z-50 w-52 rounded-md border border-separator bg-popover p-1 text-popover-foreground shadow-[0_8px_24px_rgba(0,0,0,0.12)]"
 		>
-			<p class="px-2 py-1.5 text-[11px] tracking-[0.06em] text-tertiary uppercase">Тема</p>
+			<p class="px-2 py-1.5 text-[11px] tracking-[0.06em] text-tertiary uppercase">
+				{i18n.t.theme}
+			</p>
 
 			{#each THEMES as theme (theme.value)}
 				{@const checked = current === theme.value}
@@ -112,11 +116,40 @@
 					class="flex w-full cursor-pointer items-center gap-2 rounded-sm px-2 py-1.5 text-left text-[13px] outline-none hover:bg-fill focus-visible:bg-fill focus-visible:outline-none"
 				>
 					<theme.icon class="size-4 text-muted-foreground" />
-					<span class="flex-1">{theme.label}</span>
+					<span class="flex-1">{i18n.t[theme.label]}</span>
 					{#if checked}
 						<Check class="size-4 text-primary" />
 					{/if}
 				</button>
+			{/each}
+
+			<!-- Мова: та сама сторінка іншою мовою. Посилання — у кожної версії своя адреса -->
+			<p
+				class="mt-1 border-t border-separator px-2 pt-2.5 pb-1.5 text-[11px] tracking-[0.06em] text-tertiary uppercase"
+			>
+				{i18n.t.language}
+			</p>
+			{#each LANGS as lang (lang.id)}
+				{@const checked = i18n.lang === lang.id}
+				<a
+					href={i18n.switchHref(lang.id)}
+					hreflang={lang.hreflang}
+					lang={lang.hreflang}
+					role="menuitemradio"
+					aria-checked={checked}
+					tabindex="-1"
+					data-sveltekit-noscroll
+					onclick={() => {
+						rememberLang(lang.id);
+						close(false);
+					}}
+					class="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-[13px] outline-none hover:bg-fill focus-visible:bg-fill focus-visible:outline-none"
+				>
+					<span class="flex-1">{lang.label}</span>
+					{#if checked}
+						<Check class="size-4 text-primary" />
+					{/if}
+				</a>
 			{/each}
 		</div>
 	{/if}

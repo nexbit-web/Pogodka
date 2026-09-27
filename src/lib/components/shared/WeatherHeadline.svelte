@@ -1,14 +1,20 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { getWeatherText } from '$lib/weather';
+	import { i18n } from '$lib/i18n/state.svelte';
 
 	interface Props {
 		city: string;
 		temperature: number;
 		weather: number;
 		isFelt: number;
+		/** Найближчі опади: «Дощ почнеться близько 15:00»; null — сухо, рядка немає */
+		outlook?: string | null;
+		/** Кінець заголовка для пошуковиків: «на завтра» → «Погода Київ на завтра» */
+		period?: string;
 	}
 
-	let { city, temperature, weather, isFelt }: Props = $props();
+	let { city, temperature, weather, isFelt, outlook = null, period }: Props = $props();
 
 	/*
 		Як це працює (за зразком «Погоди» на iPhone):
@@ -23,8 +29,22 @@
 		  Щокадрово змінюються лише clip-path, mask, transform і opacity.
 	*/
 
+	// «Відчувається як» показуємо, лише якщо воно відрізняється від температури:
+	// «19°… відчувається як 19°» нічого не додає
+	const showFeels = $derived(Math.round(isFelt) !== Math.round(temperature));
+
+	// Температура без плюса (як у «Погоді» на iPhone), але з типографським мінусом, як у стрічці днів
+	const degrees = (t: number) => {
+		const r = Math.round(t);
+		return r < 0 ? `−${-r}` : String(r);
+	};
+
 	// Геометрія шару, px від його верхнього краю
-	const H_EXPANDED = 204; // повна висота розгорнутої шапки
+	// Повна висота розгорнутої шапки залежить від того, які рядки є: без дірок на місці відсутніх
+	const ROW_STEP = 24;
+	const H_EXPANDED = $derived(180 + (showFeels ? ROW_STEP : 0) + (outlook ? ROW_STEP : 0));
+	// Рядок опадів — під «відчувається як», а без нього — одразу під станом погоди
+	const OUTLOOK_TOP = $derived(showFeels ? 168 + ROW_STEP : 168);
 	const H_COLLAPSED = 91; // місто + рядок + повітря до контенту
 	const CITY_BOTTOM = 48; // низ назви міста
 	const LINE_BOTTOM = 84; // низ рядка «18° | Похмуро»
@@ -52,7 +72,7 @@
 
 	// Положення шару на екрані, його видима висота і зсув розгорнутого блоку
 	let layerY = $state(HEADER_H);
-	let visible = $state(H_EXPANDED);
+	let visible = $state(untrack(() => H_EXPANDED));
 	let shift = $state(0);
 	let cityScale = $state(1);
 	let mobile = $state(false);
@@ -69,6 +89,7 @@
 		const spacer = spacerEl;
 		const cityBox = cityEl;
 		const cityText = cityTextEl;
+		const expanded = H_EXPANDED;
 		if (!spacer || !cityBox || !cityText) return;
 
 		let spacerTop = HEADER_H;
@@ -95,15 +116,15 @@
 			// Шар їде разом із навігацією, доки не впреться у верх екрана
 			const nextY = Math.max(0, top);
 			// Від верху шару до початку контенту
-			const span = top + H_EXPANDED - nextY;
-			const nextVisible = Math.min(Math.max(span, H_COLLAPSED), H_EXPANDED);
+			const span = top + expanded - nextY;
+			const nextVisible = Math.min(Math.max(span, H_COLLAPSED), expanded);
 
 			if (Math.abs(nextY - lastY) > 0.05 || Math.abs(nextVisible - lastVisible) > 0.05) {
 				lastY = nextY;
 				lastVisible = nextVisible;
 				layerY = nextY;
 				visible = nextVisible;
-				shift = Math.min(Math.max(H_EXPANDED - span, 0), H_EXPANDED);
+				shift = Math.min(Math.max(expanded - span, 0), expanded);
 			}
 		};
 
@@ -188,10 +209,11 @@
 				cityScale}px; transform: scale({collapseScale}); transform-origin: 50% 70%"
 			title={city}
 		>
-			<!-- Для пошуковиків і скрінрідерів заголовок — «Погода Харків» -->
-			<span class="sr-only">Погода&nbsp;</span><span bind:this={cityTextEl} class="inline-block"
-				>{city}</span
-			>
+			<!-- Для пошуковиків і скрінрідерів заголовок — «Погода Харків» або «Погода Харків на завтра» -->
+			<span class="sr-only">{i18n.t.weather}&nbsp;</span><span
+				bind:this={cityTextEl}
+				class="inline-block">{city}</span
+			>{#if period}<span class="sr-only">&nbsp;{period}</span>{/if}
 		</h1>
 
 		<!-- Згорнутий рядок: 18° | Похмуро -->
@@ -200,9 +222,9 @@
 			style="opacity: {lineOpacity}; transform: translateY({(1 - lineOpacity) * 6}px)"
 			aria-hidden="true"
 		>
-			<span class="tabular-nums">{Math.round(temperature)}°</span>
+			<span class="tabular-nums">{degrees(temperature)}°</span>
 			<span class="font-normal text-separator">|</span>
-			<span>{getWeatherText(weather)}</span>
+			<span>{getWeatherText(weather, i18n.lang)}</span>
 		</p>
 
 		<!-- Розгорнутий блок: їде разом зі сторінкою і мʼяко ховається під назвою міста -->
@@ -212,22 +234,35 @@
 					class="absolute inset-x-4 top-[54px] text-center text-[80px] leading-[80px] font-semibold tracking-[-0.04em] tabular-nums sm:inset-x-6"
 					style="opacity: {rowOpacity(ROWS.temp)}"
 				>
-					{Math.round(temperature)}<span class="font-normal text-tertiary">°</span>
+					{degrees(temperature)}<span class="font-normal text-tertiary">°</span>
 				</p>
 
 				<p
 					class="absolute inset-x-4 top-[140px] text-center text-[19px] leading-[26px] font-medium sm:inset-x-6"
 					style="opacity: {rowOpacity(ROWS.condition)}"
 				>
-					{getWeatherText(weather)}
+					{getWeatherText(weather, i18n.lang)}
 				</p>
 
-				<p
-					class="absolute inset-x-4 top-[168px] text-center text-[14px] leading-[20px] text-tertiary sm:inset-x-6"
-					style="opacity: {rowOpacity(ROWS.feels)}"
-				>
-					Відчувається як {Math.round(isFelt)}°
-				</p>
+				{#if showFeels}
+					<p
+						class="absolute inset-x-4 top-[168px] text-center text-[14px] leading-[20px] text-tertiary sm:inset-x-6"
+						style="opacity: {rowOpacity(ROWS.feels)}"
+					>
+						{i18n.t.feelsLike}
+						{degrees(isFelt)}°
+					</p>
+				{/if}
+
+				<!-- Парасолька чи ні — одним рядком. Колір primary, як дощ в іконках і таблиці -->
+				{#if outlook}
+					<p
+						class="absolute inset-x-4 text-center text-[14px] leading-[20px] font-medium text-primary sm:inset-x-6"
+						style="top: {OUTLOOK_TOP}px; opacity: {rowOpacity({ top: OUTLOOK_TOP, h: 20 })}"
+					>
+						{outlook}
+					</p>
+				{/if}
 			</div>
 		</div>
 	</div>

@@ -48,8 +48,6 @@ export function makeForecast(options: ForecastOptions = {}): OpenMeteoWeather {
 		windgusts_10m: [] as number[],
 		winddirection_10m: [] as number[],
 		relativehumidity_2m: [] as number[],
-		dewpoint_2m: [] as number[],
-		visibility: [] as number[],
 		precipitation: [] as number[],
 		pressure_msl: [] as number[],
 		precipitation_probability: [] as number[]
@@ -90,8 +88,6 @@ export function makeForecast(options: ForecastOptions = {}): OpenMeteoWeather {
 			h.windgusts_10m.push(o.gusts ?? 6);
 			h.winddirection_10m.push(o.windDir ?? 270);
 			h.relativehumidity_2m.push(o.humidity ?? 70);
-			h.dewpoint_2m.push(temp - 5);
-			h.visibility.push(20000);
 			h.precipitation.push(precip);
 			h.pressure_msl.push(o.pressure ?? 1013);
 			h.precipitation_probability.push(prob);

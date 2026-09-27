@@ -7,9 +7,10 @@ import Moon from '@lucide/svelte/icons/moon';
 */
 export type Theme = 'light' | 'dark';
 
-export const THEMES: { value: Theme; label: string; icon: typeof Sun }[] = [
-	{ value: 'light', label: 'Світла', icon: Sun },
-	{ value: 'dark', label: 'Темна', icon: Moon }
+// Підпис — ключ перекладу в i18n/messages
+export const THEMES: { value: Theme; label: 'themeLight' | 'themeDark'; icon: typeof Sun }[] = [
+	{ value: 'light', label: 'themeLight', icon: Sun },
+	{ value: 'dark', label: 'themeDark', icon: Moon }
 ];
 
 /** Поточна тема з того, що зберіг mode-watcher; усе інше — світла */

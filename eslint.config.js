@@ -34,6 +34,15 @@ export default defineConfig(
 		}
 	},
 	{
+		// Внутрішні посилання мають вигляд i18n.href(resolve(...)): resolve() лишається всередині
+		// і додає базовий шлях, а i18n.href — мовний префікс /ru. Правило не бачить resolve()
+		// крізь обгортку і позначало б кожне посилання, тож для посилань і goto його вимкнено.
+		files: ['src/**'],
+		rules: {
+			'svelte/no-navigation-without-resolve': ['error', { ignoreLinks: true, ignoreGoto: true }]
+		}
+	},
+	{
 		// Компоненти shadcn-svelte згенеровані CLI і приймають довільний href,
 		// тому вимога resolve() до них не застосовна.
 		files: ['src/lib/components/ui/**'],

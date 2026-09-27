@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { OG_IMAGE, SITE_NAME } from '$lib/config';
 	import { absoluteUrl, serializeLd } from '$lib/seo';
+	import { LANGS, isLocalized, langFromPath, localize, stripLang } from '$lib/i18n';
 
 	interface Props {
 		title: string;
@@ -28,6 +29,17 @@
 
 	const url = $derived(absoluteUrl(path));
 	const imageUrl = $derived(image.startsWith('http') ? image : absoluteUrl(image));
+
+	// Мовні версії сторінки для пошуковиків: українська — основна (x-default).
+	// Сторінки без перекладу посилаються лише на себе
+	const lang = $derived(langFromPath(path));
+	const alternates = $derived(
+		isLocalized(stripLang(path))
+			? LANGS.map((l) => ({ hreflang: l.hreflang, href: absoluteUrl(localize(path, l.id)) }))
+			: [{ hreflang: 'uk', href: url }]
+	);
+	const xDefault = $derived(absoluteUrl(localize(path, 'uk')));
+	const locale = $derived(LANGS.find((l) => l.id === lang)!.locale);
 	const shareTitle = $derived(socialTitle ?? title);
 
 	// Закривальний тег склеюємо з двох частин, щоб не обірвати цей блок скрипта
@@ -48,13 +60,14 @@
 			content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1"
 		/>
 		<link rel="canonical" href={url} />
-		<!-- Сайт лише українською: мова сторінки і версія за замовчуванням -->
-		<link rel="alternate" hreflang="uk" href={url} />
-		<link rel="alternate" hreflang="x-default" href={url} />
+		{#each alternates as alt (alt.hreflang)}
+			<link rel="alternate" hreflang={alt.hreflang} href={alt.href} />
+		{/each}
+		<link rel="alternate" hreflang="x-default" href={xDefault} />
 	{/if}
 
 	<meta property="og:type" content="website" />
-	<meta property="og:locale" content="uk_UA" />
+	<meta property="og:locale" content={locale} />
 	<meta property="og:site_name" content={SITE_NAME} />
 	<meta property="og:url" content={url} />
 	<meta property="og:title" content={shareTitle} />

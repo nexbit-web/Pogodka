@@ -3,26 +3,27 @@
 	import CityLinks from '$lib/components/shared/CityLinks.svelte';
 	import Footer from '$lib/components/shared/Footer.svelte';
 	import Seo from '$lib/components/shared/Seo.svelte';
-	import { HOME_DESCRIPTION, HOME_TITLE } from '$lib/seo';
+	import { i18n } from '$lib/i18n/state.svelte';
 	import type { PageData } from './$types';
 
 	let { data }: { data: PageData } = $props();
 </script>
 
 <Seo
-	title={HOME_TITLE}
-	description={HOME_DESCRIPTION}
-	path="/"
-	socialTitle="Pogodka — точний прогноз погоди в Україні"
-	imageAlt="Погода в Україні — Pogodka"
+	title={data.seo.title}
+	description={data.seo.description}
+	path={data.seo.path}
+	socialTitle={data.seo.title}
+	imageAlt={`${i18n.t.weather} — Pogodka`}
 	jsonLd={data.jsonLd}
 />
 
-<WeatherLayout data={data.weather}>
+<WeatherLayout data={data.weather} home>
 	<CityLinks
 		id="region-centres"
-		title="Погода в обласних центрах."
-		subtitle="Столиця та всі області України."
+		title={i18n.t.centresTitle}
+		subtitle={i18n.t.centresSubtitle}
+		prefix={i18n.t.weather}
 		cities={data.centres}
 	/>
 </WeatherLayout>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { i18n } from '$lib/i18n/state.svelte';
 	import Footer from '$lib/components/shared/Footer.svelte';
 	import Seo from '$lib/components/shared/Seo.svelte';
 	import { SITE_NAME } from '$lib/config';
@@ -127,7 +128,7 @@
 
 	<p class="mt-12 sm:mt-16">
 		<a
-			href={resolve('/')}
+			href={i18n.href(resolve('/'))}
 			class="inline-flex h-11 items-center rounded-full bg-primary px-6 text-[15px] font-medium text-primary-foreground transition-opacity hover:opacity-90"
 		>
 			Дивитися прогноз

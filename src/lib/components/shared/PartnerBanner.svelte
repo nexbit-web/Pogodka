@@ -1,5 +1,9 @@
+<script lang="ts">
+	import { i18n } from '$lib/i18n/state.svelte';
+</script>
+
 <!-- Банер LilyLook — власний продукт, повʼязаний із сайтом, тож без позначки «Реклама» -->
-<aside aria-label="LilyLook — магазин жіночого одягу">
+<aside aria-label={i18n.t.partnerLabel}>
 	<a
 		href="https://lilylook.store/?utm_source=pogodka&utm_medium=banner&utm_campaign=partner"
 		target="_blank"
@@ -9,7 +13,7 @@
 		<!-- width/height задають пропорції заздалегідь, щоб сторінка не стрибала при завантаженні -->
 		<img
 			src="/lilylook.baner.avif"
-			alt="LilyLook — магазин жіночого одягу. Стильні образи на кожен день"
+			alt={i18n.t.partnerAlt}
 			width="2172"
 			height="724"
 			loading="lazy"

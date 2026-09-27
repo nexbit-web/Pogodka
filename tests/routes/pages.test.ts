@@ -40,32 +40,53 @@ beforeEach(() => {
 	vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
+const url = (path: string) => new URL(`https://www.pogodka.org${path}`);
+
 describe('головна сторінка', () => {
-	const load = async () =>
-		(await import('../../src/routes/+page.server')).load({ setHeaders } as AnyEvent) as Promise<
-			Record<string, AnyEvent>
-		>;
+	const load = async (path = '/') =>
+		(await import('../../src/routes/+page.server')).load({
+			url: url(path),
+			setHeaders
+		} as AnyEvent) as Promise<Record<string, AnyEvent>>;
 
 	it('показує погоду в Києві й кешується на CDN', async () => {
 		weather.findCity.mockResolvedValue({ ...KHARKIV, nameUa: 'Київ', path: 'kyiv' });
 		const data = await load();
 
 		expect(weather.findCity).toHaveBeenCalledWith('kyiv');
-		expect(data.weather.misto).toBe('Харків');
+		expect(data.weather.misto).toBe('Київ');
+		expect(data.seo).toMatchObject({ path: '/' });
+		expect(data.seo.title).toMatch(/^Pogodka \(Погодка\)/);
 		expect(setHeaders.mock.calls[0][0]['cache-control']).toContain('s-maxage=');
 	});
 
-	it('посилається на столицю і всі 23 інші обласні центри', async () => {
+	it('посилається на столицю і всі 23 інші обласні центри: столиця першою, далі за абеткою', async () => {
 		weather.findCity.mockResolvedValue({ ...KHARKIV, path: 'kyiv' });
 		const { centres } = await load();
 
 		expect(centres).toHaveLength(24);
-		expect(centres[0]).toEqual({ name: 'Київ', path: 'kyiv', note: 'столиця' });
-		expect(centres).toContainEqual({
-			name: 'Ужгород',
-			path: 'uzhhorod',
-			note: 'Закарпатська обл.'
+		expect(centres[0]).toEqual({ name: 'Київ', path: 'kyiv' });
+		expect(centres).toContainEqual({ name: 'Ужгород', path: 'uzhhorod' });
+		const rest = centres.slice(1).map((c: { name: string }) => c.name);
+		expect(rest).toEqual([...rest].sort((a, b) => a.localeCompare(b, 'uk')));
+	});
+
+	it('/ru — назви, заголовок і опис російською', async () => {
+		weather.findCity.mockResolvedValue({
+			...KHARKIV,
+			nameUa: 'Київ',
+			nameRu: 'Киев',
+			region: 'Київ',
+			path: 'kyiv'
 		});
+		const data = await load('/ru');
+
+		expect(data.weather.misto).toBe('Киев');
+		expect(data.centres[0]).toEqual({ name: 'Киев', path: 'kyiv' });
+		expect(data.centres).toContainEqual({ name: 'Одесса', path: 'odesa' });
+		expect(data.seo).toMatchObject({ path: '/ru' });
+		expect(data.seo.title).toContain('прогноз погоды в Украине');
+		expect(data.seo.description).toMatch(/^Прогноз погоды для каждого города/);
 	});
 
 	it('структуровані дані: Organization і WebSite', async () => {
@@ -81,9 +102,10 @@ describe('головна сторінка', () => {
 });
 
 describe('сторінка міста /pohoda/[city]', () => {
-	const load = async (city: string) =>
+	const load = async (city: string, path = `/pohoda/${city}`) =>
 		(await import('../../src/routes/pohoda/[city]/+page.server')).load({
 			params: { city },
+			url: url(path),
 			setHeaders
 		} as AnyEvent) as Promise<Record<string, AnyEvent>>;
 
@@ -91,7 +113,9 @@ describe('сторінка міста /pohoda/[city]', () => {
 		weather.findCity.mockResolvedValue(KHARKIV);
 		const data = await load('kharkiv');
 
+		expect(data.view).toBe('week');
 		expect(data.city).toEqual({ name: 'Харків', region: 'Харківська область', path: 'kharkiv' });
+		expect(data.seo.path).toBe('/pohoda/kharkiv');
 		expect(data.seo.title).toMatch(/^Погода Харків/);
 		expect(data.seo.title.length).toBeLessThanOrEqual(65);
 		expect(data.seo.description).toMatch(/^Погода Харків зараз: [+−]?\d+°/);
@@ -116,6 +140,7 @@ describe('сторінка міста /pohoda/[city]', () => {
 		expect(breadcrumbs['@type']).toBe('BreadcrumbList');
 		expect(breadcrumbs.itemListElement.at(-1).item).toBe('https://www.pogodka.org/pohoda/kharkiv');
 		expect(page['@type']).toBe('WebPage');
+		expect(page.inLanguage).toBe('uk');
 		expect(page.about.geo).toEqual({
 			'@type': 'GeoCoordinates',
 			latitude: 49.99,
@@ -159,6 +184,124 @@ describe('сторінка міста /pohoda/[city]', () => {
 		const { seo } = await load('lviv-mykolaivska');
 
 		expect(seo.title).toContain('Львів (Миколаївська обл.)');
+	});
+
+	describe('російська версія /ru/pohoda/[city]', () => {
+		const RU = { ...KHARKIV, nameRu: 'Харьков' };
+
+		it('назва, область, сусіди й SEO — російською, адреси з /ru', async () => {
+			weather.findCity.mockResolvedValue(RU);
+			cities.nearbyCities.mockResolvedValue([
+				{
+					id: 1,
+					nameUa: 'Мерефа',
+					nameRu: 'Мерефа',
+					region: 'Харківська область',
+					path: 'merefa',
+					distance: 24
+				},
+				{
+					id: 2,
+					nameUa: 'Суми',
+					nameRu: 'Сумы',
+					region: 'Сумська область',
+					path: 'sumy',
+					distance: 140
+				}
+			]);
+			const data = await load('kharkiv', '/ru/pohoda/kharkiv');
+
+			expect(data.city).toEqual({
+				name: 'Харьков',
+				region: 'Харьковская область',
+				path: 'kharkiv'
+			});
+			expect(data.weather.misto).toBe('Харьков');
+			expect(data.nearby).toEqual([
+				{ name: 'Мерефа', path: 'merefa', note: '24 км' },
+				{ name: 'Сумы', path: 'sumy', note: 'Сумская обл.' }
+			]);
+			expect(data.seo.path).toBe('/ru/pohoda/kharkiv');
+			expect(data.seo.title).toBe('Погода Харьков: прогноз на сегодня, завтра и 7 дней | Pogodka');
+			expect(data.seo.description).toMatch(/^Погода Харьков сейчас: [+−]?\d+°/);
+
+			const [breadcrumbs, page] = data.seo.jsonLd['@graph'];
+			expect(breadcrumbs.itemListElement.map((i: { item: string }) => i.item)).toEqual([
+				'https://www.pogodka.org/ru',
+				'https://www.pogodka.org/ru/pohoda/kharkiv'
+			]);
+			expect(page.inLanguage).toBe('ru');
+		});
+
+		it('без російської назви в базі — українська', async () => {
+			weather.findCity.mockResolvedValue({ ...KHARKIV, nameRu: '' });
+			const data = await load('kharkiv', '/ru/pohoda/kharkiv');
+			expect(data.city.name).toBe('Харків');
+		});
+
+		it('301 зберігає мову', async () => {
+			weather.findCity.mockResolvedValue(RU);
+			const err = await load('Харьков', '/ru/pohoda/Харьков').catch((e: unknown) => e);
+			expect(err).toMatchObject({ status: 301, location: '/ru/pohoda/kharkiv' });
+		});
+	});
+});
+
+describe('сторінки «на завтра», «на 10 днів», «на вихідні»', () => {
+	const load = async (view: string, path = `/pohoda/kharkiv/${view}`, city = 'kharkiv') =>
+		(await import('../../src/routes/pohoda/[city]/[view=view]/+page.server')).load({
+			params: { city, view },
+			url: url(path),
+			setHeaders
+		} as AnyEvent) as Promise<Record<string, AnyEvent>>;
+
+	it.each([
+		[
+			'zavtra',
+			'Погода Харків на завтра — прогноз по годинах | Pogodka',
+			/^Погода Харків на завтра, \d+ \S+: від [+−]?\d+° до [+−]?\d+°/
+		],
+		[
+			'10-dniv',
+			'Погода Харків на 10 днів — точний прогноз | Pogodka',
+			/^Погода Харків на 10 днів: від /
+		],
+		[
+			'vykhidni',
+			'Погода Харків на вихідні — субота й неділя | Pogodka',
+			/^Погода Харків на вихідні: /
+		]
+	])('/%s: власні заголовок, опис, адреса й хлібні крихти', async (view, title, description) => {
+		weather.findCity.mockResolvedValue(KHARKIV);
+		const data = await load(view);
+
+		expect(data.view).toBe(view);
+		expect(data.seo.path).toBe(`/pohoda/kharkiv/${view}`);
+		expect(data.seo.title).toBe(title);
+		expect(data.seo.description).toMatch(description);
+		expect(data.seo.description).not.toMatch(/NaN|undefined|Infinity/);
+
+		const crumbs = data.seo.jsonLd['@graph'][0].itemListElement;
+		expect(crumbs).toHaveLength(3);
+		expect(crumbs[2].item).toBe(`https://www.pogodka.org/pohoda/kharkiv/${view}`);
+	});
+
+	it('російською: /ru/pohoda/kharkiv/zavtra', async () => {
+		weather.findCity.mockResolvedValue({ ...KHARKIV, nameRu: 'Харьков' });
+		const data = await load('zavtra', '/ru/pohoda/kharkiv/zavtra');
+
+		expect(data.seo.path).toBe('/ru/pohoda/kharkiv/zavtra');
+		expect(data.seo.title).toBe('Погода Харьков на завтра — прогноз по часам | Pogodka');
+		expect(data.seo.description).toMatch(/^Погода Харьков на завтра, \d+ \S+: от /);
+		expect(data.seo.jsonLd['@graph'][0].itemListElement[2].name).toBe('На завтра');
+	});
+
+	it('неканонічна назва — 301 на ту саму сторінку прогнозу', async () => {
+		weather.findCity.mockResolvedValue(KHARKIV);
+		const err = await load('10-dniv', '/pohoda/Kharkiv/10-dniv', 'Kharkiv').catch(
+			(e: unknown) => e
+		);
+		expect(err).toMatchObject({ status: 301, location: '/pohoda/kharkiv/10-dniv' });
 	});
 });
 

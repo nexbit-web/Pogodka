@@ -8,6 +8,19 @@ export interface WeatherApiResponse {
 	path: string;
 	// Сира відповідь Open-Meteo (hourly / daily масиви)
 	weather: OpenMeteoWeather;
+	/** Якість повітря й пилок на 5 днів; null — сервіс недоступний */
+	air?: AirQualityData | null;
+}
+
+/** Погодинна якість повітря Open-Meteo: європейський індекс AQI і пилок, зерен/м³ */
+export interface AirQualityData {
+	time: string[];
+	european_aqi: (number | null)[];
+	alder_pollen: (number | null)[];
+	birch_pollen: (number | null)[];
+	grass_pollen: (number | null)[];
+	mugwort_pollen: (number | null)[];
+	ragweed_pollen: (number | null)[];
 }
 
 export interface OpenMeteoWeather {
@@ -20,8 +33,6 @@ export interface OpenMeteoWeather {
 		windgusts_10m: number[];
 		winddirection_10m: number[];
 		relativehumidity_2m: number[];
-		dewpoint_2m: number[];
-		visibility: number[];
 		precipitation: number[];
 		pressure_msl: number[];
 		surface_pressure?: number[];
@@ -45,13 +56,11 @@ export interface OpenMeteoWeather {
 export interface CurrentWeather {
 	temp: number;
 	feels: number;
-	dewPoint: number;
 	code: number;
 	windDir: number;
 	humidity: number;
 	wind: number;
 	gusts: number;
-	visibility: number;
 	precipitation: number;
 	pressure: number;
 }

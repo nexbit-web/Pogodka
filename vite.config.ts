@@ -40,7 +40,8 @@ export default defineConfig({
 					name: 'server',
 					environment: 'node',
 					include: ['tests/**/*.test.ts'],
-					exclude: ['tests/**/*.svelte.test.ts']
+					exclude: ['tests/**/*.svelte.test.ts'],
+					setupFiles: ['tests/setup/app.ts']
 				}
 			},
 			{
@@ -54,7 +55,7 @@ export default defineConfig({
 					// jsdom важкий: одне оточення на потік замість нового на кожен файл
 					pool: 'vmThreads',
 					include: ['tests/**/*.svelte.test.ts'],
-					setupFiles: ['tests/setup/client.ts']
+					setupFiles: ['tests/setup/app.ts', 'tests/setup/client.ts']
 				}
 			}
 		]

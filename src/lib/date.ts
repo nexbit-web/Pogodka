@@ -4,12 +4,15 @@
 	Так у браузер не їде luxon (~20 КБ gzip), а результат однаковий на сервері й клієнті.
 */
 
+import type { Lang } from './i18n';
+import { ruPack } from './i18n/pack';
+
 export const KYIV_TZ = 'Europe/Kyiv';
 
-const WEEKDAYS = ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'пʼятниця', 'субота'];
-const WEEKDAYS_SHORT = ['нд', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+const WEEKDAYS_UK = ['неділя', 'понеділок', 'вівторок', 'середа', 'четвер', 'пʼятниця', 'субота'];
+const WEEKDAYS_SHORT_UK = ['нд', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
 // Родовий відмінок: «25 вересня»
-const MONTHS = [
+const MONTHS_UK = [
 	'січня',
 	'лютого',
 	'березня',
@@ -55,15 +58,18 @@ export function isoWeekday(iso: string): number {
 export const isWeekend = (iso: string) => isoWeekday(iso) >= 6;
 
 /** «пʼятниця» або коротко «пт» */
-export function weekdayName(iso: string, short = false): string {
-	return (short ? WEEKDAYS_SHORT : WEEKDAYS)[isoWeekday(iso) % 7];
+export function weekdayName(iso: string, short = false, lang: Lang = 'uk'): string {
+	const ru = lang === 'ru' ? ruPack() : null;
+	const names = short ? (ru?.weekdaysShort ?? WEEKDAYS_SHORT_UK) : (ru?.weekdays ?? WEEKDAYS_UK);
+	return names[isoWeekday(iso) % 7];
 }
 
 /** Число місяця без нуля попереду */
 export const dayOfMonth = (iso: string) => Number(iso.slice(8, 10));
 
 /** Місяць у родовому відмінку: «вересня» */
-export const monthName = (iso: string) => MONTHS[Number(iso.slice(5, 7)) - 1];
+export const monthName = (iso: string, lang: Lang = 'uk') =>
+	((lang === 'ru' && ruPack()?.months) || MONTHS_UK)[Number(iso.slice(5, 7)) - 1];
 
 /** Час із рядка: «06:25», або без нуля попереду — «6:25» */
 export function clock(iso: string, pad = true): string {

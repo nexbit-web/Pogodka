@@ -62,10 +62,6 @@ describe('getCurrentWeather', () => {
 		expect(current).toMatchObject({ temp: 17.4, feels: 15, code: 61, humidity: 55 });
 	});
 
-	it('переводить видимість у кілометри', () => {
-		expect(getCurrentWeather(weather, 10).visibility).toBe(20);
-	});
-
 	it('при індексі -1 не падає, а бере першу годину', () => {
 		expect(getCurrentWeather(weather, -1).temp).toBe(weather.hourly.temperature_2m[0]);
 	});
