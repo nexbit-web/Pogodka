@@ -108,6 +108,18 @@ describe('Header', () => {
 		expect(await screen.findByText('Нічого не знайдено')).toBeInTheDocument();
 	});
 
+	it('пошук відповів помилкою — «Нічого не знайдено», шапка не ламається', async () => {
+		fetchMock.mockResolvedValue(
+			new Response(JSON.stringify({ message: 'Пошук тимчасово недоступний' }), { status: 503 })
+		);
+		const { user, input } = setup();
+		await user.click(input);
+		await user.type(input, 'Льв');
+
+		expect(await screen.findByText('Нічого не знайдено')).toBeInTheDocument();
+		expect(screen.getByRole('combobox')).toBeInTheDocument();
+	});
+
 	it('стрілки підсвічують місто, Enter відкриває його', async () => {
 		const { user, input } = setup();
 		await typeAndWait(user, input);

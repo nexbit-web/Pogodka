@@ -17,6 +17,13 @@ export function setTestPath(path: string) {
 	testPage.url = new URL(`https://www.pogodka.org${path}`);
 }
 
+/*
+	Секрети з .env (боєвий Redis, база) тестам не видно: тест без власної підміни
+	не може випадково записати щось у справжній кеш чи базу. Тести, яким потрібні
+	значення, підміняють $env/dynamic/private у себе.
+*/
+vi.mock('$env/dynamic/private', () => ({ env: {} }));
+
 vi.mock('$app/state', () => ({
 	page: testPage,
 	navigating: { to: null, from: null, type: null },

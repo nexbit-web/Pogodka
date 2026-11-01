@@ -109,6 +109,15 @@ describe('WeatherHeadline', () => {
 		expect(screen.getByText('Відчувається як 15°')).toBeInTheDocument();
 	});
 
+	it('поточної години немає — чесне «—», а не чужі числа', () => {
+		render(WeatherHeadline, { city: 'Харків', temperature: null, weather: null, isFelt: null });
+
+		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('Харків');
+		expect(screen.getAllByText(/^—°?$/).length).toBeGreaterThan(0);
+		expect(screen.getAllByText('Немає даних').length).toBeGreaterThan(0);
+		expect(screen.queryByText(/Відчувається як/)).not.toBeInTheDocument();
+	});
+
 	it('знімає обробники прокрутки при виході зі сторінки', () => {
 		const add = vi.spyOn(window, 'addEventListener');
 		const remove = vi.spyOn(window, 'removeEventListener');

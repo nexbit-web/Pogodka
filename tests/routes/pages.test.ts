@@ -2,14 +2,20 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { isRedirect } from '@sveltejs/kit';
 import { makeApiResponse, makeForecast } from '../fixtures/forecast';
 
-const { weather, cities, support } = vi.hoisted(() => ({
+const { weather, cities, support, redis } = vi.hoisted(() => ({
 	weather: { findCity: vi.fn(), getForecast: vi.fn() },
 	cities: { nearbyCities: vi.fn() },
-	support: { sendSupportMessage: vi.fn() }
+	support: { sendSupportMessage: vi.fn() },
+	redis: new Map<string, string>()
 }));
 
 vi.mock('$lib/server/weather', () => weather);
 vi.mock('$lib/server/cities', () => cities);
+// Кеш населених пунктів — у памʼяті тесту, ніколи не справжній Redis
+vi.mock('$lib/server/upstash', () => ({
+	redisGet: async (key: string) => redis.get(key) ?? null,
+	redisSet: async (key: string, value: string) => void redis.set(key, value)
+}));
 vi.mock('$lib/server/support', () => support);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,6 +42,7 @@ beforeEach(() => {
 		{ id: 2, nameUa: 'Бєлгород', region: 'Інша область', path: 'x', distance: 70 }
 	]);
 	support.sendSupportMessage.mockReset();
+	redis.clear();
 	setHeaders.mockReset();
 	vi.spyOn(console, 'error').mockImplementation(() => {});
 });
@@ -161,6 +168,27 @@ describe('сторінка міста /pohoda/[city]', () => {
 	it('невідоме місто — 404', async () => {
 		weather.findCity.mockResolvedValue(null);
 		await expect(load('atlantyda')).rejects.toMatchObject({ status: 404 });
+	});
+
+	it('населений пункт береться з Redis: повторний перегляд не йде в базу', async () => {
+		weather.findCity.mockResolvedValue(KHARKIV);
+		await load('kharkiv');
+
+		// База «впала» — сторінка однаково відкривається з назвою та сусідами
+		weather.findCity.mockReset().mockRejectedValue(new Error('db down'));
+		cities.nearbyCities.mockReset().mockRejectedValue(new Error('db down'));
+		const data = await load('kharkiv');
+
+		expect(weather.findCity).not.toHaveBeenCalled();
+		expect(cities.nearbyCities).not.toHaveBeenCalled();
+		expect(data.city).toMatchObject({ name: 'Харків', path: 'kharkiv' });
+		expect(data.nearby).toHaveLength(2);
+	});
+
+	it('бази немає, а адреси ще немає в кеші — 503, а не 500', async () => {
+		weather.findCity.mockRejectedValue(new Error('db down'));
+		await expect(load('kharkiv')).rejects.toMatchObject({ status: 503 });
+		expect(weather.getForecast).not.toHaveBeenCalled();
 	});
 
 	it('збій блоку «Погода поруч» не ламає сторінку', async () => {

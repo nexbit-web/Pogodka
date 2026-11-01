@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { getCityWeather } from '$lib/server/weather';
+import { getCityWeather } from '$lib/server/place';
 import type { RequestHandler } from './$types';
 
 // Публічний ендпоінт погоди. Сторінки використовують getCityWeather напряму,

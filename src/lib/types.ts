@@ -23,6 +23,10 @@ export interface AirQualityData {
 	ragweed_pollen: (number | null)[];
 }
 
+/**
+ * Прогноз Open-Meteo. Обовʼязкові масиви на сервері перевірені (server/weather.ts):
+ * однакової довжини й без порожніх значень, тож усередині сайту їх читаємо без запасних нулів.
+ */
 export interface OpenMeteoWeather {
 	hourly: {
 		time: string[];
@@ -35,10 +39,8 @@ export interface OpenMeteoWeather {
 		relativehumidity_2m: number[];
 		precipitation: number[];
 		pressure_msl: number[];
-		surface_pressure?: number[];
-		wind_speed_10m?: number[];
-		// Можуть бути відсутні у старому кеші
-		precipitation_probability?: number[];
+		// Необовʼязкові: можуть мати порожні значення, а в старому кеші — бути відсутні
+		precipitation_probability?: (number | null)[];
 	};
 	daily: {
 		time: string[];
@@ -46,23 +48,11 @@ export interface OpenMeteoWeather {
 		temperature_2m_min: number[];
 		precipitation_sum: number[];
 		weathercode: number[];
-		precipitation_probability_max?: number[];
+		precipitation_probability_max?: (number | null)[];
 		sunrise?: string[];
 		sunset?: string[];
-		uv_index_max?: number[];
+		uv_index_max?: (number | null)[];
 	};
-}
-
-export interface CurrentWeather {
-	temp: number;
-	feels: number;
-	code: number;
-	windDir: number;
-	humidity: number;
-	wind: number;
-	gusts: number;
-	precipitation: number;
-	pressure: number;
 }
 
 export interface WeeklyDay {

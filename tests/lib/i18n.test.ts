@@ -5,7 +5,15 @@ import { RU_PACK } from '$lib/i18n/ru';
 import { centreName, placeName, regionName } from '$lib/i18n/places';
 import { REGIONS } from '$lib/server/regions';
 import { dayOfMonth, monthName, weekdayName } from '$lib/date';
-import { aqiText, getWeatherText, precipOutlook, uvText, windDirectionText } from '$lib/weather';
+import {
+	aqiText,
+	getWeatherText,
+	outlookText,
+	precipOutlook,
+	uvText,
+	windDirectionText
+} from '$lib/weather';
+import { WEATHER_CODES } from '$lib/weatherCodes';
 import { typograph } from '$lib/typography';
 import { makeForecast } from '../fixtures/forecast';
 
@@ -97,8 +105,20 @@ describe('погода й дати російською', () => {
 		const weather = makeForecast({
 			hour: (d, hr) => (d === 0 && hr === 3 ? { code: 95, precip: 2 } : {})
 		});
-		expect(precipOutlook(weather, 0, 6, 'ru')).toBe('Гроза начнётся около 2:00');
-		expect(precipOutlook(weather, 0)).toBe('Гроза почнеться близько 2:00');
+		const outlook = precipOutlook(weather, 0)!;
+		expect(outlookText(outlook, 'ru')).toBe('Гроза начнётся около 2:00');
+		expect(outlookText(outlook)).toBe('Гроза почнеться близько 2:00');
+		expect(outlookText({ event: 'lasts', kind: 'drizzle' }, 'ru')).toBe(
+			'Морось продлится ещё несколько часов'
+		);
+	});
+
+	it('опис є для кожного коду WMO — без «Неизвестно» і без українських літер', () => {
+		for (const code of Object.keys(WEATHER_CODES).map(Number)) {
+			const text = getWeatherText(code, 'ru');
+			expect(text, `код ${code}`).not.toBe('Неизвестно');
+			expect(text).not.toMatch(UKRAINIAN_LETTERS);
+		}
 	});
 
 	it('нерозривні пробіли після російських прийменників', () => {

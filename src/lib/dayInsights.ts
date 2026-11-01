@@ -1,4 +1,5 @@
 import { representativeDayCode, type PollenLevel, type PollenPlant } from './weather';
+import { cloudiness, isFog, precipKind } from './weatherCodes';
 import type { Lang } from './i18n';
 import { ruPack } from './i18n/pack';
 import type { DayHour, ForecastDay } from './types';
@@ -13,15 +14,11 @@ export function signed(temp: number): string {
 
 type Sky = 'clear' | 'cloudy' | 'overcast' | 'fog' | 'drizzle' | 'rain' | 'snow' | 'storm';
 
+// Хмарність 0 і 1 (ясно, майже ясно) — «ясно», 2 — «хмарно», 3 — «похмуро»
+const SKY_BY_CLOUDINESS: Sky[] = ['clear', 'clear', 'cloudy', 'overcast'];
+
 function sky(code: number): Sky {
-	if (code <= 1) return 'clear';
-	if (code === 2) return 'cloudy';
-	if (code === 3) return 'overcast';
-	if (code === 45 || code === 48) return 'fog';
-	if (code >= 51 && code <= 57) return 'drizzle';
-	if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
-	if (code >= 95) return 'storm';
-	return 'rain';
+	return precipKind(code) ?? (isFog(code) ? 'fog' : SKY_BY_CLOUDINESS[cloudiness(code)]);
 }
 
 const WET: Sky[] = ['storm', 'snow', 'rain', 'drizzle'];
@@ -382,14 +379,14 @@ export function describeDay(
 	const daytime = hours.filter((h) => h.hour >= 9 && h.hour <= 18);
 	const titleSky = sky(
 		fromHour > 0
-			? representativeDayCode(
-					Math.max(...hours.map((h) => h.code)),
+			? representativeDayCode({
+					apiCode: Math.max(...hours.map((h) => h.code)),
 					hours,
-					hours.reduce((sum, h) => sum + h.precip, 0),
-					Math.max(0, ...hours.map((h) => h.precipProb ?? 0)),
-					day.sunrise,
-					day.sunset
-				)
+					precipSum: hours.reduce((sum, h) => sum + h.precip, 0),
+					precipProbMax: Math.max(0, ...hours.map((h) => h.precipProb ?? 0)),
+					sunrise: day.sunrise,
+					sunset: day.sunset
+				})
 			: day.code
 	);
 	const noun = evening ? p.evening : p.day;
@@ -502,7 +499,7 @@ export function dayWarnings(day: ForecastDay, fromHour = 0, lang: Lang = 'uk'): 
 	if (gusts >= 20) warnings.push(w.windSevere(Math.round(gusts)));
 	else if (gusts >= 15) warnings.push(w.wind(Math.round(gusts)));
 
-	if (hours.some((h) => h.code >= 95)) warnings.push(w.storm);
+	if (hours.some((h) => precipKind(h.code) === 'storm')) warnings.push(w.storm);
 
 	if (precip >= 20) {
 		const snow = hours.some((h) => sky(h.code) === 'snow');

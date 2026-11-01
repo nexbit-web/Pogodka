@@ -18,6 +18,18 @@ const SECURITY_HEADERS: Record<string, string> = {
 	'Strict-Transport-Security': 'max-age=31536000'
 };
 
+/*
+	Тимчасова недоступність (база чи Open-Meteo лежать, а в кеші сторінки ще немає).
+	Retry-After каже пошуковикам «повернись пізніше» — сторінка лишається в індексі,
+	тоді як дні помилок 500 Google сприймає як зниклий сайт.
+	CDN тримає таку відповідь хвилину: шквал запитів під час збою не доходить до сервера,
+	а після відновлення сторінка оживає щонайпізніше за хвилину.
+*/
+const UNAVAILABLE_HEADERS: Record<string, string> = {
+	'Retry-After': '300',
+	'Cache-Control': 'public, max-age=0, s-maxage=60'
+};
+
 export const handle: Handle = async ({ event, resolve }) => {
 	// Мова сторінки — з адреси: /ru/… — російська, решта — українська
 	const lang = langFromPath(event.url.pathname);
@@ -27,6 +39,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
 		if (!response.headers.has(name)) response.headers.set(name, value);
+	}
+
+	if (response.status === 503) {
+		for (const [name, value] of Object.entries(UNAVAILABLE_HEADERS)) {
+			response.headers.set(name, value);
+		}
 	}
 
 	// Службовий JSON не повинен потрапляти в пошук, навіть якщо на нього хтось послався

@@ -5,9 +5,10 @@
 
 	interface Props {
 		city: string;
-		temperature: number;
-		weather: number;
-		isFelt: number;
+		/** null — поточної години в прогнозі немає: чесне «—» замість чужих чисел */
+		temperature: number | null;
+		weather: number | null;
+		isFelt: number | null;
 		/** Найближчі опади: «Дощ почнеться близько 15:00»; null — сухо, рядка немає */
 		outlook?: string | null;
 		/** Кінець заголовка для пошуковиків: «на завтра» → «Погода Київ на завтра» */
@@ -31,13 +32,18 @@
 
 	// «Відчувається як» показуємо, лише якщо воно відрізняється від температури:
 	// «19°… відчувається як 19°» нічого не додає
-	const showFeels = $derived(Math.round(isFelt) !== Math.round(temperature));
+	const showFeels = $derived(
+		isFelt !== null && temperature !== null && Math.round(isFelt) !== Math.round(temperature)
+	);
 
 	// Температура без плюса (як у «Погоді» на iPhone), але з типографським мінусом, як у стрічці днів
-	const degrees = (t: number) => {
+	const degrees = (t: number | null) => {
+		if (t === null) return '—';
 		const r = Math.round(t);
 		return r < 0 ? `−${-r}` : String(r);
 	};
+
+	const condition = $derived(weather === null ? i18n.t.noData : getWeatherText(weather, i18n.lang));
 
 	// Геометрія шару, px від його верхнього краю
 	// Повна висота розгорнутої шапки залежить від того, які рядки є: без дірок на місці відсутніх
@@ -224,7 +230,7 @@
 		>
 			<span class="tabular-nums">{degrees(temperature)}°</span>
 			<span class="font-normal text-separator">|</span>
-			<span>{getWeatherText(weather, i18n.lang)}</span>
+			<span>{condition}</span>
 		</p>
 
 		<!-- Розгорнутий блок: їде разом зі сторінкою і мʼяко ховається під назвою міста -->
@@ -241,7 +247,7 @@
 					class="absolute inset-x-4 top-[140px] text-center text-[19px] leading-[26px] font-medium sm:inset-x-6"
 					style="opacity: {rowOpacity(ROWS.condition)}"
 				>
-					{getWeatherText(weather, i18n.lang)}
+					{condition}
 				</p>
 
 				{#if showFeels}

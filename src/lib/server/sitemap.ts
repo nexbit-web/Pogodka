@@ -3,12 +3,15 @@ import { LANGS, localize } from '$lib/i18n';
 import { VIEW_SLUGS } from '$lib/forecastViews';
 import { cityPageCount, cityPathsSlice } from './cities';
 import { REGIONS } from './regions';
+import { REFERENCE_TTL, cachedJson, isStringArray } from './cache';
 
 /*
 	Карта сайту: індекс /sitemap.xml і файли /sitemaps/1.xml, /sitemaps/2.xml…
 	Лежить поза /api/, бо robots.txt закриває /api/ від роботів.
 	Google приймає до 50 000 адрес у файлі, але беремо 1 000: файл швидко віддається,
 	а з бази читається лише його частина населених пунктів.
+	Адреси й кількість лежать у Redis тиждень: роботи щодня перечитують карту сайту,
+	а база прокидається для неї раз на тиждень.
 
 	Кожна перекладена сторінка — двома записами, українською й російською, і в обох
 	посилання hreflang на обидві версії: так Google рекомендує описувати мовні версії.
@@ -66,7 +69,13 @@ const PER_CITY = LANGS.length;
 
 /** Скільки файлів у карті сайту — для індексу досить одного підрахунку рядків */
 export async function sitemapFileCount(): Promise<number> {
-	const total = STATIC_PAGES.length + (await cityPageCount()) * PER_CITY;
+	const count = await cachedJson(
+		'sitemap:v1:count',
+		REFERENCE_TTL,
+		cityPageCount,
+		(v): v is number => Number.isInteger(v) && (v as number) > 0
+	);
+	const total = STATIC_PAGES.length + count * PER_CITY;
 	return Math.max(1, Math.ceil(total / URLS_PER_FILE));
 }
 
@@ -86,7 +95,12 @@ export async function sitemapChunk(index: number): Promise<SitemapEntry[]> {
 
 	const firstCity = Math.floor(from / PER_CITY);
 	const lastCity = Math.ceil(to / PER_CITY);
-	const paths = await cityPathsSlice(firstCity, lastCity - firstCity);
+	const paths = await cachedJson(
+		`sitemap:v1:paths:${firstCity}:${lastCity - firstCity}`,
+		REFERENCE_TTL,
+		() => cityPathsSlice(firstCity, lastCity - firstCity),
+		isStringArray
+	);
 
 	const cities = paths
 		.flatMap((path, i) =>
