@@ -27,6 +27,16 @@ interface SeedCity {
 	slug: string;
 }
 
+function generateSlug(nameEn: string): string {
+	return nameEn
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toLowerCase()
+		.trim()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+|-+$/g, '');
+}
+
 async function main() {
 	console.log('🌆 Починаємо завантаження міст України...');
 
@@ -43,7 +53,7 @@ async function main() {
 			countryEn: city.countryEn,
 			latitude: city.latitude,
 			longitude: city.longitude,
-			slug: city.slug
+			slug: city.slug?.trim() || generateSlug(city.nameEn)
 		})),
 		skipDuplicates: true
 	});
