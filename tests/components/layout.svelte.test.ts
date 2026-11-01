@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 import pkg from '../../package.json';
@@ -74,10 +76,26 @@ describe('PartnerBanner', () => {
 		render(PartnerBanner);
 		const img = screen.getByRole('img');
 
-		expect(img).toHaveAttribute('width', '2172');
-		expect(img).toHaveAttribute('height', '724');
+		expect(img).toHaveAttribute('width', '1864');
+		expect(img).toHaveAttribute('height', '621');
 		expect(img).toHaveAttribute('loading', 'lazy');
 		expect(img.getAttribute('alt')).toContain('LilyLook');
+	});
+
+	it('браузер бере копію під свій екран, і всі копії існують', () => {
+		render(PartnerBanner);
+		const img = screen.getByRole('img');
+		const sources = img
+			.getAttribute('srcset')!
+			.split(',')
+			.map((s) => s.trim().split(' '));
+
+		expect(sources.map(([, w]) => w)).toEqual(['720w', '1080w', '1440w', '1864w']);
+		for (const [url] of sources) {
+			expect(existsSync(join(process.cwd(), 'static', url)), url).toBe(true);
+		}
+		// Телефон 390 px — банер на всю ширину без відступів
+		expect(img.getAttribute('sizes')).toContain('calc(100vw - 32px)');
 	});
 });
 

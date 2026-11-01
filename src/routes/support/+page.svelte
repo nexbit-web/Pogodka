@@ -5,6 +5,7 @@
 	import { resolve } from '$app/paths';
 	import { i18n } from '$lib/i18n/state.svelte';
 	import { toast } from 'svelte-sonner';
+	import { loadToaster } from '$lib/toaster.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import * as Field from '$lib/components/ui/field';
 	import { Input } from '$lib/components/ui/input';
@@ -15,6 +16,9 @@
 	import type { ActionData } from './$types';
 
 	let { form }: { form: ActionData } = $props();
+
+	// Сповіщення про відправку — їхній код вантажиться лише тут
+	$effect(() => loadToaster());
 
 	// Значення з невдалої відправки потрібні лише при першому рендері (варіант без JS)
 	const initial = untrack(() => form?.values);

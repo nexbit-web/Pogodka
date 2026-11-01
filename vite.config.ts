@@ -18,7 +18,10 @@ export default defineConfig({
 			// і кожен запит до бази перетинав Атлантику.
 			adapter: adapter({ regions: ['fra1'] }),
 			// Посилання від кореня (/pohoda/lviv), а не відносні (./pohoda/lviv): однакові на кожній сторінці
-			paths: { relative: false }
+			paths: { relative: false },
+			// Дрібні файли стилів (до 5 КБ) вбудовуються в HTML: кожен окремий CSS — ще один
+			// запит, що блокує показ сторінки. Основний CSS лишається файлом і кешується браузером
+			inlineStyleThreshold: 5 * 1024
 		})
 	],
 

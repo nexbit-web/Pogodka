@@ -15,15 +15,10 @@
 		<link rel="icon" href="/icon-512x512.png" sizes="512x512" type="image/png" />
 
 		<!--
-			На macOS/iOS підхоплюється системний SF Pro і Inter не завантажується.
-			Для Windows/Android тягнемо Inter — найближчий за рисунком до SF.
+			Шрифт Inter — із власного сервера (див. @font-face в app.css), а не з Google Fonts:
+			без двох сторонніх зʼєднань і без CSS, що блокує показ сторінки.
+			На macOS/iOS береться системний SF Pro, і Inter не завантажується зовсім.
 		-->
-		<link rel="preconnect" href="https://fonts.googleapis.com" />
-		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link
-			rel="stylesheet"
-			href="https://fonts.googleapis.com/css2?family=Inter:wght@400..700&display=swap"
-		/>
 
 		<!--
 			Свій населений пункт і своя мова одразу: прямий вхід на головну відкриває
@@ -53,13 +48,15 @@
 		<!--
 			Google AdSense: мета-тег підтверджує право на сайт, скрипт показує рекламу.
 			Той самий ідентифікатор видавця — у static/ads.txt, їх перевіряє тест.
-			Скрипт асинхронний і не затримує показ сторінки. Вікно згоди для ЄЕЗ,
+			Скрипт асинхронний і не затримує показ сторінки, а низький пріоритет пускає його
+			після CSS і коду сайту: на повільному мобільному він не відбирає в них канал. Вікно згоди для ЄЕЗ,
 			Великої Британії та Швейцарії підвантажує він же, коли в кабінеті AdSense
 			увімкнено повідомлення «Privacy & messaging → European regulations».
 		-->
 		<meta name="google-adsense-account" content="ca-pub-4358580854566630" />
 		<script
 			async
+			fetchpriority="low"
 			src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4358580854566630"
 			crossorigin="anonymous"
 		></script>
