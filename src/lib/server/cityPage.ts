@@ -1,12 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
-import { findCity, getForecast } from './weather';
-import { nearbyCities } from './cities';
-import {
-	buildForecastDays,
-	buildWeeklyDays,
-	findCurrentHourIndex,
-	getCurrentWeather
-} from '$lib/weather';
+import { getForecast } from './weather';
+import { findPlace, type Place } from './place';
+import { buildForecastDays, buildWeeklyDays, findCurrentHourIndex, hourAt } from '$lib/weather';
 import { kyivNow } from '$lib/date';
 import { viewDays, viewSuffix, type ForecastView } from '$lib/forecastViews';
 import { langFromPath, localize } from '$lib/i18n';
@@ -25,9 +20,11 @@ import {
 	type CitySeoInput
 } from '$lib/seo';
 
-// Сторінку кешує CDN: 5 хвилин свіжа, ще пів години віддається, поки оновлюється у фоні.
-// Швидка відповідь сервера — пряма вимога Core Web Vitals і краулінгового бюджету.
-const CACHE = 'public, max-age=0, s-maxage=300, stale-while-revalidate=1800';
+// Сторінку кешує CDN: 15 хвилин свіжа, ще годину віддається, поки оновлюється у фоні.
+// Прогноз у Redis оновлюється раз на 2 години, тож сторінка 15-хвилинної давності не менш точна,
+// а поточну годину браузер і так звіряє з годинником (WeatherLayout). Що довше CDN тримає сторінку,
+// то рідше запит доходить до сервера, Redis і Open-Meteo — це й швидкість, і запас під навантаження.
+const CACHE = 'public, max-age=0, s-maxage=900, stale-while-revalidate=3600';
 
 /**
  * Дані сторінки населеного пункту: /pohoda/kyiv і /pohoda/kyiv/zavtra, /10-dniv, /vykhidni,
@@ -47,9 +44,23 @@ export async function loadCityPage(
 	view: ForecastView
 ) {
 	const lang = langFromPath(url.pathname);
-	const city = await findCity(params.city);
-	if (!city)
+
+	// Населений пункт — з Redis; база — лише для адреси, якої там ще немає
+	let place: Place | null;
+	try {
+		place = await findPlace(params.city);
+	} catch (err) {
+		console.error(`[place] База недоступна, а "${params.city}" ще немає в кеші:`, err);
+		error(
+			503,
+			lang === 'ru'
+				? 'Сервис временно недоступен, попробуйте позже'
+				: 'Сервіс тимчасово недоступний, спробуйте пізніше'
+		);
+	}
+	if (!place)
 		error(404, lang === 'ru' ? 'Населённый пункт не найден' : 'Населений пункт не знайдено');
+	const { city, nearby } = place;
 
 	const suffix = viewSuffix(view);
 	const path = localize(`/pohoda/${city.path}${suffix}`, lang);
@@ -63,18 +74,11 @@ export async function loadCityPage(
 	const name = placeName(city, lang);
 	const region = regionName(city.region, lang);
 
-	const [weather, nearby] = await Promise.all([
-		getForecast(city),
-		// Блок «Погода поруч» — не критичний: без нього сторінка все одно має відкритися
-		nearbyCities(city).catch((err) => {
-			console.error(`[nearby] Не вдалося знайти сусідів для "${city.path}":`, err);
-			return [];
-		})
-	]);
+	const weather = await getForecast(city);
 
 	setHeaders({ 'cache-control': CACHE });
 
-	const current = getCurrentWeather(weather.weather, findCurrentHourIndex(weather.weather));
+	const current = hourAt(weather.weather, findCurrentHourIndex(weather.weather));
 	const tomorrow = buildWeeklyDays(weather.weather)[1];
 
 	const seoInput: CitySeoInput = {
@@ -83,7 +87,7 @@ export async function loadCityPage(
 		lang,
 		path: city.path,
 		slug: city.slug,
-		now: { temp: current.temp, feels: current.feels, code: current.code },
+		now: current ? { temp: current.temp, feels: current.feels, code: current.code } : undefined,
 		tomorrow: tomorrow && { min: tomorrow.day.mintemp_c, max: tomorrow.day.maxtemp_c }
 	};
 

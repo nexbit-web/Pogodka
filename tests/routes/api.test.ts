@@ -4,12 +4,12 @@ import { makeApiResponse } from '../fixtures/forecast';
 
 const { prisma, weather, support } = vi.hoisted(() => ({
 	prisma: { city: { findMany: vi.fn(), count: vi.fn() } },
-	weather: { getCityWeather: vi.fn(), findCity: vi.fn() },
+	weather: { getCityWeather: vi.fn() },
 	support: { sendSupportMessage: vi.fn() }
 }));
 
 vi.mock('$lib/server/prisma', () => ({ default: prisma }));
-vi.mock('$lib/server/weather', () => weather);
+vi.mock('$lib/server/place', () => weather);
 vi.mock('$lib/server/support', () => support);
 
 // Мінімальна подія запиту: обробникам потрібні лише url, params і request
@@ -95,6 +95,18 @@ describe('GET /api/cities/search', () => {
 		expect(body.map((c: { id: number }) => c.id)).toEqual([0, 19753, 11272]);
 		expect(body.every((c: { path: string; slug: string }) => c.path === c.slug)).toBe(true);
 		expect(res.headers.get('Cache-Control')).toContain('s-maxage=3600');
+	});
+
+	it('база недоступна, а запиту немає в кеші — 503 «тимчасово», а не 500', async () => {
+		prisma.city.findMany.mockRejectedValue(new Error('db down'));
+		const GET = await load();
+
+		await expect(GET(event({ url: 'https://x/api/cities/search?q=Львів' }))).rejects.toMatchObject({
+			status: 503
+		});
+		await expect(GET(event({ url: 'https://x/api/cities/search?q=' }))).rejects.toMatchObject({
+			status: 503
+		});
 	});
 
 	it('популярні міста кешуються в памʼяті — база не смикається на кожен запит', async () => {
@@ -223,6 +235,16 @@ describe('Карта сайту', () => {
 	const TOTAL = STATIC + 2501 * 2;
 
 	const locsOf = (xml: string) => [...xml.matchAll(/<loc>(.*?)<\/loc>/g)].map((m) => m[1]);
+
+	it('база недоступна, а в кеші порожньо — 503 і для індексу, і для файлу', async () => {
+		prisma.city.count.mockRejectedValue(new Error('db down'));
+		prisma.city.findMany.mockRejectedValue(new Error('db down'));
+		const index = (await import('../../src/routes/sitemap.xml/+server')).GET;
+		const file = (await import('../../src/routes/sitemaps/[file]/+server')).GET;
+
+		await expect(index(event({}))).rejects.toMatchObject({ status: 503 });
+		await expect(file(event({ params: { file: '2.xml' } }))).rejects.toMatchObject({ status: 503 });
+	});
 
 	it('/sitemap.xml — індекс файлів по 1 000 адрес, поза закритим /api/', async () => {
 		useTable(manyCities());

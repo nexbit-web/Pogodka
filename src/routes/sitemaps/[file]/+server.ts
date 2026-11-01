@@ -8,7 +8,11 @@ export const GET: RequestHandler = async ({ params }) => {
 	const match = params.file.match(/^([1-9]\d{0,3})\.xml$/);
 	if (!match) error(404, 'Невідома сторінка мапи сайту');
 
-	const chunk = await sitemapChunk(Number(match[1]) - 1);
+	// База недоступна, а в кеші ще порожньо — 503: робот прийде пізніше (Retry-After — у hooks.server)
+	const chunk = await sitemapChunk(Number(match[1]) - 1).catch((err: unknown) => {
+		console.error('[sitemap] База недоступна:', err);
+		error(503, 'Карта сайту тимчасово недоступна');
+	});
 	if (chunk.length === 0) error(404, 'Невідома сторінка мапи сайту');
 
 	return new Response(renderUrlset(chunk, today()), { headers: SITEMAP_HEADERS });

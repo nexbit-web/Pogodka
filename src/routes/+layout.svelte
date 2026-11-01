@@ -6,6 +6,7 @@
 	import { page } from '$app/state';
 	import { langFromPath } from '$lib/i18n';
 	import { trackLang } from '$lib/i18n/state.svelte';
+	import { toaster } from '$lib/toaster.svelte';
 
 	let { children } = $props();
 
@@ -17,12 +18,8 @@
 		trackLang(path);
 	});
 
-	// Сповіщення потрібні рідко (форма підтримки), тож їх код довантажується
-	// окремо вже після показу сторінки і не гальмує перше завантаження
-	let Toaster = $state<typeof import('$lib/components/ui/sonner').Toaster | null>(null);
-	$effect(() => {
-		import('$lib/components/ui/sonner').then((m) => (Toaster = m.Toaster));
-	});
+	// Сповіщення вантажить лише форма техпідтримки (див. toaster.svelte.ts)
+	const Toaster = $derived(toaster.component);
 
 	// Плашка «Погода там, де ви зараз» — лише при першому візиті і лише там, де геолокація можлива.
 	// Її код вантажиться окремо і тільки тим, кому її покажуть; зʼявляється через 1,5 с після сторінки

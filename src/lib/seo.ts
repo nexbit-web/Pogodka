@@ -26,7 +26,8 @@ export interface CitySeoInput {
 	region: string;
 	path: string;
 	slug: string;
-	now: { temp: number; feels: number; code: number };
+	/** Погода зараз; немає — поточної години в прогнозі немає, і речення про «зараз» не буде */
+	now?: { temp: number; feels: number; code: number };
 	tomorrow?: { min: number; max: number };
 	lang?: Lang;
 }
@@ -106,7 +107,9 @@ export function cityDescription(input: CitySeoInput): string {
 	const lang = input.lang ?? 'uk';
 	const t = TEXT[lang];
 	const { now, tomorrow } = input;
-	const current = `Погода ${placeName(input)} ${t.now}: ${signed(now.temp)}, ${getWeatherText(now.code, lang).toLowerCase()}, ${t.feels} ${signed(now.feels)}.`;
+	const current = now
+		? `Погода ${placeName(input)} ${t.now}: ${signed(now.temp)}, ${getWeatherText(now.code, lang).toLowerCase()}, ${t.feels} ${signed(now.feels)}.`
+		: `Погода ${placeName(input)}.`;
 	const next = tomorrow
 		? ` ${t.tomorrow} ${t.range(signed(tomorrow.min), signed(tomorrow.max))}.`
 		: '';

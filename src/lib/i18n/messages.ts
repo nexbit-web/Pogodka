@@ -62,6 +62,7 @@ export const uk = {
 	// Шапка з погодою
 	weather: 'Погода',
 	feelsLike: 'Відчувається як',
+	noData: 'Немає даних',
 	// Прогноз
 	forecastPeriod: 'Період прогнозу',
 	forecastDays: 'Дні прогнозу',

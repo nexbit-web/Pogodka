@@ -1,4 +1,6 @@
 import { redisGet, redisSet } from './upstash';
+import { pack, unpack } from './packed';
+import { meteoPaused, pauseMeteo } from './meteoLimit';
 import type { AirQualityData } from '$lib/types';
 
 /*
@@ -9,8 +11,19 @@ import type { AirQualityData } from '$lib/types';
 
 // Прогноз CAMS оновлюється раз-двічі на добу, тож частіше ніж раз на 6 годин питати марно
 const FRESH_MS = 6 * 60 * 60 * 1000;
-const CACHE_TTL = 24 * 60 * 60;
+// Дві доби — як і прогноз: запас на добу вичерпаного ліміту (стиснутий запис ~0,5 КБ)
+const CACHE_TTL = 48 * 60 * 60;
 const TIMEOUT_MS = 4000;
+
+/*
+	Дані CAMS — сітка 0,1° (~11 км): усі села в одній клітинці мають ті самі значення.
+	Тож і кеш, і запит — на клітинку, а не на населений пункт: тисячі сіл діляться кількома
+	сотнями записів, і ліміт Open-Meteo витрачається в рази повільніше без втрати точності.
+*/
+const GRID = 0.1;
+
+/** Найближчий вузол сітки: «50.5» — і для ключа кешу, і для запиту */
+export const gridPoint = (value: number) => (Math.round(value / GRID) * GRID).toFixed(1);
 
 const VARIABLES = [
 	'european_aqi',
@@ -40,6 +53,7 @@ async function fetchAir(latitude: number, longitude: number): Promise<AirQuality
 		`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}` +
 		`&hourly=${VARIABLES.join(',')}&forecast_days=5&timezone=Europe/Kyiv`;
 	const res = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(TIMEOUT_MS) });
+	if (res.status === 429) await pauseMeteo(res);
 	if (!res.ok) throw new Error(`Open-Meteo Air Quality повернув ${res.status}`);
 
 	const body = (await res.json()) as { hourly?: unknown };
@@ -53,22 +67,22 @@ export async function getAirQuality(city: {
 	latitude: number;
 	longitude: number;
 }): Promise<AirQualityData | null> {
-	const key = `air:v1:${city.path}`;
+	const lat = gridPoint(city.latitude);
+	const lon = gridPoint(city.longitude);
+	const key = `air:v2:${lat},${lon}`;
 
-	let cached: CachedAir | null = null;
-	try {
-		const raw = await redisGet(key);
-		const parsed = raw ? (JSON.parse(raw) as CachedAir) : null;
-		if (parsed && isValidAir(parsed.air)) cached = parsed;
-	} catch {
-		// Пошкоджений кеш — ідемо за свіжими даними
-	}
+	// Запис стиснутий (packed.ts); пошкоджений — ідемо за свіжими даними
+	const raw = await redisGet(key);
+	const parsed = raw ? (unpack(raw) as CachedAir | undefined) : undefined;
+	const cached = parsed && isValidAir(parsed.air) ? parsed : null;
 
 	if (cached && Date.now() - cached.fetchedAt < FRESH_MS) return cached.air;
+	// Ліміт Open-Meteo вичерпано (meteoLimit.ts): збережене або без блоку, але без марного запиту
+	if (await meteoPaused()) return cached?.air ?? null;
 
 	try {
-		const air = await fetchAir(city.latitude, city.longitude);
-		await redisSet(key, JSON.stringify({ air, fetchedAt: Date.now() }), CACHE_TTL);
+		const air = await fetchAir(Number(lat), Number(lon));
+		await redisSet(key, pack({ air, fetchedAt: Date.now() }), CACHE_TTL);
 		return air;
 	} catch (err) {
 		console.warn(`[Air Quality] Не вдалося оновити для "${city.path}":`, err);

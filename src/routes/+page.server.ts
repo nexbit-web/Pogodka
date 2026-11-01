@@ -5,7 +5,11 @@ import { centreName, placeName, regionName } from '$lib/i18n/places';
 import { graph, homeDescription, homeTitle, organizationLd, websiteLd } from '$lib/seo';
 import type { PageServerLoad } from './$types';
 
-const CACHE = 'public, max-age=0, s-maxage=300, stale-while-revalidate=1800';
+// Сторінку кешує CDN: 15 хвилин свіжа, ще годину віддається, поки оновлюється у фоні.
+// Прогноз у Redis оновлюється раз на 2 години, тож сторінка 15-хвилинної давності не менш точна,
+// а поточну годину браузер і так звіряє з годинником (WeatherLayout). Що довше CDN тримає сторінку,
+// то рідше запит доходить до сервера, Redis і Open-Meteo — це й швидкість, і запас під навантаження.
+const CACHE = 'public, max-age=0, s-maxage=900, stale-while-revalidate=3600';
 
 // Посилання на столицю й обласні центри: головна — вхідна точка для людей і роботів.
 // Столиця першою, далі за абеткою мови сторінки. Область не підписуємо:

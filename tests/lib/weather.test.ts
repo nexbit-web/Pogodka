@@ -4,16 +4,20 @@ import {
 	buildWeeklyDays,
 	findCurrentHourIndex,
 	getConditionTint,
-	getCurrentWeather,
 	getTempColor,
 	getWeatherIconId,
 	getWeatherText,
+	hourAt,
 	hpaToMmHg,
 	isNightHour,
+	outlookText,
+	precipOutlook,
+	representativeDayCode,
 	uvText,
 	windDirectionText,
 	buildTableSlots
 } from '$lib/weather';
+import { WEATHER_CODES, precipKind } from '$lib/weatherCodes';
 import { makeForecast } from '../fixtures/forecast';
 
 // Усі коди погоди, які описує WMO і повертає Open-Meteo
@@ -50,26 +54,40 @@ describe('findCurrentHourIndex', () => {
 	});
 });
 
-describe('getCurrentWeather', () => {
+describe('hourAt', () => {
 	const weather = makeForecast({
 		start: '2026-09-25',
 		hour: (day, hr) =>
-			day === 0 && hr === 10 ? { temp: 17.4, feels: 15, code: 61, humidity: 55 } : {}
+			day === 0 && hr === 10 ? { temp: 17.4, feels: 15, code: 61, humidity: 55, pressure: 990 } : {}
 	});
 
 	it('бере значення потрібної години', () => {
-		const current = getCurrentWeather(weather, 10);
-		expect(current).toMatchObject({ temp: 17.4, feels: 15, code: 61, humidity: 55 });
+		expect(hourAt(weather, 10)).toMatchObject({
+			time: '2026-09-25T10:00',
+			hour: 10,
+			temp: 17.4,
+			feels: 15,
+			code: 61,
+			humidity: 55,
+			pressure: 990
+		});
 	});
 
-	it('при індексі -1 не падає, а бере першу годину', () => {
-		expect(getCurrentWeather(weather, -1).temp).toBe(weather.hourly.temperature_2m[0]);
+	it('години немає — null, а не підміна іншою годиною чи нулями', () => {
+		expect(hourAt(weather, -1)).toBeNull();
+		expect(hourAt(weather, weather.hourly.time.length)).toBeNull();
+		expect(hourAt(makeForecast({ days: 0 }), 0)).toBeNull();
 	});
 
-	it('віддає нулі, а не undefined, коли масиви порожні', () => {
-		const empty = makeForecast({ days: 0 });
-		const current = getCurrentWeather(empty, 5);
-		for (const value of Object.values(current)) expect(value).toBe(0);
+	it('шапка й таблиця — та сама година: числа збігаються за побудовою', () => {
+		const tableHour = buildForecastDays(weather)[0].hours[10];
+		expect(hourAt(weather, 10)).toEqual(tableHour);
+	});
+
+	it('порожня ймовірність опадів — undefined, а не 0', () => {
+		const data = makeForecast({ days: 1 });
+		data.hourly.precipitation_probability![3] = null;
+		expect(hourAt(data, 3)!.precipProb).toBeUndefined();
 	});
 });
 
@@ -90,9 +108,31 @@ describe('buildWeeklyDays', () => {
 	});
 });
 
+describe('коди погоди WMO', () => {
+	it('таблиця описує всі коди, які повертає Open-Meteo', () => {
+		expect(Object.keys(WEATHER_CODES).map(Number)).toEqual(WMO_CODES);
+	});
+
+	it('іконка й текст про опади узгоджені: мокра іконка — є вид опадів, суха — немає', () => {
+		const WET_ICONS = ['drizzle', 'rain', 'snow', 'snowfall', 'thunderstorm', 'thunderstorm-hail'];
+		for (const code of WMO_CODES) {
+			const wet = WET_ICONS.includes(getWeatherIconId(code));
+			expect(precipKind(code) !== null, `код ${code}`).toBe(wet);
+		}
+	});
+
+	it('крижана мряка (56, 57): іконка мряки і такий самий текст, а не «Невідомо»', () => {
+		for (const code of [56, 57]) {
+			expect(getWeatherIconId(code)).toBe('drizzle');
+			expect(precipKind(code)).toBe('drizzle');
+			expect(getWeatherText(code)).toMatch(/крижана мряка/);
+		}
+	});
+});
+
 describe('getWeatherText', () => {
-	it('має український опис для кожного коду WMO, крім 56/57', () => {
-		for (const code of WMO_CODES.filter((c) => c !== 56 && c !== 57)) {
+	it('має український опис для кожного коду WMO', () => {
+		for (const code of WMO_CODES) {
 			expect(getWeatherText(code), `код ${code}`).not.toBe('Невідомо');
 		}
 	});
@@ -226,7 +266,11 @@ describe('windDirectionText', () => {
 		[270, 'Зх'],
 		[337, 'ПнЗх'],
 		[359, 'Пн'],
-		[360, 'Пн']
+		[360, 'Пн'],
+		// Поза 0–360 — теж коректний сектор, а не undefined
+		[-30, 'ПнЗх'],
+		[-90, 'Зх'],
+		[405, 'ПнСх']
 	])('%i° → %s', (deg, text) => {
 		expect(windDirectionText(deg)).toBe(text);
 	});
@@ -330,5 +374,112 @@ describe('findCurrentHourIndex — явна година', () => {
 		const weather = makeForecast({ start: '2026-09-25' });
 		const idx = findCurrentHourIndex(weather, { date: '2026-09-26', hour: 7 });
 		expect(weather.hourly.time[idx]).toBe('2026-09-26T07:00');
+	});
+});
+
+describe('representativeDayCode', () => {
+	const day = (code: number, hourCode = code) =>
+		buildForecastDays(
+			makeForecast({ start: '2026-09-25', days: 1, hour: () => ({ code: hourCode }) })
+		)[0].hours;
+
+	it('помітні опади — день дощовий', () => {
+		expect(representativeDayCode({ apiCode: 63, hours: day(63), precipSum: 4 })).toBe(63);
+	});
+
+	it('0,1 мм за день — не дощовий: іконка за хмарністю світлового дня', () => {
+		const hours = day(1);
+		expect(representativeDayCode({ apiCode: 61, hours, precipSum: 0.1, precipProbMax: 5 })).toBe(1);
+	});
+
+	it('туман лише якщо тримався пів світлового дня', () => {
+		expect(representativeDayCode({ apiCode: 45, hours: day(45), precipSum: 0 })).toBe(45);
+	});
+
+	it('без годин мокрий код без помітних опадів стає «похмуро»', () => {
+		expect(representativeDayCode({ apiCode: 61, hours: [], precipSum: 0 })).toBe(3);
+		expect(representativeDayCode({ apiCode: 2, hours: [], precipSum: 0 })).toBe(2);
+	});
+});
+
+describe('precipOutlook — дані без слів', () => {
+	const forecast = (wet: (hr: number) => boolean, code = 61) =>
+		makeForecast({
+			start: '2026-09-25',
+			days: 1,
+			hour: (_, hr) => (wet(hr) ? { code, precip: 1 } : { code: 3, precip: 0 })
+		});
+
+	it('дощ почнеться: година перед першим мокрим записом', () => {
+		// Запис 15:00 — дощ з 14:00 до 15:00
+		expect(
+			precipOutlook(
+				forecast((hr) => hr >= 15),
+				10
+			)
+		).toEqual({
+			event: 'starts',
+			kind: 'rain',
+			at: '14:00'
+		});
+	});
+
+	it('дощ закінчиться', () => {
+		expect(
+			precipOutlook(
+				forecast((hr) => hr <= 13),
+				10
+			)
+		).toEqual({
+			event: 'ends',
+			kind: 'rain',
+			at: '13:00'
+		});
+	});
+
+	it('дощ триватиме далі за горизонт', () => {
+		expect(
+			precipOutlook(
+				forecast(() => true, 71),
+				10
+			)
+		).toEqual({ event: 'lasts', kind: 'snow' });
+	});
+
+	it('сухо, туман із краплями чи невідома година — null', () => {
+		expect(
+			precipOutlook(
+				forecast(() => false),
+				10
+			)
+		).toBeNull();
+		expect(
+			precipOutlook(
+				forecast(() => true, 45),
+				10
+			)
+		).toBeNull();
+		expect(
+			precipOutlook(
+				forecast(() => true),
+				-1
+			)
+		).toBeNull();
+	});
+
+	it('остання година прогнозу не виходить за межі масиву', () => {
+		expect(
+			precipOutlook(
+				forecast(() => false),
+				23
+			)
+		).toBeNull();
+	});
+
+	it('рядок для шапки збирається окремо', () => {
+		expect(outlookText({ event: 'starts', kind: 'rain', at: '9:00' })).toBe(
+			'Дощ почнеться близько 9:00'
+		);
+		expect(outlookText({ event: 'lasts', kind: 'snow' })).toBe('Сніг триватиме ще кілька годин');
 	});
 });

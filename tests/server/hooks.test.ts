@@ -23,6 +23,18 @@ describe('hooks.server', () => {
 		expect(res.headers.get('X-Robots-Tag')).toBe('noindex');
 	});
 
+	it('503 — «повернись пізніше» для пошуковиків і хвилина в CDN', async () => {
+		const res = await run('/pohoda/kharkiv', new Response('down', { status: 503 }));
+
+		expect(res.headers.get('Retry-After')).toBe('300');
+		expect(res.headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=60');
+	});
+
+	it('звичайна сторінка Retry-After не отримує', async () => {
+		const res = await run('/pohoda/lviv');
+		expect(res.headers.get('Retry-After')).toBeNull();
+	});
+
 	it('не перезаписує заголовки, які вже поставив обробник', async () => {
 		const res = await run('/x', new Response('ok', { headers: { 'X-Frame-Options': 'DENY' } }));
 		expect(res.headers.get('X-Frame-Options')).toBe('DENY');

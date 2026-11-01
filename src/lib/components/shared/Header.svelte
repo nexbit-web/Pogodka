@@ -80,9 +80,11 @@
 
 		const timer = setTimeout(() => {
 			fetch(`/api/cities/search?q=${encodeURIComponent(value)}`, { signal: controller.signal })
-				.then((res) => res.json())
-				.then((data: CitySearchResult[]) => {
-					cities = data;
+				// Помилка сервера — це обʼєкт { message }, а не список: показуємо «нічого не знайдено»,
+				// а не ламаємо шапку
+				.then((res) => (res.ok ? res.json() : []))
+				.then((data: unknown) => {
+					cities = Array.isArray(data) ? (data as CitySearchResult[]) : [];
 					loading = false;
 				})
 				.catch((err) => {

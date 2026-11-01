@@ -1,6 +1,7 @@
 import type { Messages } from './messages';
 import type { Phrasebook } from '../dayInsights';
 import type { Outlook } from '../weather';
+import type { WeatherCode } from '../weatherCodes';
 
 /*
 	Усе російською — окремим модулем. Сервер підключає його одразу (hooks.server.ts),
@@ -57,6 +58,7 @@ const messages: Messages = {
 	toHome: 'На главную',
 	weather: 'Погода',
 	feelsLike: 'Ощущается как',
+	noData: 'Нет данных',
 	forecastPeriod: 'Период прогноза',
 	forecastDays: 'Дни прогноза',
 	today: 'Сегодня',
@@ -214,7 +216,7 @@ const phrases: Phrasebook = {
 	}
 };
 
-const weatherText: Record<number, string> = {
+const weatherText = {
 	0: 'Ясно',
 	1: 'Почти ясно',
 	2: 'Переменная облачность',
@@ -224,6 +226,8 @@ const weatherText: Record<number, string> = {
 	51: 'Лёгкая морось',
 	53: 'Морось',
 	55: 'Сильная морось',
+	56: 'Слабая ледяная морось',
+	57: 'Сильная ледяная морось',
 	61: 'Небольшой дождь',
 	63: 'Умеренный дождь',
 	65: 'Сильный дождь',
@@ -241,13 +245,17 @@ const weatherText: Record<number, string> = {
 	95: 'Гроза',
 	96: 'Гроза с небольшим градом',
 	99: 'Гроза с сильным градом'
-};
+} satisfies Record<WeatherCode, string>;
 
 const outlook: Outlook = {
-	storm: { word: 'Гроза', starts: 'начнётся', ends: 'закончится', lasts: 'продлится' },
-	snow: { word: 'Снег', starts: 'начнётся', ends: 'закончится', lasts: 'продлится' },
-	drizzle: { word: 'Морось', starts: 'начнётся', ends: 'закончится', lasts: 'продлится' },
-	rain: { word: 'Дождь', starts: 'начнётся', ends: 'закончится', lasts: 'продлится' }
+	about: 'около',
+	longer: 'ещё несколько часов',
+	kinds: {
+		storm: { word: 'Гроза', starts: 'начнётся', ends: 'закончится', lasts: 'продлится' },
+		snow: { word: 'Снег', starts: 'начнётся', ends: 'закончится', lasts: 'продлится' },
+		drizzle: { word: 'Морось', starts: 'начнётся', ends: 'закончится', lasts: 'продлится' },
+		rain: { word: 'Дождь', starts: 'начнётся', ends: 'закончится', lasts: 'продлится' }
+	}
 };
 
 const regions: Record<string, string> = {

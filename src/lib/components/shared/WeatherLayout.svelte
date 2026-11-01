@@ -3,7 +3,7 @@
 	import WeatherHeadline from './WeatherHeadline.svelte';
 	import DayForecast from './DayForecast.svelte';
 	import PartnerBanner from './PartnerBanner.svelte';
-	import { findCurrentHourIndex, getCurrentWeather, precipOutlook } from '$lib/weather';
+	import { findCurrentHourIndex, hourAt, outlookText, precipOutlook } from '$lib/weather';
 	import { kyivNow } from '$lib/date';
 	import { untrack, type Snippet } from 'svelte';
 	import { i18n } from '$lib/i18n/state.svelte';
@@ -47,16 +47,20 @@
 	});
 
 	const hourIndex = $derived(findCurrentHourIndex(weather, now));
-	const current = $derived(getCurrentWeather(weather, hourIndex));
-	const outlook = $derived(precipOutlook(weather, hourIndex, 6, i18n.lang));
+	// null — поточної години в прогнозі немає (наприклад, годинник пристрою збитий): шапка покаже «—»
+	const current = $derived(hourAt(weather, hourIndex));
+	const outlook = $derived.by(() => {
+		const next = precipOutlook(weather, hourIndex);
+		return next && outlookText(next, i18n.lang);
+	});
 </script>
 
 <Container>
 	<WeatherHeadline
 		city={data.misto}
-		temperature={current.temp}
-		weather={current.code}
-		isFelt={current.feels}
+		temperature={current?.temp ?? null}
+		weather={current?.code ?? null}
+		isFelt={current?.feels ?? null}
 		{outlook}
 		{period}
 	/>

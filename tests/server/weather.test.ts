@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { isHttpError } from '@sveltejs/kit';
 import { makeForecast } from '../fixtures/forecast';
+import { unpack } from '$lib/server/packed';
 
 const { prisma, redis } = vi.hoisted(() => ({
 	prisma: { city: { findMany: vi.fn() } },
@@ -16,9 +17,9 @@ const {
 	buildOpenMeteoUrl,
 	findCity,
 	isFresh,
-	getCityWeather,
 	getForecast,
-	isValidForecast,
+	completeForecast,
+	withDailyFromHourly,
 	pickBestCity
 } = await import('$lib/server/weather');
 
@@ -226,12 +227,117 @@ describe('buildOpenMeteoUrl', () => {
 			])
 		);
 	});
+
+	it('не дорожчий за 1,5 виклику ліміту: 15 змінних, добові підсумки рахуємо самі', () => {
+		const hourly = url.searchParams.get('hourly')!.split(',');
+		const daily = url.searchParams.get('daily')!.split(',');
+
+		expect(hourly.length + daily.length).toBe(15);
+		expect(daily).not.toContain('precipitation_sum');
+		expect(daily).not.toContain('precipitation_probability_max');
+		expect(daily).not.toContain('weathercode');
+	});
 });
 
-describe('isValidForecast', () => {
-	it('приймає повний прогноз і старий кеш', () => {
-		expect(isValidForecast(makeForecast())).toBe(true);
-		expect(isValidForecast(makeForecast({ legacy: true }))).toBe(true);
+describe('withDailyFromHourly — добові підсумки з погодинних даних', () => {
+	// Відповідь Open-Meteo без трьох добових полів, як її тепер повертає запит
+	const response = (overrides: Parameters<typeof makeForecast>[0] = {}) => {
+		const forecast = makeForecast({ days: 2, ...overrides });
+		const daily: Record<string, unknown> = { ...forecast.daily };
+		delete daily.precipitation_sum;
+		delete daily.precipitation_probability_max;
+		delete daily.weathercode;
+		return { hourly: forecast.hourly, daily };
+	};
+	const derive = (data: unknown) => withDailyFromHourly(data) as ReturnType<typeof makeForecast>;
+
+	it('сума опадів, найбільша ймовірність і найсильніший код — як в Open-Meteo', () => {
+		const data = response({
+			hour: (day, hr) =>
+				day === 0 && hr >= 14 && hr <= 16
+					? { code: hr === 15 ? 63 : 61, precip: hr === 15 ? 2.1 : 0.05, precipProb: 70 + hr }
+					: { code: 2, precip: 0, precipProb: 10 }
+		});
+		const { daily } = derive(data);
+
+		// 0,05 + 2,1 + 0,05 — без хвоста 2,2000000000000006
+		expect(daily.precipitation_sum).toEqual([2.2, 0]);
+		expect(daily.precipitation_probability_max).toEqual([86, 10]);
+		expect(daily.weathercode).toEqual([63, 2]);
+	});
+
+	it('день із порожньою годиною — null: completeForecast обріже його, а не покаже неправду', () => {
+		const data = response() as unknown as { hourly: Record<string, unknown[]> };
+		data.hourly.precipitation[30] = null;
+		const { daily } = derive(data);
+
+		expect(daily.precipitation_sum).toEqual([0, null]);
+		expect(completeForecast(derive(data))!.daily.time).toHaveLength(1);
+	});
+
+	it('без погодинної ймовірності добової теж немає', () => {
+		const data = response({ legacy: true });
+		expect(derive(data).daily.precipitation_probability_max).toBeUndefined();
+	});
+
+	it('зламана відповідь проходить як є — її відхилить completeForecast', () => {
+		expect(withDailyFromHourly(null)).toBeNull();
+		expect(withDailyFromHourly({ error: true })).toEqual({ error: true });
+	});
+});
+
+describe('completeForecast', () => {
+	it('повний прогноз і старий кеш повертає без змін', () => {
+		const full = makeForecast();
+		expect(completeForecast(full)).toBe(full);
+		const legacy = makeForecast({ legacy: true });
+		expect(completeForecast(legacy)).toBe(legacy);
+	});
+
+	it('порожнє значення наприкінці — прогноз обрізається до останнього повного дня', () => {
+		const data = makeForecast({ days: 10 }) as unknown as {
+			hourly: Record<string, unknown[]>;
+			daily: Record<string, unknown[]>;
+		};
+		// Температура обірвалась о 05:00 дев'ятого дня
+		data.hourly.temperature_2m[8 * 24 + 5] = null;
+		const result = completeForecast(data)!;
+
+		expect(result.daily.time).toHaveLength(8);
+		expect(result.hourly.time).toHaveLength(8 * 24);
+		// Обрізані всі масиви, разом із необовʼязковими
+		expect(result.hourly.precipitation_probability).toHaveLength(8 * 24);
+		expect(result.daily.sunrise).toHaveLength(8);
+		expect(result.hourly.temperature_2m.every(Number.isFinite)).toBe(true);
+	});
+
+	it('день без погодинних даних відкидається', () => {
+		const data = makeForecast({ days: 3 });
+		data.daily.time.push('2099-01-01');
+		data.daily.temperature_2m_max.push(10);
+		data.daily.temperature_2m_min.push(5);
+		data.daily.precipitation_sum.push(0);
+		data.daily.weathercode.push(0);
+
+		expect(completeForecast(data)!.daily.time).toHaveLength(3);
+	});
+
+	it('порожня ймовірність опадів прогноз не обрізає — поле необовʼязкове', () => {
+		const data = makeForecast({ days: 2 }) as unknown as {
+			hourly: Record<string, unknown[]>;
+		};
+		data.hourly.precipitation_probability[30] = null;
+		expect(completeForecast(data)!.hourly.time).toHaveLength(48);
+	});
+
+	it('масиви різної довжини або дані зламані з першої години — null', () => {
+		const short = makeForecast({ days: 2 });
+		short.hourly.pressure_msl.pop();
+		expect(completeForecast(short)).toBeNull();
+
+		const broken = makeForecast({ days: 2 }) as unknown as { hourly: Record<string, unknown[]> };
+		broken.hourly.weathercode[0] = null;
+		expect(completeForecast(broken)).toBeNull();
 	});
 
 	it.each([
@@ -240,7 +346,7 @@ describe('isValidForecast', () => {
 		['без hourly', { daily: makeForecast().daily }],
 		['порожній прогноз', makeForecast({ days: 0 })]
 	])('відхиляє %s', (_, data) => {
-		expect(isValidForecast(data)).toBe(false);
+		expect(completeForecast(data)).toBeNull();
 	});
 });
 
@@ -257,14 +363,20 @@ describe('getForecast', () => {
 	};
 	const cacheOf = (ageMs: number, weather = makeForecast()) =>
 		JSON.stringify({ weather, fetchedAt: Date.now() - ageMs });
+	// Redis за ключами: прогноз Львова й, за потреби, пауза після 429
+	const useRedis = (forecast: string | null, paused = false) =>
+		redis.get.mockImplementation(async (key: string) =>
+			key === 'v5:lviv' ? forecast : key === 'openmeteo:paused' && paused ? 'Daily limit' : null
+		);
+	const weatherWrites = () => redis.set.mock.calls.filter(([key]) => key === 'v5:lviv');
 
 	it('свіжий кеш (до 2 годин) — без запиту до Open-Meteo', async () => {
-		redis.get.mockResolvedValue(cacheOf(30 * 60 * 1000));
+		useRedis(cacheOf(30 * 60 * 1000));
 
 		const data = await getForecast(LVIV);
 
 		expect(data).toMatchObject({ misto: 'Львів', oblast: 'Львівська область', path: 'lviv' });
-		expect(redis.get).toHaveBeenCalledWith('v4:lviv');
+		expect(redis.get).toHaveBeenCalledWith('v5:lviv');
 		expect(fetchMock).not.toHaveBeenCalled();
 	});
 
@@ -276,14 +388,23 @@ describe('getForecast', () => {
 
 		expect(data.weather).toEqual(forecast);
 		const [key, value, ttl] = redis.set.mock.calls[0];
-		expect(key).toBe('v4:lviv');
-		expect(JSON.parse(value).fetchedAt).toBeGreaterThan(Date.now() - 5000);
-		expect(ttl).toBe(24 * 60 * 60);
+		expect(key).toBe('v5:lviv');
+		// Запис стиснутий — розпаковуємо, як це робить сайт
+		const entry = unpack(value) as { fetchedAt: number; city: unknown };
+		expect(entry.fetchedAt).toBeGreaterThan(Date.now() - 5000);
+		// Назва населеного пункту — у Redis разом із погодою
+		expect(entry.city).toEqual({
+			nameUa: 'Львів',
+			region: 'Львівська область',
+			path: 'lviv'
+		});
+		// Дві доби: запас на добу вичерпаного ліміту Open-Meteo
+		expect(ttl).toBe(48 * 60 * 60);
 		expect(fetchMock.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
 	});
 
 	it('застарілий кеш оновлюється', async () => {
-		redis.get.mockResolvedValue(cacheOf(3 * 60 * 60 * 1000));
+		useRedis(cacheOf(3 * 60 * 60 * 1000));
 		fetchMock.mockResolvedValue(new Response(JSON.stringify(makeForecast())));
 
 		await getForecast(LVIV);
@@ -294,47 +415,64 @@ describe('getForecast', () => {
 
 	it('Open-Meteo недоступний — показує застарілий кеш замість помилки', async () => {
 		const old = makeForecast({ start: '2026-01-01' });
-		redis.get.mockResolvedValue(cacheOf(10 * 60 * 60 * 1000, old));
+		useRedis(cacheOf(10 * 60 * 60 * 1000, old));
 		fetchMock.mockResolvedValue(new Response('Too many requests', { status: 429 }));
 
 		const data = await getForecast(LVIV);
 
 		expect(data.weather.daily.time[0]).toBe('2026-01-01');
-		expect(redis.set).not.toHaveBeenCalled();
+		expect(weatherWrites()).toHaveLength(0);
+	});
+
+	it('429 «добовий ліміт» — пауза в Redis до півночі за UTC', async () => {
+		fetchMock.mockResolvedValue(
+			new Response(
+				JSON.stringify({
+					error: true,
+					reason: 'Daily API request limit exceeded. Please try again tomorrow.'
+				}),
+				{ status: 429 }
+			)
+		);
+
+		await expectHttpError(getForecast(LVIV), 503);
+		const [key, , seconds] = redis.set.mock.calls.find(([k]) => k === 'openmeteo:paused')!;
+		expect(key).toBe('openmeteo:paused');
+		expect(seconds).toBeGreaterThan(0);
+		expect(seconds).toBeLessThanOrEqual(24 * 60 * 60);
+	});
+
+	it('пауза: застарілий кеш віддається без марного запиту до Open-Meteo', async () => {
+		useRedis(cacheOf(5 * 60 * 60 * 1000), true);
+
+		await expect(getForecast(LVIV)).resolves.toMatchObject({ misto: 'Львів' });
+		expect(fetchMock).not.toHaveBeenCalled();
+	});
+
+	it('пауза і кешу немає — одразу 503, без запиту до Open-Meteo', async () => {
+		useRedis(null, true);
+
+		await expectHttpError(getForecast(LVIV), 503);
+		expect(fetchMock).not.toHaveBeenCalled();
 	});
 
 	it('пошкоджений кеш ігнорує і бере свіжі дані', async () => {
-		redis.get.mockResolvedValue('{not json');
+		useRedis('{not json');
 		fetchMock.mockResolvedValue(new Response(JSON.stringify(makeForecast())));
 
 		await expect(getForecast(LVIV)).resolves.toMatchObject({ misto: 'Львів' });
 	});
 
-	it('без кешу й без Open-Meteo — 502, а не 500', async () => {
+	it('без кешу й без Open-Meteo — 503 «тимчасово», а не 500', async () => {
 		fetchMock.mockRejectedValue(new DOMException('The operation timed out', 'TimeoutError'));
-		await expectHttpError(getForecast(LVIV), 502);
+		await expectHttpError(getForecast(LVIV), 503);
 	});
 
-	it('неповна відповідь Open-Meteo — 502 і не потрапляє в кеш', async () => {
+	it('неповна відповідь Open-Meteo — 503 і не потрапляє в кеш', async () => {
 		fetchMock.mockResolvedValue(new Response(JSON.stringify({ error: true, reason: 'boom' })));
 
-		await expectHttpError(getForecast(LVIV), 502);
+		await expectHttpError(getForecast(LVIV), 503);
 		expect(redis.set).not.toHaveBeenCalled();
-	});
-});
-
-describe('getCityWeather', () => {
-	it('знаходить місто і віддає його прогноз', async () => {
-		database(LVIV_DUPLICATES);
-		fetchMock.mockResolvedValue(new Response(JSON.stringify(makeForecast())));
-
-		await expect(getCityWeather('Lviv')).resolves.toMatchObject({ misto: 'Львів', path: 'lviv' });
-	});
-
-	it('невідоме місто — 404 без запиту до Open-Meteo', async () => {
-		database([]);
-		await expectHttpError(getCityWeather('Атлантида'), 404);
-		expect(fetchMock).not.toHaveBeenCalled();
 	});
 });
 
